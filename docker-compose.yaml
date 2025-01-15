@@ -1,0 +1,41 @@
+services:
+  main-service:
+    container_name: main-service
+    image: ml-demonstration-main-service
+    build:
+      context: main-service
+      dockerfile: Dockerfile
+    environment:
+      DB_NAME: db
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+    restart: on-failure
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    networks:
+      - ml-demonstration-net
+
+  db:
+    image: postgres:16.3
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: db
+    restart: on-failure
+    volumes:
+      - app-data:/var/lib/postgresql/data
+    networks:
+        - ml-demonstration-net
+
+
+volumes:
+  app-data:
+
+networks:
+  ml-demonstration-net:
+    name: ml-demonstration-net
+
