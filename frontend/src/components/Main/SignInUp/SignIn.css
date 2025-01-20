@@ -1,0 +1,48 @@
+.sign-in-up{
+    flex-grow: 1;
+    height: 780px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+}
+.sign-in-up__container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    background-color: #D3D8E8;
+    padding: 15px;
+    border-radius: 15px;
+}
+.sign-in-up__container input, button{
+    width: 280px;
+    margin: 8px;
+    border-radius: 0.6rem;
+}
+.sign-in-up__button{
+    border-radius: 1rem;
+    background-color:#49C5BA;
+
+    cursor:pointer;
+    color:#ffffff;
+    font-size: 16px;
+
+    padding:7px 64px;
+
+    border: unset;
+}
+.sign-in-up__button:hover {
+    box-shadow: 0 0 0 1px rgb(253, 253, 253);
+}
+.sign-in-up__button:active {
+    position:relative;
+    top:1px;
+}
+
+#password{
+    font-size: 14px;
+    color: #006AFF;
+    cursor: pointer;
+}
