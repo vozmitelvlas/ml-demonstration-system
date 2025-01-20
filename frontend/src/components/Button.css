@@ -1,0 +1,25 @@
+.search_button{
+    display: flex;
+    align-items: center;
+    justify-content:center;
+    margin: 10px;
+
+    height: 45px;
+    width: 150px;
+    background-color: #F1F2F5;
+    color: #000000;
+    border-radius: 15px;
+    border-color: #8a8a8a50;
+
+    box-shadow: 2px 2px 5px 0 rgba(34, 60, 80, 0.2);
+
+    cursor: pointer;
+}
+.search_button:hover {
+    box-shadow: 0 0 0 1px rgb(253, 253, 253);
+}
+
+.search_button:active {
+    position:relative;
+    top: 2px;
+}

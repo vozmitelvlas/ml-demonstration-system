@@ -1,0 +1,20 @@
+.catalog-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 30px 50px 0 50px;
+}
+h1{
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 32px;
+}
+.catalog-header__inputs {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+.catalog-header__date input {
+
+
+}

@@ -1,0 +1,15 @@
+select {
+    height: calc(1.7rem + 2px);
+    width: calc(20rem + 2px);
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #D9D9D9;
+    border-radius: 0.4rem;
+
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: #212529;
+    opacity: 0.6;
+
+    cursor: pointer;
+}
