@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="1" author="Andrey Malykh">
+        <createTable tableName="limits">
+            <column name="limit_id" type="bigint" autoIncrement="true" generationType="by default">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="rps_limit" type="integer"/>
+            <column name="requests_per_week_limit" type="integer"/>
+        </createTable>
+
+        <createTable tableName="models">
+            <column name="model_id" type="bigint" autoIncrement="true" generationType="by default">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="limit_id" type="bigint">
+                <constraints nullable="false" unique="true"
+                             foreignKeyName="models_limit_id_fkey"
+                             references="limits(limit_id)"
+                />
+            </column>
+            <column name="other_data" type="jsonb"/>
+            <column name="updated_at" type="timestamp" defaultValueComputed="current_timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp" defaultValueComputed="current_timestamp">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="model_versions">
+            <column name="model_version_id" type="bigint" autoIncrement="true" generationType="by default">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="model_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="model_versions_model_id_fkey"
+                             references="models(model_id)"
+                             deleteCascade="true"
+                />
+            </column>
+            <column name="version_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="uri" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="text"/>
+            <column name="updated_at" type="timestamp" defaultValueComputed="current_timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp" defaultValueComputed="current_timestamp">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="model_info">
+            <column name="model_id" type="bigint">
+                <constraints primaryKey="true"
+                             foreignKeyName="model_info_model_id"
+                             references="models(model_id)"
+                             deleteCascade="true"
+                />
+            </column>
+            <column name="runtime" type="varchar(255)"/>
+            <column name="problem_type" type="varchar(255)"/>
+        </createTable>
+
+        <createTable tableName="organizations">
+            <column name="organization_id" type="bigint" autoIncrement="true" generationType="by default">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="description" type="text"/>
+            <column name="updated_at" type="timestamp" defaultValueComputed="current_timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp" defaultValueComputed="current_timestamp">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="models_organizations_limits">
+            <column name="organization_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="model_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="limit_id" type="bigint">
+                <constraints nullable="false" unique="true"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="models_organizations_limits"
+                                 baseColumnNames="organization_id"
+                                 constraintName="models_organizations_limits_organization_id_fkey"
+                                 referencedTableName="organizations"
+                                 referencedColumnNames="organization_id"
+                                 deleteCascade="true"
+        />
+        <addForeignKeyConstraint baseTableName="models_organizations_limits"
+                                 baseColumnNames="model_id"
+                                 constraintName="models_organizations_limits_model_id_fkey"
+                                 referencedTableName="models"
+                                 referencedColumnNames="model_id"
+                                 deleteCascade="true"
+        />
+        <addForeignKeyConstraint baseTableName="models_organizations_limits"
+                                 baseColumnNames="limit_id"
+                                 constraintName="models_organizations_limits_limit_id_fkey"
+                                 referencedTableName="limits"
+                                 referencedColumnNames="limit_id"
+        />
+        <addUniqueConstraint tableName="models_organizations_limits" columnNames="model_id, organization_id"/>
+
+        <createTable tableName="users">
+            <column name="user_id" type="bigint" autoIncrement="true" generationType="by default">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="login" type="varchar(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="password" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="varchar(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="first_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="organization_id" type="bigint">
+                <constraints nullable="false"
+                             foreignKeyName="users_organization_id_fkey"
+                             references="organizations(organization_id)"
+                />
+            </column>
+            <column name="patronymic" type="varchar(255)"/>
+            <column name="description" type="text"/>
+            <column name="other_data" type="jsonb"/>
+            <column name="updated_at" type="timestamp" defaultValueComputed="current_timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp" defaultValueComputed="current_timestamp">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="roles">
+            <column name="role_id" type="bigint" autoIncrement="true" generationType="by default">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="users_roles">
+            <column name="user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="users_roles"
+                                 baseColumnNames="user_id"
+                                 constraintName="users_roles_user_id_fkey"
+                                 referencedTableName="users"
+                                 referencedColumnNames="user_id"
+                                 deleteCascade="true"
+        />
+        <addForeignKeyConstraint baseTableName="users_roles"
+                                 baseColumnNames="role_id"
+                                 constraintName="users_roles_role_id_fkey"
+                                 referencedTableName="roles"
+                                 referencedColumnNames="role_id"
+        />
+        <addUniqueConstraint tableName="users_roles" columnNames="user_id, role_id"/>
+
+        <createTable tableName="models_users_limits">
+            <column name="user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="model_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="limit_id" type="bigint">
+                <constraints nullable="false" unique="true"/>
+            </column>
+        </createTable>
+
+
+        <addForeignKeyConstraint baseTableName="models_users_limits"
+                                 baseColumnNames="user_id"
+                                 constraintName="models_users_limits_user_id_fkey"
+                                 referencedTableName="users"
+                                 referencedColumnNames="user_id"
+                                 deleteCascade="true"
+        />
+        <addForeignKeyConstraint baseTableName="models_users_limits"
+                                 baseColumnNames="model_id"
+                                 constraintName="models_users_limits_model_id_fkey"
+                                 referencedTableName="models"
+                                 referencedColumnNames="model_id"
+                                 deleteCascade="true"
+        />
+        <addForeignKeyConstraint baseTableName="models_users_limits"
+                                 baseColumnNames="limit_id"
+                                 constraintName="models_users_limits_limit_id_fkey"
+                                 referencedTableName="limits"
+                                 referencedColumnNames="limit_id"
+        />
+        <addUniqueConstraint tableName="models_users_limits" columnNames="model_id, user_id"/>
+
+    </changeSet>
+</databaseChangeLog>
