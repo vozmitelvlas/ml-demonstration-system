@@ -1,11 +1,13 @@
-package ru.etu.mldemonstrationapp.mainservice.entity;
+package ru.etu.mldemonstrationapp.mainservice.users;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import ru.etu.mldemonstrationapp.mainservice.organizations.Organization;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -24,6 +26,10 @@ public class User implements Serializable {
     @Column(nullable = false, unique = true)
     private String login;
 
+    @JsonIgnore
+    @Column(nullable = false)
+    private String password;
+
     @Column(nullable = false, unique = true)
     private String email;
 
@@ -39,7 +45,7 @@ public class User implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "organization_id", nullable = false)
-    Organization organization;
+    private Organization organization;
 
     @ManyToMany
     @JoinTable(
@@ -47,13 +53,13 @@ public class User implements Serializable {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    List<Role> roles;
+    private List<Role> roles;
 
     @UpdateTimestamp
     @Column(nullable = false)
-    Instant updatedAt;
+    private Instant updatedAt;
 
     @CreationTimestamp
     @Column(nullable = false)
-    Instant createdAt;
+    private Instant createdAt;
 }

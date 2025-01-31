@@ -1,4 +1,4 @@
-package ru.etu.mldemonstrationapp.mainservice.entity;
+package ru.etu.mldemonstrationapp.mainservice.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;

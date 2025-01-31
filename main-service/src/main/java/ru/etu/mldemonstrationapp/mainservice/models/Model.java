@@ -1,4 +1,4 @@
-package ru.etu.mldemonstrationapp.mainservice.entity;
+package ru.etu.mldemonstrationapp.mainservice.models;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -26,7 +26,7 @@ public class Model implements Serializable {
 
     @OneToOne
     @JoinColumn(name = "model_id")
-    ModelInfo modelInfo;
+    private ModelInfo modelInfo;
 
     @OneToMany
     @JoinColumn(name = "model_id")
@@ -34,7 +34,7 @@ public class Model implements Serializable {
 
     @OneToOne
     @JoinColumn(name = "limit_id")
-    Limit limit;
+    private Limit limit;
 
     @UpdateTimestamp
     @Column(nullable = false)
