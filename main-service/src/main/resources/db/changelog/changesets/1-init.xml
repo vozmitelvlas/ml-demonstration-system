@@ -21,7 +21,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="limit_id" type="bigint">
-                <constraints nullable="false" unique="true"
+                <constraints unique="true"
                              foreignKeyName="models_limit_id_fkey"
                              references="limits(limit_id)"
                 />

@@ -9,6 +9,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -24,13 +25,13 @@ public class Model implements Serializable {
     @Column(nullable = false)
     private String name;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "model_id")
     private ModelInfo modelInfo;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "model_id")
-    private List<ModelVersion> modelVersions;
+    private List<ModelVersion> modelVersions = new ArrayList<>();
 
     @OneToOne
     @JoinColumn(name = "limit_id")

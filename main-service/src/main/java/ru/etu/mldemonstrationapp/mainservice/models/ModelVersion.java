@@ -1,14 +1,15 @@
 package ru.etu.mldemonstrationapp.mainservice.models;
 
-    import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.*;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-    import java.io.Serializable;
-    import java.time.Instant;
+import java.io.Serializable;
+import java.time.Instant;
 
 @Entity
 @Data
@@ -27,6 +28,11 @@ public class ModelVersion implements Serializable {
 
     @Column(nullable = false)
     private String uri;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "model_id")
+    @JsonIgnore
+    private Model model;
 
     @UpdateTimestamp
     @Column(nullable = false)
