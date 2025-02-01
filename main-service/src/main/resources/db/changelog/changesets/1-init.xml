@@ -6,7 +6,7 @@
 
     <changeSet id="1" author="Andrey Malykh">
         <createTable tableName="limits">
-            <column name="limit_id" type="bigint" autoIncrement="true" generationType="by default">
+            <column name="limit_id" type="bigint" autoIncrement="true" generationType="by default" startWith="1001">
                 <constraints primaryKey="true"/>
             </column>
             <column name="rps_limit" type="integer"/>
@@ -14,7 +14,7 @@
         </createTable>
 
         <createTable tableName="models">
-            <column name="model_id" type="bigint" autoIncrement="true" generationType="by default">
+            <column name="model_id" type="bigint" autoIncrement="true" generationType="by default" startWith="1001">
                 <constraints primaryKey="true"/>
             </column>
             <column name="name" type="varchar(255)">
@@ -36,7 +36,7 @@
         </createTable>
 
         <createTable tableName="model_versions">
-            <column name="model_version_id" type="bigint" autoIncrement="true" generationType="by default">
+            <column name="model_version_id" type="bigint" autoIncrement="true" generationType="by default" startWith="1001">
                 <constraints primaryKey="true"/>
             </column>
             <column name="model_id" type="bigint">
@@ -73,7 +73,7 @@
         </createTable>
 
         <createTable tableName="organizations">
-            <column name="organization_id" type="bigint" autoIncrement="true" generationType="by default">
+            <column name="organization_id" type="bigint" autoIncrement="true" generationType="by default" startWith="1001">
                 <constraints primaryKey="true"/>
             </column>
             <column name="name" type="varchar(255)">
@@ -123,7 +123,7 @@
         <addUniqueConstraint tableName="models_organizations_limits" columnNames="model_id, organization_id"/>
 
         <createTable tableName="users">
-            <column name="user_id" type="bigint" autoIncrement="true" generationType="by default">
+            <column name="user_id" type="bigint" autoIncrement="true" generationType="by default" startWith="1001">
                 <constraints primaryKey="true"/>
             </column>
             <column name="login" type="varchar(255)">
@@ -159,7 +159,7 @@
         </createTable>
 
         <createTable tableName="roles">
-            <column name="role_id" type="bigint" autoIncrement="true" generationType="by default">
+            <column name="role_id" type="bigint" autoIncrement="true" generationType="by default" startWith="1001">
                 <constraints primaryKey="true"/>
             </column>
             <column name="name" type="varchar(255)">
