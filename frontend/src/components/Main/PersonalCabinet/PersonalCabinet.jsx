@@ -66,32 +66,32 @@ function PersonalCabinet() {
                     <div className="edit-modal__title">
                         <h3>Редактирование данных</h3>
                     </div>
-                    <table className="edit-modal__table">
+                    <table className="change-container__table tableHover naked-input ">
                         <tbody>
                         <tr>
                             <td>Логин</td>
-                            <td><Input>ivanov_ivan</Input></td>
+                            <td className="text-center"><Input>ivanov_ivan</Input></td>
                         </tr>
                         <tr>
                             <td>Фамилия</td>
-                            <td><Input>Ivanov</Input></td>
+                            <td className="text-center"><Input>Ivanov</Input></td>
                         </tr>
                         <tr>
                             <td>Имя</td>
-                            <td><Input>Ivan</Input></td>
+                            <td className="text-center"><Input>Ivan</Input></td>
                         </tr>
                         <tr>
                             <td>Отчество</td>
-                            <td><Input>Jovanovich</Input></td>
+                            <td className="text-center"><Input>Jovanovich</Input></td>
                         </tr>
                         <tr>
                             <td>E-mail</td>
-                            <td><Input>ivan@mail.ru</Input></td>
+                            <td className="text-center"><Input>ivan@mail.ru</Input></td>
                         </tr>
 
                         <tr>
                             <td>Описание</td>
-                            <td><textarea id={"description"} rows="12" cols="50" defaultValue={"ADASAlasdair"}></textarea></td>
+                            <td className="text-center"><textarea id={"description"} rows="12" cols="50" defaultValue={"ADASAlasdair"}></textarea></td>
                         </tr>
                         </tbody>
                     </table>

@@ -9,7 +9,9 @@ const Input = ({
                    type,
                    classNames,
                    placeholder,
-                   disabled = false
+                   disabled = false,
+                   onMouseOver,
+                   onMouseOut
                }) => {
     let classes = ["text-field__input "].concat(classNames || []).join(" ");
     return (
@@ -22,6 +24,8 @@ const Input = ({
             className={classes}
             placeholder={placeholder}
             disabled={disabled}
+            onMouseOver={onMouseOver}
+            onMouseOut={onMouseOut}
         />
     );
 }

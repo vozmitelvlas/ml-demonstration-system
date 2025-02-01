@@ -14,7 +14,7 @@ function CatalogHeader({title, searchFields}) {
                     <Input key={ind} placeholder={holder}></Input>
                 ))}
                 <div className="catalog-header__date">
-                    <p className="text-class">Дата создания</p>
+                    <p className="text-class">Дата добавления</p>
                     <Input type="date"></Input>
                     <span className="text-class">-</span>
                     <Input type="date"></Input>

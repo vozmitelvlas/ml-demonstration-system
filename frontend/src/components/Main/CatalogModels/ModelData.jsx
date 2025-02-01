@@ -9,7 +9,6 @@ function ModelData(){
     let { modelId } = useParams()
     let navigate = useNavigate()
     let modelData = ["ID", "Название", "Статус", "RunTime", "Тип задачи", "URL модели", "Образ модели"]
-
     return(
         <div className="change-container">
             <div>
@@ -22,7 +21,7 @@ function ModelData(){
                         {modelData.map((title, index) => (
                             <tr key={index}>
                                 <td>{title}</td>
-                                <td><Input classNames={"text-center"} disabled={true}>something</Input></td>
+                                <td className="text-center"><Input classNames={"text-center"} disabled={true}>something</Input></td>
                             </tr>
                         ))}
                         <tr>

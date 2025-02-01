@@ -21,7 +21,6 @@ function SignUp(){
                 <Input placeholder="E-mail"></Input>
                 <Input type="password" placeholder="Пароль"></Input>
                 <Input type="password" placeholder="Повторите пароль"></Input>
-
                 <button className="sign-in-up__button" onClick={handleEnterClick}>Зарегистрироваться</button>
                 <p>Если есть аккант, <span id="password" onClick={() => navigate("/")}>войдите</span></p>
             </div>

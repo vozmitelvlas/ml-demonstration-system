@@ -14,6 +14,7 @@ import {useState} from "react";
 import ModelData from "./components/Main/CatalogModels/ModelData.jsx";
 import SignUp from "./components/Main/SignInUp/SignUp.jsx";
 import PasswordRecover from "./components/Main/SignInUp/PasswordRecover.jsx";
+import Filter from "./components/Main/Filter/Filter.jsx";
 
 
 function ProtectedRoute({ isAuthenticated }) {
@@ -33,7 +34,7 @@ function App() {
         <div className="header-main">
             {
                 !excludedPaths.includes(location.pathname) &&
-                <Header login={userLogin} isAdmin={true} isAdminMode={isAdminMode} setIsAdminMode={setIsAdminMode} />
+                <Header login={userLogin} isAdmin={true} isAdminMode={isAdminMode} setIsAdminMode={setIsAdminMode}/>
             }
             <div className="main-content">
                 <Routes>
