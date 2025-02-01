@@ -31,16 +31,21 @@
     text-align: left;
 
     border: 2px solid #ffffff;
-    border-radius: 5px;
+    border-radius: 15px;
     background-color: #ffffff;
     transition: 0.3s ease-in;
 }
 
 .edit-modal {
-    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    flex-direction: column;
+
+    border-radius: 15px;
     position: relative;
     top: 0;
-    width: 40%;
+    width: 50%;
     height: fit-content;
     padding: 0px 15px;
     text-align: left;

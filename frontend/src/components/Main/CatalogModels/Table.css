@@ -70,7 +70,7 @@ div.table-title {
 
 .table-fill tr {
     border-top: 1px solid #C1C3D1;
-    border-bottom-: 1px solid #C1C3D1;
+    border-bottom: 1px solid #C1C3D1;
     color: #666B85;
     font-family: 'Inter', sans-serif;
     font-size: 16px;
@@ -79,7 +79,7 @@ div.table-title {
 }
 
 .table-fill tr:hover td {
-    background: #4E5066;
+    background: #49C5BA;
     color: #FFFFFF;
     border-top: 1px solid #22262e;
 }
@@ -97,7 +97,7 @@ div.table-title {
 }
 
 .table-fill tr:nth-child(odd):hover td {
-    background: #4E5066;
+    background: #49C5BA;
 }
 
 .table-fill tr:last-child td:first-child {

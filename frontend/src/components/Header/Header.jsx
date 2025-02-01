@@ -21,7 +21,6 @@ function Header({login, isAdminMode, setIsAdminMode, isAdmin}) {
         }
     };
 
-
     return (
         <header>
             <div className="left-header" onClick={() => navigate("/user")}>

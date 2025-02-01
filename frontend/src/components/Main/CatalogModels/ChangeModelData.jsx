@@ -7,28 +7,48 @@ import {useNavigate, useParams} from "react-router-dom";
 
 function ChangeModelData(qualifiedName) {
     let navigate = useNavigate()
-    let { modelId } = useParams()
+    let {modelId} = useParams()
 
-    let modelData = ["ID", "Название", "Статус", "RunTime", "Тип задачи", "URL модели", "Образ модели"]
+    let modelData = ["ID", "Название", "Версия", "Статус", "RunTime", "Тип задачи", "URL модели", "Образ модели"]
 
+    let createTooltip = (text) => {
+        let span = document.createElement("span")
+        span.className = "tooltip"
+        span.textContent = text
+        return span
+    }
+    let showToolTip = (event) => {
+        let info = event.target.closest(".change-container__info")
+        info.prepend(createTooltip("Названия других версий данной модели также изменятся"))
+    }
+    let closeTooltip = (event) => {
+
+        let tooltip = document.querySelector(".tooltip")
+        if (tooltip) {
+            tooltip.remove()
+        }
+
+    }
     return (
         <div className="change-container">
             <div>
                 <DataHeader firstButton="ИНФОРМАЦИЯ" secondButton="ОГРАНИЧЕНИЯ">Изменение данных модели</DataHeader>
 
                 <div className="change-container__info">
-                    <table className="change-container__table">
 
+                    <table className="change-container__table tableHover">
                         <tbody className="naked-input">
                         {modelData.map((title, index) => (
                             <tr key={index}>
                                 <td>{title}</td>
-                                <td><Input classNames={"text-center"}>something</Input></td>
+                                <td className="text-center"><Input onMouseOver={showToolTip}
+                                                                   onMouseOut={closeTooltip}>something</Input></td>
                             </tr>
                         ))}
                         <tr>
                             <td>Описание</td>
-                            <td><textarea id={"description"} rows="8" cols="47" defaultValue={"ADASAlasdair"}></textarea></td>
+                            <td><textarea id={"description"} rows="6" cols="47"
+                                          defaultValue={"ADASAlasdair"}></textarea></td>
                         </tr>
                         </tbody>
                     </table>
@@ -47,11 +67,11 @@ function ChangeModelData(qualifiedName) {
                     </div>
 
                     <h2>Лимиты по умолчанию</h2>
-                    <table className="change-container__table">
-                        <tbody className="naked-input">
+                    <table className="change-container__table tableHover naked-input">
+                        <tbody>
                         <tr>
                             <td>Лимит RPS</td>
-                            <td><Input classNames={"text-center"}>50</Input></td>
+                            <td><Input>50</Input></td>
                         </tr>
                         <tr>
                             <td>Лимит запрсов/нед</td>
@@ -63,9 +83,10 @@ function ChangeModelData(qualifiedName) {
                 </div>
             </div>
 
-
             <div className="delete-modal__buttons">
-                <Button onClick={() => {navigate("/models")}}>Назад</Button>
+                <Button onClick={() => {
+                    navigate("/models")
+                }}>Назад</Button>
                 <Button>Сохранить</Button>
             </div>
         </div>
