@@ -1,5 +1,6 @@
-package ru.etu.mldemonstrationapp.mainservice.entity;
+package ru.etu.mldemonstrationapp.mainservice.models;
 
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,20 +15,28 @@ import java.time.Instant;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "organizations")
-public class Organization implements Serializable {
+@Table(name = "model_versions")
+public class ModelVersion implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long organizationId;
+    private Long modelVersionId;
 
-    @Column(nullable = false, unique = true)
-    private String name;
+    @Column(nullable = false)
+    private String versionName;
 
     private String description;
 
+    @Column(nullable = false)
+    private String uri;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "model_id")
+    @JsonIgnore
+    private Model model;
+
     @UpdateTimestamp
     @Column(nullable = false)
-    Instant updatedAt;
+    private Instant updatedAt;
 
     @CreationTimestamp
     @Column(nullable = false)

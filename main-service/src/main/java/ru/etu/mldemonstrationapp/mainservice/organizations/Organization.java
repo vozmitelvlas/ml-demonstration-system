@@ -1,31 +1,29 @@
-package ru.etu.mldemonstrationapp.mainservice.entity;
+package ru.etu.mldemonstrationapp.mainservice.organizations;
 
-    import jakarta.persistence.*;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.io.Serializable;
 import java.time.Instant;
 
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "model_versions")
-public class ModelVersion {
+@Table(name = "organizations")
+public class Organization implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long modelVersionId;
+    private Long organizationId;
 
-    @Column(nullable = false)
-    private String versionName;
+    @Column(nullable = false, unique = true)
+    private String name;
 
     private String description;
-
-    @Column(nullable = false)
-    private String uri;
 
     @UpdateTimestamp
     @Column(nullable = false)
