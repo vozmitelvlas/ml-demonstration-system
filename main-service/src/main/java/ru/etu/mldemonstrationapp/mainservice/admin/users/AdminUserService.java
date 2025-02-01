@@ -32,15 +32,19 @@ public class AdminUserService {
 
     @Transactional
     public User createUser(CreateUserRequest dto) {
-        Organization organization = organizationRepository.findById(dto.organizationId())
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.CONFLICT,
-                        "Organization with id %s does not exist".formatted(dto.organizationId()))
-                );
-        List<Role> roles = userRepository.findRolesByName(dto.roles());
-        if (roles.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Not found any valid roles for the user");
+        if (userRepository.existsByLogin(dto.login())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Login already in use");
         }
+
+        if (userRepository.existsByEmail(dto.email())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already in use");
+        }
+
+        Organization organization = organizationRepository.findById(dto.organizationId()).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "Organization with id %s does not exist".formatted(dto.organizationId())
+        ));
+
 
         return userRepository.save(new User(
                 null,
@@ -52,7 +56,7 @@ public class AdminUserService {
                 dto.patronymic(),
                 dto.description(),
                 organization,
-                roles,
+                findRolesOrThrowConflict(dto.roles()),
                 Instant.now(),
                 Instant.now()
         ));
@@ -67,17 +71,24 @@ public class AdminUserService {
         user.setPatronymic(dto.patronymic());
         user.setDescription(dto.description());
         if (dto.organizationId() != null) {
-            Organization organization = organizationRepository.findById(dto.organizationId()).orElseThrow(() -> new ResponseStatusException(
-                    HttpStatus.CONFLICT,
-                    "Organization with id %s does not exist".formatted(dto.organizationId()))
-            );
+            Organization organization = organizationRepository.findById(dto.organizationId())
+                    .orElseThrow(() -> new ResponseStatusException(
+                            HttpStatus.CONFLICT,
+                            "Organization with id %s does not exist".formatted(dto.organizationId()))
+                    );
             user.setOrganization(organization);
         }
-        if (!dto.roles().isEmpty()) {
-            List<Role> roles = userRepository.findRolesByName(dto.roles());
-            user.setRoles(roles);
-        }
+        user.setRoles(findRolesOrThrowConflict(dto.roles()));
+
         return userRepository.save(user);
+    }
+
+    private List<Role> findRolesOrThrowConflict(List<String> rolesNames) {
+        List<Role> roles = userRepository.findRolesByName(rolesNames);
+        if (roles.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Not found any valid roles for the user");
+        }
+        return roles;
     }
 
     @Transactional
