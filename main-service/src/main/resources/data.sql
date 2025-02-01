@@ -1,0 +1,33 @@
+INSERT INTO roles (role_id, name) VALUES (1, 'ADMIN'), (2, 'USER'), (3, 'ORGANIZATION_HEAD');
+
+INSERT INTO organizations (organization_id, name, description)
+VALUES (1, 'Отдел разработки', 'Организация для разработчиков моделей'),
+       (2, 'Отдел администрирования', 'Администраторы приложения'),
+       (3, 'Управленческий отдел', 'Организация для отдела управленцов');
+
+INSERT INTO users (user_id, login, password, first_name, last_name, email, organization_id)
+VALUES (1, 'admin', 'password', 'Админ', 'Админов', 'admin@example.com', 2),
+       (2, 'user', 'password', 'Иван', 'Иванов', 'user@example.com', 1),
+       (3, 'director', 'password', 'Сергей', 'Сергеев', 'director@example.com', 3);
+
+
+INSERT INTO users_roles (user_id, role_id) VALUES (1, 1), (1, 3), (2, 2), (3, 2), (3, 3);
+
+INSERT INTO limits (limit_id, requests_per_week_limit, rps_limit)
+VALUES (1, 100, 5), (2, 1000, 10), (3, 10, 1), (4, 20, 2), (5, 30, 5), (6, 100, 25), (7, 1000, 3), (8, 250, 3);
+
+
+INSERT INTO models (model_id, name, limit_id)
+VALUES (1, 'DenseNet', 1), (2, 'ALBERT', 2);
+
+INSERT INTO model_info (model_id, runtime, problem_type)
+VALUES (1, 'PyTorch', 'Классификация изображений'), (2, 'TensorFlow', 'Обработка естественного языка');
+
+INSERT INTO model_versions (model_version_id, model_id, version_name, uri, description)
+VALUES (1, 1, '121', 'http://localhost:4000/densenet/121', 'A DenseNet convolutional neural network. Version with 121 layers'),
+       (2, 1, '169', 'http://localhost:4001/densenet/169', 'A DenseNet convolutional neural network. Version with 169 layers'),
+       (3, 2, '#1', 'http://localhost:4002/ALBERT', 'The TF-NLP library provides a collection of scripts for training and evaluating transformer-based models, on various tasks such as sentence classification, question answering, and translation.');
+
+INSERT INTO models_users_limits (model_id, user_id, limit_id) VALUES (1, 2, 3), (1, 3, 4), (2, 3, 5);
+
+INSERT INTO models_organizations_limits (model_id, organization_id, limit_id) VALUES (1, 1, 6), (1, 3, 7), (2, 3, 8);
