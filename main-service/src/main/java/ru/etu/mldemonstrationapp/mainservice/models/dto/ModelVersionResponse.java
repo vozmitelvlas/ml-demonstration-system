@@ -8,7 +8,7 @@ import java.time.Instant;
 public record ModelVersionResponse(
         Long modelId,
         String modelName,
-        Long versionId,
+        Long modelVersionId,
         String versionName,
         String description,
         String uri,

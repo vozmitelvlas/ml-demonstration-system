@@ -29,7 +29,7 @@ public class ModelVersion implements Serializable {
     @Column(nullable = false)
     private String uri;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "model_id")
     @JsonIgnore
     private Model model;

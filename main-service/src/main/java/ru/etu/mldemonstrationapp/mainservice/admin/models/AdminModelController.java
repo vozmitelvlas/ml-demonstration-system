@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.etu.mldemonstrationapp.mainservice.admin.models.dto.CreateModelRequest;
 import ru.etu.mldemonstrationapp.mainservice.admin.models.dto.CreateModelVersionRequest;
+import ru.etu.mldemonstrationapp.mainservice.admin.models.dto.UpdateModelVersionRequest;
 import ru.etu.mldemonstrationapp.mainservice.models.Model;
 import ru.etu.mldemonstrationapp.mainservice.models.dto.ModelVersionResponse;
 
@@ -74,13 +75,28 @@ public class AdminModelController {
                         .replacePath("/api/admin/models/{modelId}/versions/{versionId}")
                         .build(Map.of(
                                 "modelId", modelVersion.modelId(),
-                                "versionId", modelVersion.versionId())
+                                "versionId", modelVersion.modelVersionId())
                         )
                 )
                 .body(modelVersion);
 
     }
 
+    @Operation(description = "Update model version")
+    @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
+    @PutMapping("/{modelId}/versions/{versionId}")
+    public ModelVersionResponse updateModel(@PathVariable Long modelId, @PathVariable Long versionId,
+                                            @RequestBody UpdateModelVersionRequest updateModelVersionRequest) {
+        return adminModelsService.updateModelVersion(versionId, updateModelVersionRequest);
+    }
+
+    @Operation(description = "Delete model version. If deleted version was last then delete model too")
+    @ApiResponse(responseCode = "204")
+    @DeleteMapping("/{modelId}/versions/{versionId}")
+    public ResponseEntity<Void> deleteModelVersion(@PathVariable Long modelId, @PathVariable Long versionId) {
+        adminModelsService.deleteModelVersion(versionId);
+        return ResponseEntity.noContent().build();
+    }
 }
 
 

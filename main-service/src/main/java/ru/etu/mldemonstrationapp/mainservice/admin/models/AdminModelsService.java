@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import ru.etu.mldemonstrationapp.mainservice.admin.models.dto.CreateModelRequest;
 import ru.etu.mldemonstrationapp.mainservice.admin.models.dto.CreateModelVersionRequest;
+import ru.etu.mldemonstrationapp.mainservice.admin.models.dto.UpdateModelVersionRequest;
 import ru.etu.mldemonstrationapp.mainservice.models.*;
 import ru.etu.mldemonstrationapp.mainservice.models.dto.ModelVersionResponse;
 
@@ -65,6 +66,9 @@ public class AdminModelsService {
     @Transactional
     public ModelVersionResponse createModelVersion(Long modelId, CreateModelVersionRequest dto) {
         Model model = modelRepository.findById(modelId).orElseThrow();
+        if (modelVersionRepository.versionNameUnique(model.getModelId(), dto.versionName())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Version name already in use");
+        }
         ModelVersion modelVersion = modelVersionRepository.save(new ModelVersion(
                 null,
                 dto.versionName(),
@@ -88,4 +92,50 @@ public class AdminModelsService {
         );
     }
 
+    @Transactional
+    public ModelVersionResponse updateModelVersion(Long versionId, UpdateModelVersionRequest dto) {
+        ModelVersion modelVersion = modelVersionRepository.findById(versionId).orElseThrow();
+        Model model = modelVersion.getModel();
+
+        boolean isModelNameChanged = !dto.modelName().equals(model.getName());
+        if (isModelNameChanged && modelRepository.existsByName(dto.modelName())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Model name already in use");
+        }
+
+        boolean isVersionNameChanged = !dto.versionName().equals(modelVersion.getVersionName());
+        if (isVersionNameChanged && modelVersionRepository.versionNameUnique(model.getModelId(), dto.versionName())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Version name already in use");
+        }
+
+        model.setName(dto.modelName());
+        model.getModelInfo().setRuntime(dto.runtime());
+        model.getModelInfo().setProblemType(dto.problemType());
+
+        modelVersion.setVersionName(dto.versionName());
+        modelVersion.setUri(dto.uri());
+        modelVersion.setDescription(dto.description());
+
+        modelRepository.save(model);
+
+        return new ModelVersionResponse(
+                model.getModelId(),
+                model.getName(),
+                modelVersion.getModelVersionId(),
+                modelVersion.getVersionName(),
+                modelVersion.getDescription(),
+                modelVersion.getUri(),
+                modelVersion.getModel().getModelInfo(),
+                modelVersion.getModel().getLimit(),
+                modelVersion.getUpdatedAt(),
+                modelVersion.getCreatedAt()
+        );
+    }
+
+    @Transactional
+    void deleteModelVersion(Long id) {
+        ModelVersion modelVersion = modelVersionRepository.findById(id).orElseThrow();
+        Long modelId = modelVersion.getModel().getModelId();
+        modelVersionRepository.delete(modelVersion);
+        modelRepository.deleteModelIfVersionsListEmpty(modelId);
+    }
 }
