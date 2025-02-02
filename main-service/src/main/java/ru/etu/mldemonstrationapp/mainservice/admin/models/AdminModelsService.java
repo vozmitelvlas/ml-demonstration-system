@@ -3,7 +3,9 @@ package ru.etu.mldemonstrationapp.mainservice.admin.models;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import ru.etu.mldemonstrationapp.mainservice.admin.models.dto.CreateModelRequest;
 import ru.etu.mldemonstrationapp.mainservice.admin.models.dto.CreateModelVersionRequest;
 import ru.etu.mldemonstrationapp.mainservice.models.*;
@@ -36,6 +38,9 @@ public class AdminModelsService {
 
     @Transactional
     public Model createModel(CreateModelRequest dto) {
+        if (modelRepository.existsByName(dto.name())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Model name already in use");
+        }
         Model model = new Model();
         model.setName(dto.name());
         model = modelRepository.save(model);
