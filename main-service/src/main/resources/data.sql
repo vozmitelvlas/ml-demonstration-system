@@ -3,7 +3,8 @@ INSERT INTO roles (role_id, name) VALUES (1, 'ADMIN'), (2, 'USER'), (3, 'ORGANIZ
 INSERT INTO organizations (organization_id, name, description)
 VALUES (1, 'Отдел разработки', 'Организация для разработчиков моделей'),
        (2, 'Отдел администрирования', 'Администраторы приложения'),
-       (3, 'Управленческий отдел', 'Организация для отдела управленцов');
+       (3, 'Управленческий отдел', 'Организация для отдела управленцов'),
+       (4, 'Пользовательский отдел', 'Работа с пользователями');
 
 INSERT INTO users (user_id, login, password, first_name, last_name, email, organization_id)
 VALUES (1, 'admin', 'password', 'Админ', 'Админов', 'admin@example.com', 2),

@@ -6,9 +6,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
+import ru.etu.mldemonstrationapp.mainservice.organizations.Organization;
+import ru.etu.mldemonstrationapp.mainservice.organizations.OrganizationRepository;
 import ru.etu.mldemonstrationapp.mainservice.users.dto.CreateUserRequest;
 import ru.etu.mldemonstrationapp.mainservice.users.dto.UpdateUserRequest;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -16,6 +20,7 @@ import java.util.List;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final OrganizationRepository organizationRepository;
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
@@ -32,6 +37,17 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Login or email already exists");
         }
 
+        List<Role> userRoles = userRepository.findRolesByName(Collections.singletonList("USER"));
+        if (userRoles.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Default role USER not found");
+        }
+
+        Organization organization = organizationRepository.findById(4L)
+        .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "Organization with id 4 does not exist"
+        ));
+
         User user = new User();
         user.setLogin(request.login());
         user.setPassword(passwordEncoder.encode(request.password()));
@@ -40,8 +56,8 @@ public class UserService {
         user.setLastName(request.lastName());
         user.setPatronymic(request.patronymic());
         user.setDescription(request.description());
-        user.setOrganization(request.organization());
-        user.setRoles(userRepository.findRolesByName(request.roles()));
+        user.setRoles(userRoles);
+        user.setOrganization(organization);
 
         return userRepository.save(user);
     }
@@ -53,7 +69,6 @@ public class UserService {
         user.setLastName(request.lastName());
         user.setPatronymic(request.patronymic());
         user.setDescription(request.description());
-        user.setRoles(userRepository.findRolesByName(request.roles()));
 
         return userRepository.save(user);
     }

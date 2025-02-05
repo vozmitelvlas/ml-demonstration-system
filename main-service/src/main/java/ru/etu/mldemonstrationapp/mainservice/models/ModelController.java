@@ -1,10 +1,12 @@
 package ru.etu.mldemonstrationapp.mainservice.models;
 
 import lombok.RequiredArgsConstructor;
+import ru.etu.mldemonstrationapp.mainservice.models.dto.ModelVersionResponse;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.etu.mldemonstrationapp.mainservice.models.dto.CreateModelRequest;
-import ru.etu.mldemonstrationapp.mainservice.models.dto.UpdateModelRequest;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -24,19 +26,13 @@ public class ModelController {
         return ResponseEntity.ok(modelService.getModelById(id));
     }
 
-    @PostMapping
-    public ResponseEntity<Model> createModel(@RequestBody CreateModelRequest request) {
-        return ResponseEntity.ok(modelService.createModel(request));
+    @GetMapping("/versions/{id}")
+    public ResponseEntity<ModelVersionResponse> getModelVersionById(@PathVariable Long id) {
+        return ResponseEntity.ok(modelService.getModelVersionById(id));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Model> updateModel(@PathVariable Long id, @RequestBody UpdateModelRequest request) {
-        return ResponseEntity.ok(modelService.updateModel(id, request));
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteModel(@PathVariable Long id) {
-        modelService.deleteModel(id);
-        return ResponseEntity.noContent().build();
+    @GetMapping("/versions")
+    public ResponseEntity<List<ModelVersionResponse>> getAllModelVersions() {
+        return ResponseEntity.ok(modelService.getAllModelVersions());
     }
 }
