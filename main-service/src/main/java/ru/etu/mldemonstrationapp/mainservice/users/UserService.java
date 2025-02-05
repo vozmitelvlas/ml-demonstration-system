@@ -34,7 +34,7 @@ public class UserService {
     @Transactional
     public User createUser(CreateUserRequest request) {
         if (userRepository.existsByLogin(request.login()) || userRepository.existsByEmail(request.email())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Login or email already exists");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Login or email already exists");
         }
 
         List<Role> userRoles = userRepository.findRolesByName(Collections.singletonList("USER"));
