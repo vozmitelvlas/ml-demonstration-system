@@ -1,9 +1,12 @@
 package ru.etu.mldemonstrationapp.mainservice.models;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import ru.etu.mldemonstrationapp.mainservice.models.dto.ModelVersionResponse;
+import org.springframework.web.server.ResponseStatusException;
+import ru.etu.mldemonstrationapp.mainservice.models.dto.CreateModelRequest;
+import ru.etu.mldemonstrationapp.mainservice.models.dto.UpdateModelRequest;
 
 import java.util.List;
 
@@ -11,28 +14,37 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ModelService {
     private final ModelRepository modelRepository;
-    private final ModelVersionRepository modelVersionRepository;
-
-    public Model getModelById(Long id) {
-        return modelRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Модель не найдена"));
-    }
 
     public List<Model> getAllModels() {
         return modelRepository.findAll();
     }
 
+    public Model getModelById(Long id) {
+        return modelRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Model not found"));
+    }
+
     @Transactional
-    public Model createModel(Model model) {
+    public Model createModel(CreateModelRequest request) {
+        Model model = new Model();
+        model.setName(request.name());
+        model.setModelInfo(request.modelInfo());
+        model.setLimit(request.limit());
+        return modelRepository.save(model);
+    }
+
+    @Transactional
+    public Model updateModel(Long id, UpdateModelRequest request) {
+        Model model = getModelById(id);
+        model.setName(request.name());
+        model.setModelInfo(request.modelInfo());
+        model.setLimit(request.limit());
         return modelRepository.save(model);
     }
 
     @Transactional
     public void deleteModel(Long id) {
-        modelRepository.deleteModelIfVersionsListEmpty(id);
-    }
-
-    public List<ModelVersionResponse> getModelVersions(Long modelId) {
-        return modelVersionRepository.findModelVersions();
+        Model model = getModelById(id);
+        modelRepository.delete(model);
     }
 }
