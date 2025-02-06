@@ -5,9 +5,11 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
+import ru.etu.mldemonstrationapp.mainservice.config.CustomUserDetails;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
@@ -21,9 +23,12 @@ public class JwtService {
     @Value("${jwt.secret-key}")
     private String jwtSecret;
 
+    private SecretKey secretKey;
+
     private final Duration tokenTtl = Duration.ofMinutes(5);
 
-    private SecretKey secretKey;
+    public final static String AUTH_TOKEN_COOKIE_NAME = "__Host-access-token";
+
 
     public String generateToken(CustomUserDetails userDetails) {
         Instant issuedAt = Instant.now();
@@ -34,8 +39,8 @@ public class JwtService {
                 .subject(userDetails.getUsername())
                 .issuedAt(Date.from(issuedAt))
                 .expiration(Date.from(issuedAt.plus(tokenTtl)))
-                .claim("user_id", userDetails.getUser().getUserId())
-                .claim("email", userDetails.getUser().getEmail())
+                .claim("user_id", userDetails.user().getUserId())
+                .claim("email", userDetails.user().getEmail())
                 .claim("roles", userDetails
                         .getAuthorities()
                         .stream()
@@ -46,6 +51,27 @@ public class JwtService {
                 .compact();
     }
 
+    public ResponseCookie generateTokenCookie(CustomUserDetails userDetails) {
+        String token = generateToken(userDetails);
+        return ResponseCookie.from(AUTH_TOKEN_COOKIE_NAME, token)
+                .maxAge(tokenTtl)
+                .httpOnly(true)
+                .domain(null)
+                .path("/")
+                .secure(true)
+                .build();
+    }
+
+    public ResponseCookie getEmptyTokenCookie() {
+        return ResponseCookie.from(JwtService.AUTH_TOKEN_COOKIE_NAME, "")
+                .path("/")
+                .httpOnly(true)
+                .secure(true)
+                .domain(null)
+                .maxAge(0)
+                .build();
+    }
+
     public Claims parseToken(String token) {
         try {
             return Jwts.parser().verifyWith(getSecretKey()).build().parseSignedClaims(token).getPayload();
@@ -54,10 +80,9 @@ public class JwtService {
         }
     }
 
-
     private SecretKey getSecretKey() {
         if (secretKey == null) {
-            return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+            secretKey = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
         }
         return secretKey;
     }
