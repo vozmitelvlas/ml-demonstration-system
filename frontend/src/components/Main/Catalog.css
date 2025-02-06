@@ -21,8 +21,6 @@ main{
 .options-buttons_right-down{
     display: flex;
     justify-content: flex-end;
-
-
 }
 .options-buttons{
     display: flex;
@@ -40,8 +38,20 @@ main{
     justify-content: center;
     align-items: center;
 }
+.filter-button{
+    height: 35px;
+    width: 120px;
+}
+
 #modelName{
     color: #006AFF;
     cursor: pointer;
 }
+
+.multi-select{
+    text-align: left;
+    color: #49C5BA;
+    width: 300px;
+}
+
 

@@ -1,0 +1,7 @@
+.users{
+    height: 600px;
+    overflow: auto;
+}
+.users td{
+    padding-right: 120px;
+}

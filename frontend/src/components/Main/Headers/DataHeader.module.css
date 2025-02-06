@@ -1,0 +1,28 @@
+
+.header{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+.buttons{
+    display: flex;
+    margin-top: 10px;
+}
+.buttons button{
+    width: 150px;
+    padding: 0;
+    border: none;
+    background: #ffffff;
+    cursor: pointer;
+}
+
+hr{
+    border: none;
+    height: 1px;
+}
+.newColor {
+    color: #49C5BA;
+    background: #49c5ba;
+}

@@ -1,47 +1,38 @@
 import CatalogHeader from "../Headers/CatalogHeader.jsx";
-import Button from "../../Button.jsx";
+import Button from "../Button/Button.jsx";
 import deleteLogo from "../../../assets/delete.svg";
 import editLogo from "../../../assets/edit.svg"
-import "../Catalog.css"
-import "../CatalogModels/Table.css"
-import {useNavigate} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import React, {useState} from "react";
 import Filter from "../Filter/Filter.jsx";
-import Input from "../../Input.jsx";
+import Input from "../Input/Input.jsx";
+import DeleteModal from "../../utils/DeleteModal.jsx";
 
-function CatalogUsers() {
+export default function CatalogUsers() {
     let navigate = useNavigate()
+    let [isDeletingModel, setIsDeletingModel] = useState(false)
+    let [isOpen, setIsOpen] = useState(false);
 
-    let modelsCatalog = (event) => {
-        navigate("/models")
+    let closeDeleteModal = () => {
+        setIsDeletingModel(false)
     }
-    let usersGroups = () => {
-        navigate("/users/organisations")
+    let onDeleteUserClick = (event) => {
+        let tr = event.target.closest("tr")
+        setIsDeletingModel(true)
     }
-    let clickOnTbody = (event) => {
-        let deleteRef = event.target.closest('[name="deleteLogo"]')
-        let editRef = event.target.closest('[name="editLogo"]')
-        if (editRef) {
-            navigate("/users/edit")
-        } else if (deleteRef) {
-
-        }
-    }
-    const [isOpen, setIsOpen] = useState(false);
-    const toggleSidebar = () => {
+    let toggleSidebar = () => {
         setIsOpen(!isOpen);
     };
 
-    let closeModal = (event) => {
-        let editModal = event.target.closest(".edit-modal-overlay")
-        editModal.classList.add("edit-modal-overlay_hidden")
+    let closeAddModal = (event) => {
+        let editModal = event.target.closest(".add-modal-overlay")
+        editModal.classList.add("add-modal-overlay_hidden")
     }
-    const addUser = () => {
-        let editModal = document.querySelector(".edit-modal-overlay")
-        editModal.classList.remove("edit-modal-overlay_hidden")
+    let openAddModal = () => {
+        let editModal = document.querySelector(".add-modal-overlay")
+        editModal.classList.remove("add-modal-overlay_hidden")
 
     };
-
 
     return (
         <>
@@ -49,7 +40,7 @@ function CatalogUsers() {
                 <Filter
                     setIsOpen={setIsOpen}
                     selects={{
-                        "Группа": {
+                        "Организация": {
                             options: ["Пользователи", "Администраторы"],
                             names: ["users", "admins"]
                         },
@@ -65,7 +56,7 @@ function CatalogUsers() {
                 <CatalogHeader title={"Каталог пользователей"} searchFields={["Почта", "Фамилия"]}></CatalogHeader>
 
                 <div className="options-buttons_up">
-                    <Button onClick={addUser}>Добавить пользователя</Button>
+                    <Button onClick={openAddModal}>Добавить пользователя</Button>
                 </div>
 
                 <div className="catalog-users">
@@ -86,7 +77,7 @@ function CatalogUsers() {
                                 <strong>Почта</strong>
                             </th>
                             <th className="text-center">
-                                <strong>Группа</strong>
+                                <strong>Организация</strong>
                             </th>
                             <th className="text-center">
                                 <strong>Дата регистрации</strong>
@@ -95,7 +86,7 @@ function CatalogUsers() {
                             <th></th>
                         </tr>
                         </thead>
-                        <tbody onClick={clickOnTbody}>
+                        <tbody>
                         <tr>
                             <td className="text-center">
                                 <input type="checkbox"/>
@@ -107,27 +98,10 @@ function CatalogUsers() {
                             <td className="text-center">Пользователи</td>
                             <td className="text-center">13.01.25</td>
                             <td className="text-center">
-                                <a><img name="editLogo" className="a-img" src={editLogo}></img></a>
+                                <Link className="a-img" to={`/users/${1}/edit`}><img src={editLogo}></img></Link>
                             </td>
                             <td className="text-center">
-                                <a name="deleteLogo" className="a-img"><img src={deleteLogo}></img></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td className="text-center">
-                                <input type="checkbox"/>
-                            </td>
-                            <td className="text-center">Ivanov</td>
-                            <td className="text-center">Ivan</td>
-                            <td className="text-center">ivanov_ivan</td>
-                            <td className="text-center">ivanovIvan@mail.ru</td>
-                            <td className="text-center">Пользователи</td>
-                            <td className="text-center">13.01.25</td>
-                            <td className="text-center">
-                                <a><img name="editLogo" className="a-img" src={editLogo}></img></a>
-                            </td>
-                            <td className="text-center">
-                                <a name="deleteLogo" className="a-img"><img src={deleteLogo}></img></a>
+                                <a  className="a-img" onClick={onDeleteUserClick}><img src={deleteLogo}></img></a>
                             </td>
                         </tr>
                         </tbody>
@@ -135,18 +109,18 @@ function CatalogUsers() {
                 </div>
 
                 <div className="options-buttons">
-                    <Button classNames={"filter-button"} onClick={toggleSidebar}>Фильтр</Button>
+                    <Button classNames="filter-button" onClick={toggleSidebar}>Фильтр</Button>
                     <div className="options-buttons_right-down">
                         <Button>Мониторинг</Button>
-                        <Button onClick={usersGroups}>Организации</Button>
-                        <Button onClick={modelsCatalog}>Модели</Button>
+                        <Button onClick={() => {navigate("/users/organisations")}}>Организации</Button>
+                        <Button onClick={() => {navigate("/models")}}>Модели</Button>
                     </div>
                 </div>
             </main>
 
-            <div className="edit-modal-overlay edit-modal-overlay_hidden">
-                <div className="edit-modal">
-                    <div className="edit-modal__title">
+            <div className="add-modal-overlay add-modal-overlay_hidden">
+                <div className="add-user-modal">
+                    <div className="add-modal__title">
                         <h3>Добавление пользователя</h3>
                     </div>
                     <table className="change-container__table tableHover ">
@@ -182,15 +156,14 @@ function CatalogUsers() {
                         </tr>
                         </tbody>
                     </table>
-                    <div className="edit-modal__buttons">
-                        <Button onClick={closeModal}>Отмена</Button>
+                    <div className="add-user__buttons">
+                        <Button onClick={closeAddModal}>Отмена</Button>
                         <Button>Сохранить</Button>
                     </div>
                 </div>
             </div>
+            <DeleteModal open={isDeletingModel} onNo={closeDeleteModal}></DeleteModal>
         </>
 
     )
 }
-
-export default CatalogUsers

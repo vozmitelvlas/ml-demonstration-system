@@ -1,5 +1,5 @@
 import React from 'react';
-import "./Input.css"
+import styles from "./Input.module.css"
 
 const Input = ({
                    id,
@@ -13,7 +13,7 @@ const Input = ({
                    onMouseOver,
                    onMouseOut
                }) => {
-    let classes = ["text-field__input "].concat(classNames || []).join(" ");
+    let classes = [styles.input].concat(classNames || []).join(" ");
     return (
         <input
             id={id}
