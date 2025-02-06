@@ -12,6 +12,7 @@ import ru.etu.mldemonstrationapp.mainservice.models.dto.CreateModelRequest;
 import ru.etu.mldemonstrationapp.mainservice.models.dto.ModelVersionResponse;
 import ru.etu.mldemonstrationapp.mainservice.models.dto.UpdateModelRequest;
 
+import jakarta.validation.Valid;
 import java.util.List;
 
 @Service
@@ -30,7 +31,7 @@ public class ModelService {
     }
 
     @Transactional
-    public Model createModel(CreateModelRequest request) {
+    public Model createModel(@Valid CreateModelRequest request) {
         Model model = new Model();
         model.setName(request.name());
         model.setModelInfo(request.modelInfo());
@@ -39,7 +40,7 @@ public class ModelService {
     }
 
     @Transactional
-    public Model updateModel(Long id, UpdateModelRequest request) {
+    public Model updateModel(Long id, @Valid UpdateModelRequest request) {
         Model model = getModelById(id);
         model.setName(request.name());
         model.setModelInfo(request.modelInfo());
@@ -62,3 +63,4 @@ public class ModelService {
         return modelVersionRepository.findModelVersions();
     }
 }
+
