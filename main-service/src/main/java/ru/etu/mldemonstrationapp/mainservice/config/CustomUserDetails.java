@@ -1,6 +1,5 @@
-package ru.etu.mldemonstrationapp.mainservice.auth;
+package ru.etu.mldemonstrationapp.mainservice.config;
 
-import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -8,13 +7,7 @@ import ru.etu.mldemonstrationapp.mainservice.users.User;
 
 import java.util.Collection;
 
-@Getter
-public class CustomUserDetails implements UserDetails {
-    private final User user;
-
-    CustomUserDetails(User user) {
-        this.user = user;
-    }
+public record CustomUserDetails(User user) implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
