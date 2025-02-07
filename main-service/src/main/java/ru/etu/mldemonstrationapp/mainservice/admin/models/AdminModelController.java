@@ -2,6 +2,7 @@ package ru.etu.mldemonstrationapp.mainservice.admin.models;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -52,7 +53,7 @@ public class AdminModelController {
     @Operation(description = "Register new model")
     @ApiResponse(useReturnTypeSchema = true, responseCode = "201")
     @PostMapping
-    public ResponseEntity<Model> registerModel(@RequestBody CreateModelRequest createModelRequest,
+    public ResponseEntity<Model> registerModel(@Valid @RequestBody CreateModelRequest createModelRequest,
                                                UriComponentsBuilder uriComponentsBuilder) {
         Model model = adminModelsService.createModel(createModelRequest);
         return ResponseEntity
@@ -67,7 +68,7 @@ public class AdminModelController {
     @ApiResponse(useReturnTypeSchema = true, responseCode = "201")
     @PostMapping("/{id}/versions")
     public ResponseEntity<ModelVersionResponse> createModelVersion(@PathVariable Long id,
-                                                                   @RequestBody CreateModelVersionRequest createModelVersionRequest,
+                                                                   @Valid @RequestBody CreateModelVersionRequest createModelVersionRequest,
                                                                    UriComponentsBuilder uriComponentsBuilder) {
         ModelVersionResponse modelVersion = adminModelsService.createModelVersion(id, createModelVersionRequest);
         return ResponseEntity
@@ -86,7 +87,7 @@ public class AdminModelController {
     @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
     @PutMapping("/{modelId}/versions/{versionId}")
     public ModelVersionResponse updateModel(@PathVariable Long modelId, @PathVariable Long versionId,
-                                            @RequestBody UpdateModelVersionRequest updateModelVersionRequest) {
+                                            @Valid @RequestBody UpdateModelVersionRequest updateModelVersionRequest) {
         return adminModelsService.updateModelVersion(versionId, updateModelVersionRequest);
     }
 

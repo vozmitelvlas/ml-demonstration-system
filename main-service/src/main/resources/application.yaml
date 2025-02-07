@@ -27,6 +27,9 @@ spring:
     change-log: classpath:/db/changelog/db.changelog-master.xml
     drop-first: true
 
+jwt:
+  secret-key: ${JWT_SECRET:example-of-secret-not-for-production-use}
+
 springdoc:
   api-docs:
     path: /v3/api-docs

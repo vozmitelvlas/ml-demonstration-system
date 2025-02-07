@@ -1,13 +1,15 @@
 package ru.etu.mldemonstrationapp.mainservice.exception;
 
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.nio.file.AccessDeniedException;
+import javax.naming.AuthenticationException;
 import java.util.NoSuchElementException;
 
 @RestControllerAdvice
@@ -27,10 +29,28 @@ public class GlobalExceptionHandler {
                 .body(ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, exception.getMessage()));
     }
 
-    @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ProblemDetail> handleAccessDenied(AccessDeniedException exception) {
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ProblemDetail> handleAuthenticationException(AuthenticationException exception) {
         return ResponseEntity
-                .status(HttpStatus.FORBIDDEN)
-                .body(ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, exception.getMessage()));
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, exception.getMessage()));
     }
+
+    @ExceptionHandler(BindException.class)
+    public ResponseEntity<ProblemDetail> handleBindException(BindException exception) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST,
+                "Request could not be processed due to incorrect format"
+        );
+        problemDetail.setProperty("errors", exception.getAllErrors().stream()
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .toList()
+        );
+
+        return ResponseEntity
+                .badRequest()
+                .body(problemDetail);
+    }
+
+
 }

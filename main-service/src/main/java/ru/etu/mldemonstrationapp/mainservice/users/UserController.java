@@ -4,7 +4,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.etu.mldemonstrationapp.mainservice.users.dto.CreateUserRequest;
 import ru.etu.mldemonstrationapp.mainservice.users.dto.UpdateUserRequest;
 
 import java.util.List;
@@ -23,11 +22,6 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getUserById(id));
-    }
-
-    @PostMapping
-    public ResponseEntity<User> createUser(@Valid @RequestBody CreateUserRequest request) {
-        return ResponseEntity.ok(userService.createUser(request));
     }
 
     @PutMapping("/{id}")

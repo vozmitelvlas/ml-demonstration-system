@@ -48,7 +48,7 @@ public class User implements Serializable {
     @JoinColumn(name = "organization_id", nullable = false)
     private Organization organization;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id"),
