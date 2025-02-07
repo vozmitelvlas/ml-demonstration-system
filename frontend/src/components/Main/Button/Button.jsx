@@ -1,9 +1,9 @@
 import React from 'react';
-import "./Button.css"
+import styles from "./Button.module.css"
 
 
 const Button = ({ children, onClick, type, classNames }) => {
-    let classes = ["search_button", "text-class"].concat(classNames || []).join(" ");
+    let classes = [styles.button].concat(classNames || []).join(" ");
     return (
         <button
             onClick={onClick}

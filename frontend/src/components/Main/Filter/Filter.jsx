@@ -1,10 +1,10 @@
-import "./Filter.css"
+import styles from "./Filter.module.css"
 import {useEffect, useMemo, useState} from "react";
 import arrowLogo from "../../../assets/arrow-down.svg"
-import Button from "../../Button.jsx";
+import Button from "../Button/Button.jsx";
 import closeLogo from "../../../assets/delete.svg";
 
-const Filter = ({setIsOpen, selects = {}, sorts = {}}) => {
+export default function Filter({setIsOpen, selects = {}, sorts = {}}) {
 
     const [isVisible, setIsVisible] = useState({});
     const [filterValues, setFilterValues] = useState(useMemo(() => {
@@ -25,7 +25,7 @@ const Filter = ({setIsOpen, selects = {}, sorts = {}}) => {
         newIsVisible[name] = !newIsVisible[name];
         setIsVisible(newIsVisible);
         const svgIcon = event.target.matches('img') ? event.target : event.target.querySelector('img');
-        svgIcon.classList.toggle('rotated');
+        svgIcon.classList.toggle(styles.rotated);
 
     };
     const handleRadioChange = (name) => {
@@ -46,27 +46,27 @@ const Filter = ({setIsOpen, selects = {}, sorts = {}}) => {
     }
 
     return (
-        <div className="filter">
-            <div className="filter-header">
-                <div className="head">
+        <div className={styles.filter}>
+            <div className={styles.header}>
+                <div className={styles.title}>
                     <h2>Фильтры </h2>
                     <a className="a-img"><img src={closeLogo} alt={"close"} onClick={() => setIsOpen(false)}/></a>
                 </div>
-                <hr className="line"/>
+                <hr className={styles.line}/>
             </div>
 
-            <div className="filter-container">
+            <div className={styles.container}>
                 <div>
                     {Object.entries(selects).map(([name, { options, names }]) => (
-                        <div key={name} className="item">
+                        <div key={name} className={styles.item}>
                             <button className="text-class" onClick={() => handleClick(name, event)}>
                                 {name}
                                 <img src={arrowLogo} alt={"ArrowLogo"}/>
                             </button>
                             {isVisible[name] && (
-                                <div className={`block ${isVisible[name] ? 'visible' : ''}`}>
+                                <div className={`${styles.block} ${isVisible[name] ? styles.visible : ''}`}>
                                     {options.map((option, i) => (
-                                        <div key={`${name}-${i}`} className="option">
+                                        <div key={`${name}-${i}`} className={styles.option}>
                                             <input
                                                 type="checkbox"
                                                 name={names[i]}
@@ -82,15 +82,15 @@ const Filter = ({setIsOpen, selects = {}, sorts = {}}) => {
                     ))}
 
                     {Object.entries(sorts)?.map(([name, { options, names }]) => (
-                        <div key={name} className="item">
+                        <div key={name} className={styles.item}>
                             <button className="text-class" onClick={() => handleClick(name, event)}>
                                 {name}
                                 <img src={arrowLogo} alt={"ArrowLogo"} />
                             </button>
                             {isVisible[name] && (
-                                <div className={`block ${isVisible[name] ? 'visible' : ''}`}>
+                                <div className={`${styles.block} ${isVisible[name] ? styles.visible : ''}`}>
                                     {options.map((option, i) => (
-                                        <div key={`${name}-${i}`} className="option">
+                                        <div key={`${name}-${i}`} className={styles.option}>
                                             <input
                                                 type="radio"
                                                 name={"radio"}
@@ -108,14 +108,12 @@ const Filter = ({setIsOpen, selects = {}, sorts = {}}) => {
                 </div>
 
 
-                <div className="filter__buttons">
-                    <Button classNames="filter-button">Сбросить</Button>
-                    <Button classNames="filter-button">Применить</Button>
+                <div className={styles.buttons}>
+                    <Button>Сбросить</Button>
+                    <Button>Применить</Button>
                 </div>
             </div>
 
         </div>
     );
 };
-
-export default Filter;

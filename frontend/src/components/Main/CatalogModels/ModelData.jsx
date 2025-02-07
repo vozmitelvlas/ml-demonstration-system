@@ -1,60 +1,70 @@
 import DataHeader from "../Headers/DataHeader.jsx";
-import Input from "../../Input.jsx";
-import Button from "../../Button.jsx";
-import React from "react";
+import Input from "../Input/Input.jsx";
+import Button from "../Button/Button.jsx";
+import React, {useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
+import styles from "./ModelData.module.css"
 
 
-function ModelData(){
-    let { modelId } = useParams()
+export default function ModelData() {
+    let {modelId} = useParams()
     let navigate = useNavigate()
-    let modelData = ["ID", "Название", "Статус", "RunTime", "Тип задачи", "URL модели", "Образ модели"]
-    return(
+    const [activeBut, setActiveBut] = useState("first");
+    let modelData = ["ID", "Название", "Версия", "Статус", "RunTime", "Тип задачи", "URL модели", "Образ модели"]
+
+    return (
         <div className="change-container">
             <div>
-                <DataHeader firstButton="ИНФОРМАЦИЯ" secondButton="ВИЗУАЛИЗАЦИЯ">Модель Graph-based segmentation model</DataHeader>
+                <DataHeader activeBut={activeBut}
+                            setActiveBut={setActiveBut}
+                            firstButton="ИНФОРМАЦИЯ"
+                            secondButton="ВИЗУАЛИЗАЦИЯ">
+                    Модель Graph-based segmentation model
+                </DataHeader>
 
-                <div className="change-container__info">
-                    <table className="change-container__table">
-
-                        <tbody className="naked-input">
-                        {modelData.map((title, index) => (
-                            <tr key={index}>
-                                <td>{title}</td>
-                                <td className="text-center"><Input classNames={"text-center"} disabled={true}>something</Input></td>
+                {activeBut === "first" && (
+                    <div>
+                        <table className="change-container__table naked-input">
+                            <tbody>
+                            {modelData.map((title, index) => (
+                                <tr key={index}>
+                                    <td>{title}</td>
+                                    <td className="text-center"><Input classNames={"text-center"}
+                                                                       disabled={true}>something</Input></td>
+                                </tr>
+                            ))}
+                            <tr>
+                                <td>Описание</td>
+                                <td><textarea id={"description"} rows="8" cols="47" defaultValue={"ADASAlasdair"}
+                                              disabled></textarea></td>
                             </tr>
-                        ))}
-                        <tr>
-                            <td>Описание</td>
-                            <td><textarea id={"description"} rows="8" cols="47" defaultValue={"ADASAlasdair"} disabled></textarea></td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div className="change-container__second" hidden>
-                    <div className="to-center">
-                        <div className="upload">
-                            <div className="upload-container">
-                                <i className="fa fa-cloud-upload"></i>
-                                <h3>Загрузите данные для модели</h3>
-                                <p>Поддерживаемые форматы: PNG, JPEG, BMP</p>
-                                <input type="file" id="file"/>
-                            </div>
-                        </div>
-
-                        <button className="sign-in-up__button">Отправить</button>
+                            </tbody>
+                        </table>
                     </div>
+                )}
+                {activeBut === "second" && (
+                    <div>
+                        <div className="to-center">
+                            <div className={styles.upload}>
+                                <div className={styles.uploadContainer}>
+                                    <i className="fa fa-cloud-upload"></i>
+                                    <h3>Загрузите данные для модели</h3>
+                                    <p>Поддерживаемые форматы: PNG, JPEG, BMP</p>
+                                    <input type="file" id="file"/>
+                                </div>
+                            </div>
 
-                </div>
+                            <button className={styles.sendButton}>Отправить</button>
+                        </div>
+                    </div>
+                )}
             </div>
 
-
-            <div className="delete-modal__buttons">
-                <Button onClick={() => {navigate("/models")}}>Назад</Button>
+            <div>
+                <Button onClick={() => {
+                    navigate("/models")
+                }}>Назад</Button>
             </div>
         </div>
     )
 }
-
-export default ModelData

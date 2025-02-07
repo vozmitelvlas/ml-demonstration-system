@@ -4,23 +4,27 @@ header {
     align-items: center;
     background: #F1F2F5;
 }
+header a:hover{
+    background: #d0d0d5;
+}
 
-.right_header {
+.right {
     display: flex;
     align-items: center;
     margin-left: auto;
 
     font-family: 'Inter', sans-serif;
 }
-.left-header{
+.left{
     display: flex;
     align-items: center;
     padding-right: 15px;
     cursor: pointer;
 }
-.left-header:hover{
+.left:hover{
     background: #d0d0d5;
 }
+
 
 img{
     margin: 5px;
@@ -39,7 +43,7 @@ h3{
     margin-left: 20px;
 }
 
-.dropdown-content {
+.content {
     display: none;
     position: absolute;
     background-color: #f1f1f1;
@@ -49,7 +53,7 @@ h3{
     top: 100%; /* Перемещает меню вверх */
     right: 0;   /* Выравнивание по правому краю */
 }
-.dropdown-content a {
+.content a {
     color: black;
     padding: 12px 16px;
     text-decoration: none;
@@ -60,20 +64,11 @@ a.disabled {
     cursor: default;
 }
 
-.dropdown-content a:hover {
+.content a:hover {
     background: #49C5BA;
     color: #FFFFFF;
 }
 
-.dropdown:hover .dropdown-content {
+.dropdown:hover .content {
     display: block;
-}
-
-.dropdown:hover {
-    background: #d0d0d5;
-}
-
-#exitLogo:hover{
-    background: #d0d0d5;
-    /*background: rgba(175, 175, 175, 0.48);*/
 }

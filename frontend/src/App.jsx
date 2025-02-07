@@ -14,7 +14,8 @@ import {useState} from "react";
 import ModelData from "./components/Main/CatalogModels/ModelData.jsx";
 import SignUp from "./components/Main/SignInUp/SignUp.jsx";
 import PasswordRecover from "./components/Main/SignInUp/PasswordRecover.jsx";
-import Filter from "./components/Main/Filter/Filter.jsx";
+import MyOrganisations from "./components/Main/MyOrganisations/MyOrganisations.jsx";
+import ChangeMyOrganisation from "./components/Main/MyOrganisations/ChangeMyOrganisation.jsx";
 
 
 function ProtectedRoute({ isAuthenticated }) {
@@ -34,7 +35,7 @@ function App() {
         <div className="header-main">
             {
                 !excludedPaths.includes(location.pathname) &&
-                <Header login={userLogin} isAdmin={true} isAdminMode={isAdminMode} setIsAdminMode={setIsAdminMode}/>
+                <Header login={userLogin} isMainOrg={true} isAdmin={true} isAdminMode={isAdminMode} setIsAdminMode={setIsAdminMode}/>
             }
             <div className="main-content">
                 <Routes>
@@ -49,10 +50,13 @@ function App() {
                     <Route path="/models/:modelId/data" element={<ModelData />} />
 
                     <Route path="/users" element={<CatalogUsers />} />
-                    <Route path="/users/edit" element={<ChangeUserData />} />
+                    <Route path="/users/:userId/edit" element={<ChangeUserData />} />
+
+                    <Route path="/user/organisations" element={<MyOrganisations />} />
+                    <Route path="/user/organisations/:orgId/edit" element={<ChangeMyOrganisation />} />
 
                     <Route path="/users/organisations" element={<CatalogOrganisations />} />
-                    <Route path="/users/organisations/edit" element={<ChangeOrganisations />} />
+                    <Route path="/users/organisations/:orgId/edit" element={<ChangeOrganisations />} />
                 </Routes>
             </div>
         </div>

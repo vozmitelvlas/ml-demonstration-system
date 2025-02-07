@@ -36,7 +36,7 @@
     transition: 0.3s ease-in;
 }
 
-.edit-modal {
+.edit-modal, .add-user-modal {
     display: flex;
     justify-content: center;
     align-content: center;
@@ -65,7 +65,7 @@
     font-weight: bold;
     color: #000000;
 }
-.delete-modal__buttons, .edit-modal__buttons {
+.delete-modal__buttons, .edit-modal__buttons, .add-user__buttons {
     display: flex;
     justify-content: space-evenly;
     gap: 100px;
@@ -89,15 +89,8 @@
     display: flex;
     flex-direction: column;
 }
-
-.personal-cabinet__table{
-    font-size: 24px;
-    text-align: left;
-}
-.personal-cabinet__table td {
-    padding-bottom: 15px;
-    padding-top: 15px;
-    width: 400px;
-    vertical-align: middle;
+.add-modal__inputs input{
+    width: calc(24rem + 2px);
+    box-shadow: 0 0 0 0 rgba(158, 158, 158, 0.25);
 }
 
