@@ -2,6 +2,7 @@ package ru.etu.mldemonstrationapp.mainservice.admin.organizations;
 
 import io.swagger.v3.oas.annotations.Operation;
  import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,7 +35,7 @@ public class AdminOrganizationController {
 
     @ApiResponse(useReturnTypeSchema = true, responseCode = "201")
     @PostMapping
-    public ResponseEntity<Organization> createOrganization(@RequestBody CreateOrganizationRequest dto,
+    public ResponseEntity<Organization> createOrganization(@Valid @RequestBody CreateOrganizationRequest dto,
                                                            UriComponentsBuilder uriComponentsBuilder) {
         Organization organization = organizationService.createOrganization(dto);
         return ResponseEntity
@@ -47,7 +48,7 @@ public class AdminOrganizationController {
 
     @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
     @PutMapping("/{id}")
-    public Organization updateOrganization(@RequestBody Long id, @RequestBody UpdateOrganizationRequest dto) {
+    public Organization updateOrganization(@PathVariable Long id, @Valid @RequestBody UpdateOrganizationRequest dto) {
         return organizationService.updateOrganization(id, dto);
     }
 

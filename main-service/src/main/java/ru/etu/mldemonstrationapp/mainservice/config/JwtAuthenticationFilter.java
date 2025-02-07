@@ -32,7 +32,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final UserDetailsService userDetailsService;
 
     private final static String AUTHORIZATION_PREFIX = "Bearer ";
-    private final static String authPrefix = "/api/auth";
+    private final static String AUTH_PREFIX = "/api/auth";
 
     @Override
     protected void doFilterInternal(
@@ -40,7 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-        if (request.getRequestURI().startsWith(authPrefix)) {
+        if (request.getRequestURI().startsWith(AUTH_PREFIX)) {
             filterChain.doFilter(request, response);
             return;
         }

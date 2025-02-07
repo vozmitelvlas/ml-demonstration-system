@@ -1,6 +1,7 @@
 package ru.etu.mldemonstrationapp.mainservice.auth;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -18,12 +19,12 @@ public class AuthController {
     private final JwtService jwtService;
 
     @PostMapping("/login")
-    ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
+    ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
         return authService.login(loginRequest);
     }
 
     @PostMapping("/register")
-    ResponseEntity<LoginResponse> register(@RequestBody CreateUserRequest createUserRequest) {
+    ResponseEntity<LoginResponse> register(@Valid @RequestBody CreateUserRequest createUserRequest) {
         return authService.register(createUserRequest);
     }
 

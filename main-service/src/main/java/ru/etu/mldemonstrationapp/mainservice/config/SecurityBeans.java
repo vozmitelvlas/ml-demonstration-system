@@ -10,7 +10,6 @@ import org.springframework.security.authentication.AuthenticationCredentialsNotF
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -30,7 +29,6 @@ import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
-@EnableWebSecurity(debug = true)
 public class SecurityBeans {
 
     @Bean
@@ -95,7 +93,7 @@ public class SecurityBeans {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
                 return;
             }
-            
+
             response.sendError(HttpServletResponse.SC_FORBIDDEN, authException.getMessage());
         };
     }
