@@ -3,12 +3,11 @@ package ru.etu.mldemonstrationapp.mainservice.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.nio.file.AccessDeniedException;
+import javax.naming.AuthenticationException;
 import java.util.NoSuchElementException;
 
 @RestControllerAdvice
@@ -28,10 +27,12 @@ public class GlobalExceptionHandler {
                 .body(ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, exception.getMessage()));
     }
 
-    @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ProblemDetail> handleAccessDenied(BadCredentialsException exception) {
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ProblemDetail> handleAuthenticationException(AuthenticationException exception) {
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
                 .body(ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, exception.getMessage()));
     }
+
+
 }

@@ -8,11 +8,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -25,9 +27,12 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+    private final AuthenticationEntryPoint authenticationEntryPoint;
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+
     private final static String AUTHORIZATION_PREFIX = "Bearer ";
+    private final static String authPrefix = "/api/auth";
 
     @Override
     protected void doFilterInternal(
@@ -35,7 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-        if (request.getRequestURI().startsWith("/api/auth")) {
+        if (request.getRequestURI().startsWith(authPrefix)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -44,7 +49,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         Cookie cookie = WebUtils.getCookie(request, JwtService.AUTH_TOKEN_COOKIE_NAME);
 
         if (cookie == null && (!StringUtils.hasLength(authHeader) || !authHeader.startsWith(AUTHORIZATION_PREFIX))) {
-            filterChain.doFilter(request, response);
+            this.authenticationEntryPoint.commence(request, response,
+                    new AuthenticationCredentialsNotFoundException("Authorization token not found"));
             return;
         }
 
