@@ -1,33 +1,56 @@
 import CatalogHeader from "../Headers/CatalogHeader.jsx";
-import Button from "../../Button.jsx";
+import Button from "../Button/Button.jsx";
 import deleteLogo from "../../../assets/delete.svg";
 import editLogo from "../../../assets/edit.svg"
-import {useNavigate} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import "../Catalog.css"
-import "../CatalogModels/Table.css"
-import {useState} from "react";
+import "../Table.css"
+import React, {useState} from "react";
 import Filter from "../Filter/Filter.jsx";
+import DeleteModal from "../../utils/DeleteModal.jsx";
+import Input from "../Input/Input.jsx";
+import Select from "react-select"
 
-function CatalogOrganisations() {
+const options = [
+    {value: 'O1', label: 'First'},
+    {value: 'O2', label: 'Second'}
+];
+
+export default function CatalogOrganisations() {
     let navigate = useNavigate()
-
-    let usersCatalog = (event) => {
-        navigate("/users")
-    }
-    let clickOnTbody = (event) => {
-        let deleteRef = event.target.closest('[name="deleteLogo"]')
-        let editRef = event.target.closest('[name="editLogo"]')
-
-        if (editRef) {
-            console.log("asd")
-            navigate("/users/organisations/edit")
-        } else if (deleteRef) {
-        }
-    }
     const [isOpen, setIsOpen] = useState(false);
+    let [isDeletingModel, setIsDeletingModel] = useState(false)
+    const [selectedValues, setSelectedValues] = useState([]);
+
     const toggleSidebar = () => {
         setIsOpen(!isOpen);
+    }
+    let onCloseDeleteModal = () => {
+        setIsDeletingModel(false)
+    }
+    let onDeleteOrgClick = (event) => {
+        let tr = event.target.closest("tr")
+        setIsDeletingModel(true)
+    }
+    let onCloseAddModal = (event) => {
+        event.preventDefault()
+        let addModal = event.target.closest(".add-modal-overlay")
+        addModal.classList.add("add-modal-overlay_hidden")
+    }
+    let onOpenAddModal = () => {
+        let addModal = document.querySelector(".add-modal-overlay")
+        addModal.classList.remove("add-modal-overlay_hidden")
+    }
+    let onAddNewCatalog = (event) => {
+        event.preventDefault()
+        console.log("asd")
+    }
+
+    const handleSelectChange = (newValue) => {
+        console.log(newValue)
+        setSelectedValues(newValue);
     };
+
 
     return (
         <>
@@ -45,16 +68,18 @@ function CatalogOrganisations() {
                 <CatalogHeader title={"Организации"} searchFields={["Название организации"]}></CatalogHeader>
 
                 <div className="options-buttons_up">
-                    <Button>Добавить организацию</Button>
+                    <Button onClick={onOpenAddModal}>Добавить организацию</Button>
                 </div>
 
                 <div className="catalog-orgs">
                     <table className="table-fill table-organisation">
                         <thead>
                         <tr>
-                            <th></th>
                             <th className="text-center">
                                 <strong>Название</strong>
+                            </th>
+                            <th className="text-center">
+                                <strong>Руководитель</strong>
                             </th>
                             <th className="text-center">
                                 <strong>Дата создания</strong>
@@ -63,47 +88,79 @@ function CatalogOrganisations() {
                             <th></th>
                         </tr>
                         </thead>
-                        <tbody onClick={clickOnTbody}>
+                        <tbody>
                         <tr>
-                            <td className="text-center">
-                                <input type="checkbox"/>
-                            </td>
                             <td className="text-center">Пользователи</td>
+                            <td className="text-center">ivan_ivanov</td>
                             <td className="text-center">12.31.23</td>
                             <td className="text-center">
-                                <a><img name="editLogo" className="a-img" src={editLogo}></img></a>
+                                <Link className="a-img" to={`/users/organisations/${1}/edit`}><img src={editLogo}></img></Link>
                             </td>
                             <td className="text-center">
-                                <a name="deleteLogo" className="a-img"><img src={deleteLogo}></img></a>
+                                <a className="a-img" onClick={onDeleteOrgClick}><img src={deleteLogo}></img></a>
                             </td>
                         </tr>
                         <tr>
-                            <td className="text-center">
-                                <input type="checkbox"/>
-                            </td>
-                            <td className="text-center">Администраторы</td>
-                            <td className="text-center">12.31.23</td>
-                            <td className="text-center">
-                                <a><img name="editLogo" className="a-img" src={editLogo}></img></a>
-                            </td>
-                            <td className="text-center">
-                                <a name="deleteLogo" className="a-img"><img src={deleteLogo}></img></a>
-                            </td>
                         </tr>
                         </tbody>
                     </table>
                 </div>
 
                 <div className="options-buttons">
-                    <Button classNames={"filter-button"} onClick={toggleSidebar}>Фильтр</Button>
+                    <Button classNames="filter-button" onClick={toggleSidebar}>Фильтр</Button>
                     <div className="options-buttons_right-down">
                         <Button>Мониторинг</Button>
-                        <Button onClick={usersCatalog}>Пользователи</Button>
+                        <Button onClick={() => {
+                            navigate("/users")
+                        }}>Пользователи</Button>
                     </div>
                 </div>
+
+                <div className="add-modal-overlay add-modal-overlay_hidden">
+                    <div className="add-modal">
+                        <div className="add-modal__title">
+                            <h3>Новая организация</h3>
+                        </div>
+
+                        <form className="add-modal__form">
+                            <div className="add-modal__inputs">
+                                <Input placeholder={"Название"}></Input>
+                                <Input placeholder={"Руководитель (логин)"}></Input>
+                                <Input placeholder={"Лимит запросов для участников"}></Input>
+                            </div>
+
+                            <div>
+                                <p className={"text-class"}>Доступные модели:</p>
+                                <Select
+                                    className="multi-select"
+                                    isMulti
+                                    options={options}
+                                    onChange={handleSelectChange}
+                                    closeMenuOnSelect={false}
+                                    placeholder={"Выбрать"}
+                                    isSearchable
+                                />
+                            </div>
+
+                            <div>
+                                <p className={"text-class"}>Описание:</p>
+                                <textarea id={"description"} rows="6" cols="35"
+                                          defaultValue={"ADASAlasdair"}></textarea>
+                            </div>
+
+
+                            <div className="add-modal__buttons">
+                                <Button type="submit" onClick={onCloseAddModal}>Отмена</Button>
+                                <Button type="submit" onClick={onAddNewCatalog}>Добавить</Button>
+                            </div>
+
+                        </form>
+
+                    </div>
+                </div>
+
+                <DeleteModal open={isDeletingModel} onNo={onCloseDeleteModal}></DeleteModal>
             </main>
         </>
     )
 }
-
-export default CatalogOrganisations

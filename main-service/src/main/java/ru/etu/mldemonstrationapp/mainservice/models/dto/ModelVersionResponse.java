@@ -16,5 +16,5 @@ public record ModelVersionResponse(
         Limit limit,
         Instant updatedAt,
         Instant createdAt
-) {
-}
+) {}
+

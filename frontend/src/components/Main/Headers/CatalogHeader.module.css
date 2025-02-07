@@ -1,4 +1,4 @@
-.catalog-header {
+.header {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -9,11 +9,8 @@ h1{
     font-weight: 800;
     font-size: 32px;
 }
-.catalog-header__inputs {
+.inputs {
     display: flex;
     align-items: center;
     gap: 20px;
-}
-.catalog-header__date{
-
 }

@@ -1,18 +1,14 @@
-import Input from "../../Input.jsx";
+import Input from "../Input/Input.jsx";
 import React from "react";
 import {useNavigate} from "react-router-dom";
-import "./SignIn.css"
+import styles from "./SignIn.module.css"
 
-function SignUp(){
+export default function SignUp(){
     let navigate = useNavigate()
-    const handleEnterClick = () => {
-        navigate("/models")
-    }
 
     return(
-        <div className="sign-in-up">
-
-            <div className="sign-in-up__container">
+        <div className={styles.signInUp}>
+            <div className={styles.container}>
                 <p className="text-class">Регистрация</p>
                 <Input placeholder="Логин"></Input>
                 <Input placeholder="Фамилия"></Input>
@@ -21,11 +17,9 @@ function SignUp(){
                 <Input placeholder="E-mail"></Input>
                 <Input type="password" placeholder="Пароль"></Input>
                 <Input type="password" placeholder="Повторите пароль"></Input>
-                <button className="sign-in-up__button" onClick={handleEnterClick}>Зарегистрироваться</button>
-                <p>Если есть аккант, <span id="password" onClick={() => navigate("/")}>войдите</span></p>
+                <button className={styles.button} onClick={() => navigate("/models")}>Зарегистрироваться</button>
+                <p>Если есть аккант, <span className={styles.password} onClick={() => navigate("/")}>войдите</span></p>
             </div>
-
         </div>
     )
 }
-export default SignUp

@@ -1,61 +1,26 @@
-import React from "react";
-import "../CatalogModels/ModelData.css"
+import React from 'react';
+import styles from "./DataHeader.module.css"
 
-function DataHeader({children, firstButton, secondButton, onClick}) {
-
+export default function DataHeader({children, firstButton, secondButton, setActiveBut, activeBut}) {
     let handleClick = (event) => {
-        let div = event.target.closest(".header-buttons")
-        let buttons = div.querySelectorAll("button")
-
-        if (event.target instanceof HTMLButtonElement) {
-            let [activeBut, hr1] = event.target.closest("div").querySelectorAll('*');
-            if (!activeBut.classList.contains("new-color")) {
-                activeBut.classList.add("new-color")
-                hr1.classList.add("colorHr")
-            }
-
-            let otherButton = Array.from(buttons).filter((button) => button !== activeBut)[0]
-            let hr2 = otherButton.closest("div").querySelector("hr")
-            if (otherButton.classList.contains("new-color")) {
-                otherButton.classList.remove("new-color")
-                hr2.classList.remove("colorHr")
-            }
-
-            if (activeBut.name === "info") {
-                document.querySelector('.change-container__info').removeAttribute('hidden');
-                document.querySelector('.change-container__second').setAttribute('hidden', '');
-
-            } else {
-                document.querySelector('.change-container__info').setAttribute('hidden', '');
-                document.querySelector('.change-container__second').removeAttribute('hidden');
-
-                $(document).ready(function() {
-                    $(".js-select2").select2({
-                        closeOnSelect : false,
-                        placeholder : "Администраторы",
-                        // allowHtml: true,
-                        allowClear: true,
-                        tags: true // создает новые опции на лету
-                    });
-                });
-            }
+        if (event.target instanceof HTMLButtonElement){
+            setActiveBut(event.target.name)
         }
     }
 
     return (
-        <div className="change-container__header">
+        <div className={styles.header}>
             <h1>{children}</h1>
-            <div onClick={handleClick} className="header-buttons">
+            <div onClick={handleClick} className={styles.buttons}>
                 <div>
-                    <button name="info" className="new-color">{firstButton}</button>
-                    <hr className="colorHr"/>
+                    <button name="first" className={activeBut === 'first' ? styles.newColor : ""}>{firstButton}</button>
+                    <hr className={activeBut === 'first' ? styles.newColor : ""}/>
                 </div>
                 <div>
-                    <button>{secondButton}</button>
-                    <hr/>
+                    <button name="second" className={activeBut === 'second' ? styles.newColor : ""}>{secondButton}</button>
+                    <hr className={activeBut === 'second' ? styles.newColor : ""}/>
                 </div>
             </div>
         </div>
     )
 }
-export default DataHeader
