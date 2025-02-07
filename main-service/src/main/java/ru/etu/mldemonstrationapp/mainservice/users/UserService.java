@@ -65,12 +65,8 @@ public class UserService {
     @Transactional
     public User updateUser(Long id, UpdateUserRequest request) {
         User user = getUserById(id);
-        if (request.firstName() != null) {
-            user.setFirstName(request.firstName());
-        }
-        if (request.lastName() != null) {
-            user.setLastName(request.lastName());
-        }
+        user.setFirstName(request.firstName());
+        user.setLastName(request.lastName());
         user.setPatronymic(request.patronymic());
         user.setDescription(request.description());
         return userRepository.save(user);
