@@ -12,7 +12,7 @@ public record UpdateUserRequest(
         @Size(min = 1, max = 255, message = "Last name name must be between 1 and 255 characters")
         String lastName,
 
-        @Size(max = 500, message = "Patronymic cannot exceed 500 characters")
+        @Size(max = 255, message = "Patronymic cannot exceed 255 characters")
         String patronymic,
 
         @Size(max = 500, message = "Description cannot exceed 500 characters")
