@@ -11,6 +11,7 @@ public record CreateModelRequest(
 
         @NotNull(message = "URI cannot be null")
         @Pattern(regexp = "^(https?|ftp)://[\\w-]+(\\.[\\w-]+)+([\\w.,@?^=%&:/~+#-]*[\\w@?^=%&/~+#-])?$", message = "Invalid URI format")
+        @Size(min = 1, max = 255, message = "URI must be between 1 and 255 characters")
         String uri,
 
         @Size(max = 500, message = "Description cannot exceed 500 characters")
@@ -21,6 +22,7 @@ public record CreateModelRequest(
         String problemType,
 
         @NotNull(message = "Runtime cannot be null")
+        @Size(min = 1, max = 255, message = "Runtime must be between 1 and 255 characters")
         String runtime
 ) {
 }

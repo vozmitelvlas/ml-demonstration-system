@@ -9,6 +9,7 @@ public record CreateModelVersionRequest(
         String versionName,
 
         @NotNull(message = "URI cannot be null")
+        @Size(min = 1, max = 255, message = "URI must be between 1 and 255 characters")
         String uri,
 
         @Size(max = 500, message = "Description cannot exceed 500 characters")
