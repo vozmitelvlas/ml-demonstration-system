@@ -1,6 +1,7 @@
 package ru.etu.mldemonstrationapp.mainservice.admin.users;
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +33,7 @@ public class AdminUserController {
 
     @ApiResponse(useReturnTypeSchema = true, responseCode = "201")
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody CreateUserRequest dto, UriComponentsBuilder uriComponentsBuilder) {
+    public ResponseEntity<User> createUser(@Valid @RequestBody CreateUserRequest dto, UriComponentsBuilder uriComponentsBuilder) {
         User user = adminUserService.createUser(dto);
         return ResponseEntity
                 .created(uriComponentsBuilder
@@ -44,10 +45,9 @@ public class AdminUserController {
 
     @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
     @PutMapping("/{id}")
-    public User updateUser(@PathVariable Long id, @RequestBody UpdateUserRequest dto) {
+    public User updateUser(@PathVariable Long id, @Valid @RequestBody UpdateUserRequest dto) {
         return adminUserService.updateUser(id, dto);
     }
-
 
     @ApiResponse(responseCode = "204")
     @DeleteMapping("/{id}")
@@ -55,6 +55,5 @@ public class AdminUserController {
         adminUserService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
-
-
 }
+

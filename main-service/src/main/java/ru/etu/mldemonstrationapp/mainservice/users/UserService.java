@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
 import ru.etu.mldemonstrationapp.mainservice.organizations.Organization;
 import ru.etu.mldemonstrationapp.mainservice.organizations.OrganizationRepository;
 import ru.etu.mldemonstrationapp.mainservice.users.dto.CreateUserRequest;
@@ -18,6 +17,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class UserService {
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final OrganizationRepository organizationRepository;
@@ -34,7 +34,7 @@ public class UserService {
     @Transactional
     public User createUser(CreateUserRequest request) {
         if (userRepository.existsByLogin(request.login()) || userRepository.existsByEmail(request.email())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Login or email already exists");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Login or email already exists");
         }
 
         List<Role> userRoles = userRepository.findRolesByName(Collections.singletonList("USER"));
@@ -43,10 +43,7 @@ public class UserService {
         }
 
         Organization organization = organizationRepository.findById(4L)
-        .orElseThrow(() -> new ResponseStatusException(
-                HttpStatus.CONFLICT,
-                "Organization with id 4 does not exist"
-        ));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT, "Organization with id 4 does not exist"));
 
         User user = new User();
         user.setLogin(request.login());
@@ -69,7 +66,6 @@ public class UserService {
         user.setLastName(request.lastName());
         user.setPatronymic(request.patronymic());
         user.setDescription(request.description());
-
         return userRepository.save(user);
     }
 
