@@ -19,6 +19,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -33,15 +36,21 @@ import java.util.List;
 public class SecurityBeans {
 
     @Bean
-    protected SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity,
-                                                      JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
+    protected SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
+        List<RequestMatcher> authenticationIgnoredRequestMatchers = List.of(
+                new AntPathRequestMatcher("/api/auth/**"),
+                new AntPathRequestMatcher("/swagger-ui*/*"),
+                new AntPathRequestMatcher("/v3/api-docs/**")
+        );
+        jwtAuthenticationFilter.setIgnoredRequestsMatcher(new OrRequestMatcher(authenticationIgnoredRequestMatchers));
+
         return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(config -> config
-                        .requestMatchers("/swagger-ui/*", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/swagger-ui*/*", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/**").authenticated()
