@@ -27,7 +27,7 @@ public class JwtService {
 
     private final Duration tokenTtl = Duration.ofMinutes(5);
 
-    public final static String AUTH_TOKEN_COOKIE_NAME = "__Host-access-token";
+    public final static String AUTH_TOKEN_COOKIE_NAME = "x-auth-token";
 
 
     public String generateToken(CustomUserDetails userDetails) {
