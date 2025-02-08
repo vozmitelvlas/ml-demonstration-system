@@ -1,12 +1,10 @@
 package ru.etu.mldemonstrationapp.mainservice.auth;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import ru.etu.mldemonstrationapp.mainservice.config.CustomUserDetails;
@@ -73,11 +71,7 @@ public class JwtService {
     }
 
     public Claims parseToken(String token) {
-        try {
-            return Jwts.parser().verifyWith(getSecretKey()).build().parseSignedClaims(token).getPayload();
-        } catch (JwtException e) {
-            throw new AuthenticationCredentialsNotFoundException(e.getMessage());
-        }
+        return Jwts.parser().verifyWith(getSecretKey()).build().parseSignedClaims(token).getPayload();
     }
 
     private SecretKey getSecretKey() {

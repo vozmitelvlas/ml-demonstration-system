@@ -8,10 +8,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -39,7 +41,8 @@ public class SecurityBeans {
     protected SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         List<RequestMatcher> authenticationIgnoredRequestMatchers = List.of(
                 new AntPathRequestMatcher("/api/auth/**"),
-                new AntPathRequestMatcher("/swagger-ui*/*"),
+                new AntPathRequestMatcher("/swagger-ui/*"),
+                new AntPathRequestMatcher("/swagger-ui.html"),
                 new AntPathRequestMatcher("/v3/api-docs/**")
         );
         jwtAuthenticationFilter.setIgnoredRequestsMatcher(new OrRequestMatcher(authenticationIgnoredRequestMatchers));
@@ -99,7 +102,8 @@ public class SecurityBeans {
                 return;
             }
 
-            if (authException instanceof AuthenticationCredentialsNotFoundException) {
+            if (authException instanceof BadCredentialsException ||
+                    authException instanceof AuthenticationCredentialsNotFoundException) {
                 response.addHeader(HttpHeaders.WWW_AUTHENTICATE, "Bearer");
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
                 return;
