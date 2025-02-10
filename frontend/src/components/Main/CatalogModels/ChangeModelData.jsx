@@ -5,6 +5,7 @@ import Button from "../Button/Button.jsx";
 import DataHeader from "../Headers/DataHeader.jsx";
 import {useNavigate, useParams} from "react-router-dom";
 import Select from "react-select";
+import {customStyle} from "../../utils/selectStyles.jsx";
 
 const options = [
     {value: 'O1', label: 'First'},
@@ -22,22 +23,8 @@ export default function ChangeModelData() {
         console.log(newValue)
         setSelectedValues(newValue);
     };
-
-    let createTooltip = (text) => {
-        let span = document.createElement("span")
-        span.className = "tooltip"
-        span.textContent = text
-        return span
-    }
-    let showToolTip = (event) => {
-        let info = event.target.closest("div")
-        info.prepend(createTooltip("Названия других версий данной модели также изменятся"))
-    }
-    let closeTooltip = () => {
-        let tooltip = document.querySelector(".tooltip")
-        if (tooltip) {
-            tooltip.remove()
-        }
+    let onChangeName = () => {
+        alert('Названия других версий данной модели также изменятся')
     }
 
     return (
@@ -52,20 +39,18 @@ export default function ChangeModelData() {
                 </DataHeader>
 
                 {activeBut === "first" && (
-                    <div>
+                    <div className="test">
                         <table className="change-container__table tableHover naked-input">
                             <tbody>
                             {modelData.map((title, index) => (
                                 <tr key={index}>
                                     <td>{title}</td>
-                                    <td className="text-center"><Input onMouseOver={showToolTip}
-                                                                       onMouseOut={closeTooltip}>something</Input></td>
+                                    <td className="text-center"><Input onClick={onChangeName}>something</Input></td>
                                 </tr>
                             ))}
                             <tr>
                                 <td>Описание</td>
-                                <td><textarea id={"description"} rows="6" cols="47"
-                                              defaultValue={"ADASAlasdair"}></textarea></td>
+                                <td><textarea defaultValue={"ADASAlasdair"}></textarea></td>
                             </tr>
                             </tbody>
                         </table>
@@ -77,13 +62,14 @@ export default function ChangeModelData() {
                         <div className="select-container">
                             <p className="text-class">Организации с доступом к модели</p>
                             <Select
-                                className="multi-select"
+                                className="limits-select"
                                 isMulti
                                 options={options}
                                 onChange={handleSelectChange}
                                 closeMenuOnSelect={false}
                                 placeholder={"Выбрать"}
                                 isSearchable
+                                styles={customStyle}
                             />
                         </div>
 
@@ -95,7 +81,7 @@ export default function ChangeModelData() {
                                 <td><Input>50</Input></td>
                             </tr>
                             <tr>
-                                <td>Лимит запрсов/нед</td>
+                                <td>Лимит запросов/нед</td>
                                 <td><Input>1000</Input></td>
                             </tr>
 

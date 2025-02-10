@@ -5,6 +5,14 @@ import Button from "../Button/Button.jsx";
 import {useNavigate} from "react-router-dom";
 import deleteLogo from "../../../assets/delete.svg";
 import DeleteModal from "../../utils/DeleteModal.jsx";
+import Select from "react-select";
+import {customStyle} from "../../utils/selectStyles.jsx";
+
+const limitOptions = [
+    {value: 'O1', label: 'Лимит организации'},
+    {value: 'O2', label: 'Лимиты модели'},
+    {value: 'O2', label: 'Лимиты пользователя'}
+];
 
 export default function ChangeOrganisations(){
     let navigate = useNavigate()
@@ -43,16 +51,12 @@ export default function ChangeOrganisations(){
                                 <td className="text-center"><Input>ivan_ivanov</Input></td>
                             </tr>
                             <tr>
-                                <td>Лимит</td>
-                                <td className="text-center"><Input>30</Input></td>
-                            </tr>
-                            <tr>
                                 <td>Дата создания</td>
                                 <td className="text-center"><Input>17.12.2025</Input></td>
                             </tr>
                             <tr>
                                 <td>Описание</td>
-                                <td ><textarea id={"description"} rows="6" cols="47" defaultValue={"ADASAlasdair"}></textarea></td>
+                                <td ><textarea defaultValue={"ADASAlasdair"}></textarea></td>
                             </tr>
                             </tbody>
                         </table>
@@ -63,11 +67,15 @@ export default function ChangeOrganisations(){
                     <div>
                         <div className="limits">
                             <h2>Установка лимита для участников организации</h2>
-                            <select>
-                                <option value="default">Лимит организации</option>
-                                <option value="modelLimit">Лимиты модели </option>
-                                <option value="userLimit">Лимиты пользователя </option>
-                            </select>
+                            <Select
+                                className="limits-select"
+                                options={limitOptions}
+                                // onChange={handleSelectChange}
+                                closeMenuOnSelect={false}
+                                placeholder={"Выбрать"}
+                                isSearchable
+                                styles={customStyle}
+                            />
                         </div>
 
                         <h2>Доступные организации модели</h2>
@@ -106,7 +114,7 @@ export default function ChangeOrganisations(){
             </div>
 
             <div className="delete-modal__buttons">
-                <Button onClick={() => {navigate("/users/organisations")}}>Назад</Button>
+                <Button onClick={() => {navigate("/organisations")}}>Назад</Button>
                 <Button>Сохранить</Button>
             </div>
 

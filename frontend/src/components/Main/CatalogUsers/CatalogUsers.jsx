@@ -111,9 +111,9 @@ export default function CatalogUsers() {
                 <div className="options-buttons">
                     <Button classNames="filter-button" onClick={toggleSidebar}>Фильтр</Button>
                     <div className="options-buttons_right-down">
-                        <Button>Мониторинг</Button>
-                        <Button onClick={() => {navigate("/users/organisations")}}>Организации</Button>
                         <Button onClick={() => {navigate("/models")}}>Модели</Button>
+                        <Button onClick={() => {navigate("/users")}}>Пользователи</Button>
+                        <Button onClick={() => {navigate("/organisations")}}>Организации</Button>
                     </div>
                 </div>
             </main>
@@ -121,9 +121,9 @@ export default function CatalogUsers() {
             <div className="add-modal-overlay add-modal-overlay_hidden">
                 <div className="add-user-modal">
                     <div className="add-modal__title">
-                        <h3>Добавление пользователя</h3>
+                        <h3>Новый пользователь</h3>
                     </div>
-                    <table className="change-container__table tableHover ">
+                    <table className="change-container__table tableHover naked-input">
                         <tbody>
                         <tr>
                             <td>Логин</td>
@@ -152,7 +152,7 @@ export default function CatalogUsers() {
 
                         <tr>
                             <td>Описание</td>
-                            <td className="text-center"><textarea id={"description"} rows="12" cols="50" defaultValue={""}></textarea></td>
+                            <td className="text-center"><textarea></textarea></td>
                         </tr>
                         </tbody>
                     </table>

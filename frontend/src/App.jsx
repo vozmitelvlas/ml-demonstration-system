@@ -1,4 +1,4 @@
-import './App.css'
+import styles from './App.module.css'
 import Header from "./components/Header/Header.jsx";
 import CatalogModels from "./components/Main/CatalogModels/CatalogModels.jsx";
 import {Routes, Route, Outlet, Navigate} from "react-router-dom";
@@ -15,7 +15,6 @@ import ModelData from "./components/Main/CatalogModels/ModelData.jsx";
 import SignUp from "./components/Main/SignInUp/SignUp.jsx";
 import PasswordRecover from "./components/Main/SignInUp/PasswordRecover.jsx";
 import MyOrganisations from "./components/Main/MyOrganisations/MyOrganisations.jsx";
-import ChangeMyOrganisation from "./components/Main/MyOrganisations/ChangeMyOrganisation.jsx";
 
 
 function ProtectedRoute({ isAuthenticated }) {
@@ -32,12 +31,12 @@ function App() {
     const excludedPaths = ['/', '/signup', '/password'];
 
     return (
-        <div className="header-main">
+        <div className={isAdminMode ? styles.adminMain : styles.main}>
             {
                 !excludedPaths.includes(location.pathname) &&
                 <Header login={userLogin} isMainOrg={true} isAdmin={true} isAdminMode={isAdminMode} setIsAdminMode={setIsAdminMode}/>
             }
-            <div className="main-content">
+            <div className={styles.mainContent}>
                 <Routes>
                     <Route path="/" element={<SignIn />} />
                     <Route path="/signup" element={<SignUp />} />
@@ -52,11 +51,10 @@ function App() {
                     <Route path="/users" element={<CatalogUsers />} />
                     <Route path="/users/:userId/edit" element={<ChangeUserData />} />
 
-                    <Route path="/user/organisations" element={<MyOrganisations />} />
-                    <Route path="/user/organisations/:orgId/edit" element={<ChangeMyOrganisation />} />
+                    <Route path="/user/organisation" element={<MyOrganisations />} />
 
-                    <Route path="/users/organisations" element={<CatalogOrganisations />} />
-                    <Route path="/users/organisations/:orgId/edit" element={<ChangeOrganisations />} />
+                    <Route path="/organisations" element={<CatalogOrganisations />} />
+                    <Route path="/organisations/:orgId/edit" element={<ChangeOrganisations />} />
                 </Routes>
             </div>
         </div>

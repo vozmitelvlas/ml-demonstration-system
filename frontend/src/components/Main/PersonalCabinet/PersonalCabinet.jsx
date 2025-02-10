@@ -50,7 +50,7 @@ export default function PersonalCabinet() {
 
                     <tr>
                         <td>Описание</td>
-                        <td><textarea id={"description"} rows="14" cols="60" defaultValue={"ADASAlasdair"} disabled></textarea></td>
+                        <td><textarea defaultValue={"ADASAlasdair"} disabled></textarea></td>
                     </tr>
                     </tbody>
                 </table>
@@ -86,7 +86,7 @@ export default function PersonalCabinet() {
 
                         <tr>
                             <td>Описание</td>
-                            <td className="text-center"><textarea id={"description"} rows="12" cols="50" defaultValue={"ADASAlasdair"}></textarea></td>
+                            <td className="text-center"><textarea defaultValue={"ADASAlasdair"}></textarea></td>
                         </tr>
                         </tbody>
                     </table>

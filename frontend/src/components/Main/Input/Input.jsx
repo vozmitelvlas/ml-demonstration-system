@@ -11,7 +11,8 @@ const Input = ({
                    placeholder,
                    disabled = false,
                    onMouseOver,
-                   onMouseOut
+                   onMouseOut,
+                   onClick,
                }) => {
     let classes = [styles.input].concat(classNames || []).join(" ");
     return (
@@ -26,6 +27,7 @@ const Input = ({
             disabled={disabled}
             onMouseOver={onMouseOver}
             onMouseOut={onMouseOut}
+            onClick={onClick}
         />
     );
 }

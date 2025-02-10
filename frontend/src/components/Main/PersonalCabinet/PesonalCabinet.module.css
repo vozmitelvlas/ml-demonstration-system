@@ -22,7 +22,7 @@
     height: unset;
 }
 .userOptions button:hover {
-    background-color:#49C5BA;
+    background-color: var(--accent-color);
     color: white;
 }
 

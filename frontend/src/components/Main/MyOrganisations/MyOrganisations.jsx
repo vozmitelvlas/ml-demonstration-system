@@ -1,10 +1,19 @@
 import Filter from "../Filter/Filter.jsx";
-import {useState} from "react";
+import React, {useState} from "react";
 import CatalogHeader from "../Headers/CatalogHeader.jsx";
 import Button from "../Button/Button.jsx";
 import editLogo from "../../../assets/edit.svg";
 import deleteLogo from "../../../assets/delete.svg";
 import {Link, useNavigate} from "react-router-dom";
+import styles from"./MyOrganisations.module.css"
+import Select from "react-select";
+import {customStyle} from "../../utils/selectStyles.jsx";
+
+const limitOptions = [
+    {value: 'O1', label: 'Лимит организации'},
+    {value: 'O2', label: 'Лимиты модели'},
+    {value: 'O2', label: 'Лимиты пользователя'}
+];
 
 export default function MyOrganisations(){
     const navigate = useNavigate()
@@ -16,6 +25,15 @@ export default function MyOrganisations(){
     let onEditOrg = () => {
         navigate("/user/organisations/edit")
     }
+
+    const allUsers = [{
+        id: 3,
+        email: "123123.mail.ru"
+    }, {id: 4, email: "adaqwdawdawd.mail.ru"}, {id: 1, email: "vvvvv.mail.ru"}, {id: 2, email: "qqqqq.mail.ru"}, {id: 3, email: "123123.mail.ru"}, {id: 4, email: "adaqwdawdawd.mail.ru"},
+        {id: 1, email: "vvvvv.mail.ru"}, {id: 2, email: "qqqqq.mail.ru"}, {
+            id: 3,
+            email: "123123.mail.ru"
+        }, {id: 4, email: "adaqwdawdawd.mail.ru"}, {id: 1, email: "vvvvv.mail.ru"}, {id: 2, email: "qqqqq.mail.ru"}, {id: 3, email: "123123.mail.ru"}, {id: 4, email: "adaqwdawdawd.mail.ru"}]
 
     return (
         <>
@@ -31,43 +49,56 @@ export default function MyOrganisations(){
             }
 
             <main>
-                <CatalogHeader title={"Мои организации"} searchFields={["Название организации"]}></CatalogHeader>
-
-                <div className="catalog-orgs">
-                    <table className="table-fill table-organisation">
-                        <thead>
-                        <tr>
-                            <th className="text-center">
-                                <strong>Название</strong>
-                            </th>
-                            <th className="text-center">
-                                <strong>Дата создания</strong>
-                            </th>
-                            <th></th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <td className="text-center">Пользователи</td>
-                            <td className="text-center">12.31.23</td>
-                            <td className="text-center">
-                                <Link className="a-img" to={`/user/organisations/${1}/edit`}><img src={editLogo}></img></Link>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td className="text-center">Администраторы</td>
-                            <td className="text-center">12.31.23</td>
-                            <td className="text-center">
-                                <a><img name="editLogo" className="a-img" src={editLogo}></img></a>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                <div className={styles.header}>
+                    <h1>Моя организация</h1>
                 </div>
 
-                <div className="options-buttons">
-                    <Button classNames="filter-button" onClick={toggleSidebar}>Фильтр</Button>
+                <div className={styles.content}>
+                    <div className={styles.limit}>
+                        <h2>Название организации - <span>Название</span></h2>
+
+                        <div>
+                            <h2>Описание:</h2>
+                            <textarea defaultValue={"ADASAlasdair"} disabled></textarea>
+                        </div>
+
+                        <div>
+                            <h2>Установка лимита для участников организации:</h2>
+                            <div className={styles.limits}>
+                                <Select
+                                    className={"limits-select"}
+                                    options={limitOptions}
+                                    // onChange={handleSelectChange}
+                                    closeMenuOnSelect={false}
+                                    placeholder={"Пользователи"}
+                                    isSearchable
+                                    styles={customStyle}
+                                />
+                                <button className={styles.button}>Сохранить</button>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                    <div  className={styles.users}>
+                        <h2>Участники организации:</h2>
+                        <div className={styles.table}>
+                            <table className="change-container__table tableHover to-center">
+                                <tbody>
+                                {allUsers.map((user, ind) => (
+                                    <tr key={ind}>
+                                        <td>{ind + 1}</td>
+                                        <td className="text-center">{user.email}</td>
+                                    </tr>
+                                ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
                 </div>
+
             </main>
         </>
     )

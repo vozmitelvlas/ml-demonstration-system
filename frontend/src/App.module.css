@@ -1,0 +1,16 @@
+.main{
+  height: 100vh;
+}
+.adminMain{
+  height: 100vh;
+}
+.adminMain h1 {
+  color: #49C5BA;
+}
+
+.mainContent{
+  display: flex;
+  justify-content: center;
+  /*padding: 30px 30px 5px;*/
+  height: 89%;
+}

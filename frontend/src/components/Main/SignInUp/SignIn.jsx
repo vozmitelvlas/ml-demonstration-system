@@ -1,13 +1,27 @@
 import styles from "./SignIn.module.css"
 import Input from "../Input/Input.jsx";
-import React from "react";
+import React, {useEffect} from "react";
 import {useNavigate} from "react-router-dom";
+import axios from "axios";
 
 export default function SignIn() {
     let navigate = useNavigate()
     const handleEnterClick = () => {
         navigate("/models")
     }
+
+    // useEffect(() => {
+    //     const loginData = {
+    //         username: 'admin',
+    //         password: 'password'
+    //     };
+    //
+    //     axios
+    //         .post('http://localhost:8080/api/auth/login', loginData)
+    //         .then((res) => {
+    //             console.log(res);
+    //         });
+    // }, []);
 
     return (
         <div className={styles.signInUp}>

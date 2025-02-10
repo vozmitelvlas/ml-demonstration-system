@@ -1,19 +1,13 @@
-header {
+.header {
     width: 100%;
     display: flex;
     align-items: center;
     background: #F1F2F5;
 }
-header a:hover{
-    background: #d0d0d5;
-}
-
 .right {
     display: flex;
     align-items: center;
     margin-left: auto;
-
-    font-family: 'Inter', sans-serif;
 }
 .left{
     display: flex;
@@ -21,22 +15,29 @@ header a:hover{
     padding-right: 15px;
     cursor: pointer;
 }
-.left:hover{
+.header a:hover{
+    background: #d0d0d5;
+}
+.header > .left:hover{
     background: #d0d0d5;
 }
 
-
-img{
-    margin: 5px;
+.adminMode{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    color: white;
+    background: var(--accent-color);
 }
-h3{
-    font-family: 'Inter', sans-serif;
-    font-weight: 800;
-    font-size: 18px;
-
-    margin-left: 5px;
+.adminMode > .right a:hover{
+    background: var(--accent-color);
 }
-
+.adminMode > .left:hover{
+    background: var(--accent-color);
+}
+.whiteSvg{
+    filter: invert(100%);
+}
 .dropdown {
     position: relative;
     display: inline-block;
@@ -65,8 +66,8 @@ a.disabled {
 }
 
 .content a:hover {
-    background: #49C5BA;
-    color: #FFFFFF;
+    background: var(--accent-color);
+    color: #ffffff;
 }
 
 .dropdown:hover .content {

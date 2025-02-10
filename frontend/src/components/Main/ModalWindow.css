@@ -27,7 +27,7 @@
     top: 0;
     width: 30%;
     height: fit-content;
-    padding: 0px 15px;
+    padding: 0 15px;
     text-align: left;
 
     border: 2px solid #ffffff;
@@ -45,7 +45,7 @@
     border-radius: 15px;
     position: relative;
     top: 0;
-    width: 50%;
+    width: 40%;
     height: fit-content;
     padding: 0px 15px;
     text-align: left;

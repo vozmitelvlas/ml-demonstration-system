@@ -5,8 +5,20 @@ import Button from "../Button/Button.jsx";
 import {useNavigate} from "react-router-dom";
 import deleteLogo from "../../../assets/delete.svg";
 import DeleteModal from "../../utils/DeleteModal.jsx";
+import Select from "react-select";
+import {customStyle, firstStyle, secondStyle} from "../../utils/selectStyles.jsx";
 
-export default function ChangeUserData(){
+const roleOptions = [
+    {value: 'O1', label: 'Администратор'},
+    {value: 'O2', label: 'Пользователь'},
+    {value: '03', label: 'Руководитель организации'},
+];
+const orgOptions = [
+    {value: 'O1', label: 'Администраторы'},
+    {value: 'O2', label: 'Пользователи'},
+];
+
+export default function ChangeUserData() {
     let navigate = useNavigate()
     const [activeBut, setActiveBut] = useState("first");
     let [isDeletingModel, setIsDeletingModel] = useState(false)
@@ -18,8 +30,15 @@ export default function ChangeUserData(){
         let tr = event.target.closest("tr")
         setIsDeletingModel(true)
     }
+    const [selectStyle, setSelectStyles] = useState(customStyle);
+    const setFirstMultiBackColor = () => {
+        setSelectStyles((prev) => firstStyle(prev));
+    };
+    const setSecondMultiBackColor = () => {
+        setSelectStyles((prev) => secondStyle(prev));
+    }
 
-    return(
+    return (
         <div className="change-container">
             <div>
                 <DataHeader activeBut={activeBut}
@@ -46,21 +65,39 @@ export default function ChangeUserData(){
                                 <td className="text-center"><Input>Ivan</Input></td>
                             </tr>
                             <tr>
-                                <td>Организация</td>
-                                <td className="text-center">
-                                    <select>
-                                        <option value="default">{"Администраторы"}</option>
-                                        <option value="users">Пользователи</option>
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
                                 <td>Дата регистрации</td>
                                 <td className="text-center"><Input>17.09.2025</Input></td>
                             </tr>
                             <tr>
+                                <td>Организация</td>
+                                <td>
+                                    <Select
+                                        options={orgOptions}
+                                        // onChange={handleSelectChange}
+                                        closeMenuOnSelect={false}
+                                        placeholder={"Пользователи"}
+                                        isSearchable
+                                        styles={selectStyle}
+                                    />
+                                </td>
+                            </tr>
+                            <tr onMouseEnter={setFirstMultiBackColor} onMouseLeave={setSecondMultiBackColor}>
+                                <td>Роль</td>
+                                <td>
+                                    <Select
+                                        isMulti
+                                        options={roleOptions}
+                                        // onChange={handleSelectChange}
+                                        closeMenuOnSelect={false}
+                                        placeholder={"Пользователь"}
+                                        isSearchable
+                                        styles={selectStyle}
+                                    />
+                                </td>
+                            </tr>
+                            <tr>
                                 <td>Описание</td>
-                                <td className="text-center"><textarea id={"description"} rows="12" cols="50" defaultValue={"Asdasd"}></textarea></td>
+                                <td><textarea defaultValue={"Asdasd"}></textarea></td>
                             </tr>
                             </tbody>
                         </table>
@@ -94,7 +131,8 @@ export default function ChangeUserData(){
                                 <td className="text-center"><Input>50</Input></td>
                                 <td className="text-center"><Input>1000</Input></td>
                                 <td className="text-center">
-                                    <a className="a-img" onClick={onDeleteModelClick}><img src={deleteLogo}></img></a>
+                                    <a className="a-img" onClick={onDeleteModelClick}><img
+                                        src={deleteLogo}></img></a>
                                 </td>
                             </tr>
                             <tr>
@@ -103,7 +141,8 @@ export default function ChangeUserData(){
                                 <td className="text-center"><Input>10</Input></td>
                                 <td className="text-center"><Input>-</Input></td>
                                 <td className="text-center">
-                                    <a className="a-img" onClick={onDeleteModelClick}><img src={deleteLogo}></img></a>
+                                    <a className="a-img" onClick={onDeleteModelClick}><img
+                                        src={deleteLogo}></img></a>
                                 </td>
                             </tr>
                             </tbody>
@@ -114,7 +153,9 @@ export default function ChangeUserData(){
             </div>
 
             <div className="delete-modal__buttons">
-                <Button onClick={() => {navigate("/users")}}>Назад</Button>
+                <Button onClick={() => {
+                    navigate("/users")
+                }}>Назад</Button>
                 <Button>Сохранить</Button>
             </div>
 

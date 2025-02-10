@@ -29,14 +29,12 @@ export default function ModelData() {
                             {modelData.map((title, index) => (
                                 <tr key={index}>
                                     <td>{title}</td>
-                                    <td className="text-center"><Input classNames={"text-center"}
-                                                                       disabled={true}>something</Input></td>
+                                    <td className="text-center"><p>something</p></td>
                                 </tr>
                             ))}
                             <tr>
                                 <td>Описание</td>
-                                <td><textarea id={"description"} rows="8" cols="47" defaultValue={"ADASAlasdair"}
-                                              disabled></textarea></td>
+                                <td><textarea defaultValue={"ADASAlasdair"} disabled></textarea></td>
                             </tr>
                             </tbody>
                         </table>

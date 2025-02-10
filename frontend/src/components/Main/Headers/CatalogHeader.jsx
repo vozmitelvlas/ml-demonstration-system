@@ -4,7 +4,7 @@ import Button from "../Button/Button.jsx";
 import Input from "../Input/Input.jsx";
 import React from "react";
 
-export default function CatalogHeader({title, searchFields}) {
+export default function CatalogHeader({title, searchFields = []}) {
 
     return (
         <div className={styles.header}>
@@ -21,7 +21,7 @@ export default function CatalogHeader({title, searchFields}) {
                 </div>
 
                 <Button>
-                    <img src={searchLogo} alt="search"></img>
+                    <a className="a-img"><img src={searchLogo} alt="search"></img></a>
                     Поиск
                 </Button>
             </div>
