@@ -57,3 +57,9 @@ textarea{
 textarea:not([disabled]):hover {
   background-color: white;
 }
+input[type="checkbox"] {
+  accent-color: #4f9f99;
+}
+input[type="radio"] {
+  accent-color: #4f9f99;
+}
