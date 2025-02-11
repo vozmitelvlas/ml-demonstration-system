@@ -53,7 +53,7 @@ public class SecurityBeans {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(config -> config
-                        .requestMatchers("/swagger-ui*/*", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/swagger-ui/*", "swagger-ui.html", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/**").authenticated()
