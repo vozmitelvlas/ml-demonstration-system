@@ -28,13 +28,15 @@ public class AuthService {
                 loginRequest.password())
         );
         var userDetails = (CustomUserDetails) authentication.getPrincipal();
-        ResponseCookie cookie = jwtService.generateTokenCookie(userDetails);
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(new LoginResponse(userDetails.user()));
+        String token = jwtService.generateToken(userDetails);
+        ResponseCookie cookie = jwtService.generateTokenCookie(token);
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(new LoginResponse(userDetails.user(), token));
     }
 
     public ResponseEntity<LoginResponse> register(CreateUserRequest createUserRequest) {
         User user = userService.createUser(createUserRequest);
-        ResponseCookie cookie = jwtService.generateTokenCookie(new CustomUserDetails(user));
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(new LoginResponse(user));
+        String token = jwtService.generateToken(new CustomUserDetails(user));
+        ResponseCookie cookie = jwtService.generateTokenCookie(token);
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(new LoginResponse(user, token));
     }
 }
