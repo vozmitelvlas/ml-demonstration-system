@@ -49,6 +49,16 @@ public class JwtService {
                 .compact();
     }
 
+    public ResponseCookie generateTokenCookie(String token) {
+        return ResponseCookie.from(AUTH_TOKEN_COOKIE_NAME, token)
+                .maxAge(tokenTtl)
+                .httpOnly(true)
+                .domain(null)
+                .path("/")
+                .secure(true)
+                .build();
+    }
+
     public ResponseCookie generateTokenCookie(CustomUserDetails userDetails) {
         String token = generateToken(userDetails);
         return ResponseCookie.from(AUTH_TOKEN_COOKIE_NAME, token)
