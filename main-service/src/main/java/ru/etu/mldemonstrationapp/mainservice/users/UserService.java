@@ -3,12 +3,14 @@ package ru.etu.mldemonstrationapp.mainservice.users;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import ru.etu.mldemonstrationapp.mainservice.organizations.Organization;
 import ru.etu.mldemonstrationapp.mainservice.organizations.OrganizationRepository;
 import ru.etu.mldemonstrationapp.mainservice.users.dto.CreateUserRequest;
+import ru.etu.mldemonstrationapp.mainservice.users.dto.UpdatePasswordRequest;
 import ru.etu.mldemonstrationapp.mainservice.users.dto.UpdateUserRequest;
 
 import java.util.Collections;
@@ -74,8 +76,20 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteUser(Long id) {
-        User user = getUserById(id);
-        userRepository.delete(user);
+    public void updateUserPassword(Long id, UpdatePasswordRequest request) {
+        User user = userRepository.findById(id).orElseThrow();
+        if (passwordEncoder.matches(request.oldPassword(), user.getPassword())) {
+            user.setPassword(passwordEncoder.encode(request.newPassword()));
+            userRepository.save(user);
+            return;
+        }
+        throw new BadCredentialsException("Old password is incorrect");
     }
+
+
+    @Transactional
+    public void deleteUser(Long id) {
+        userRepository.deleteById(id);
+    }
+
 }

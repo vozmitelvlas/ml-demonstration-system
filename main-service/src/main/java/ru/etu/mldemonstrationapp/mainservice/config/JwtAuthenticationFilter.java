@@ -12,7 +12,6 @@ import lombok.Setter;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
@@ -82,7 +81,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             SecurityContext context = SecurityContextHolder.createEmptyContext();
 
             var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-                    token.subject(),
+                    token,
                     tokenString,
                     token.authorities().stream().map(SimpleGrantedAuthority::new).toList()
             );
