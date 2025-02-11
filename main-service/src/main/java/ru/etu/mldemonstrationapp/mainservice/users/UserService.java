@@ -3,10 +3,12 @@ package ru.etu.mldemonstrationapp.mainservice.users;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import ru.etu.mldemonstrationapp.mainservice.auth.JwtService;
 import ru.etu.mldemonstrationapp.mainservice.organizations.Organization;
 import ru.etu.mldemonstrationapp.mainservice.organizations.OrganizationRepository;
 import ru.etu.mldemonstrationapp.mainservice.users.dto.CreateUserRequest;
@@ -23,6 +25,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final OrganizationRepository organizationRepository;
+    private final JwtService jwtService;
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
@@ -88,8 +91,9 @@ public class UserService {
 
 
     @Transactional
-    public void deleteUser(Long id) {
+    public ResponseCookie deleteUser(Long id) {
         userRepository.deleteById(id);
+        return jwtService.getEmptyTokenCookie();
     }
 
 }

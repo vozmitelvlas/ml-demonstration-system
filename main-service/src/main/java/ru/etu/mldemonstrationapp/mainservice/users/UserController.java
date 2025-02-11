@@ -9,7 +9,6 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import ru.etu.mldemonstrationapp.mainservice.auth.JwtService;
 import ru.etu.mldemonstrationapp.mainservice.auth.JwtToken;
 import ru.etu.mldemonstrationapp.mainservice.users.dto.UpdatePasswordRequest;
 import ru.etu.mldemonstrationapp.mainservice.users.dto.UpdateUserRequest;
@@ -21,7 +20,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
-    private final JwtService jwtService;
 
     @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
     @GetMapping
@@ -59,9 +57,8 @@ public class UserController {
     @Operation(description = "Delete your own user")
     @ApiResponse(useReturnTypeSchema = true, responseCode = "204")
     @DeleteMapping("/profile")
-    public ResponseEntity<Void> deleteProfile(@AuthenticationPrincipal JwtToken token) {
-        userService.deleteUser(token.userId());
-        ResponseCookie authCookie = jwtService.getEmptyTokenCookie();
+    public ResponseEntity<Void> deleteProfile(@AuthenticationPrincipal JwtToken jwtToken) {
+        ResponseCookie authCookie = userService.deleteUser(jwtToken.userId());
         return ResponseEntity.noContent().header(HttpHeaders.SET_COOKIE, authCookie.toString()).build();
     }
 }

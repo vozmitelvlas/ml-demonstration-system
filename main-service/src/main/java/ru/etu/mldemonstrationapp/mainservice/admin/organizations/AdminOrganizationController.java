@@ -1,7 +1,6 @@
 package ru.etu.mldemonstrationapp.mainservice.admin.organizations;
 
-import io.swagger.v3.oas.annotations.Operation;
- import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
