@@ -3,13 +3,14 @@ package ru.etu.mldemonstrationapp.mainservice.auth;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.RequiredTypeException;
 
+import java.security.Principal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public record JwtToken(UUID id, String subject, Long userId, String email, List<String> authorities, Instant issuedAt,
-                       Instant expiresAt) {
+                       Instant expiresAt) implements Principal {
 
     private static List<String> convertRolesClaim(Claims claims) {
         Object roleClaim = claims.get("roles");
@@ -28,5 +29,10 @@ public record JwtToken(UUID id, String subject, Long userId, String email, List<
                 claims.getIssuedAt().toInstant(),
                 claims.getExpiration().toInstant()
         );
+    }
+
+    @Override
+    public String getName() {
+        return subject;
     }
 }

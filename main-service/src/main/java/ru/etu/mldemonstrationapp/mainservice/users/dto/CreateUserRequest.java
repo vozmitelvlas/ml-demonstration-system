@@ -10,7 +10,7 @@ public record CreateUserRequest(
         String login,
 
         @NotBlank(message = "Password cannot be blank")
-        @Size(min = 6, message = "Password must be at least 6 characters long")
+        @Size(min = 6, max = 255, message = "Password length must be between 6 and 255 characters")
         String password,
 
         @NotBlank(message = "Email cannot be blank")
