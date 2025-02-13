@@ -1,6 +1,7 @@
 package ru.etu.mldemonstrationapp.mainservice.admin.organizations;
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@SecurityRequirement(name = "jwt-bearer")
 @RequestMapping("/api/admin/organizations")
 @RequiredArgsConstructor
 public class AdminOrganizationController {

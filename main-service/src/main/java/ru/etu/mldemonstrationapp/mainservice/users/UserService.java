@@ -36,6 +36,10 @@ public class UserService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow();
+    }
+
     @Transactional
     public User createUser(CreateUserRequest request) {
         if (userRepository.existsByLogin(request.login())) {
@@ -87,6 +91,13 @@ public class UserService {
             return;
         }
         throw new BadCredentialsException("Old password is incorrect");
+    }
+
+    @Transactional
+    public void setUserPassword(Long id, String password) {
+        User user = userRepository.findById(id).orElseThrow();
+        user.setPassword(passwordEncoder.encode(password));
+        userRepository.save(user);
     }
 
 

@@ -1,6 +1,7 @@
 package ru.etu.mldemonstrationapp.mainservice.admin.users;
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@SecurityRequirement(name = "jwt-bearer")
 @RequestMapping("/api/admin/users")
 @RequiredArgsConstructor
 public class AdminUserController {

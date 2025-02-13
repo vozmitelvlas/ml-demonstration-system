@@ -2,6 +2,7 @@ package ru.etu.mldemonstrationapp.mainservice.admin.models;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@SecurityRequirement(name = "jwt-bearer")
 @RequestMapping("/api/admin/models")
 @RequiredArgsConstructor
 public class AdminModelController {
