@@ -2,6 +2,7 @@ package ru.etu.mldemonstrationapp.mainservice.users;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -18,6 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
+@SecurityRequirement(name = "jwt-bearer")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
