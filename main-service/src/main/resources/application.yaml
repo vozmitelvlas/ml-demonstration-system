@@ -1,5 +1,7 @@
 server:
   port: 8080
+  error:
+    include-stacktrace: never
 
 spring:
   application:
@@ -13,4 +15,23 @@ spring:
     url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${spring.datasource.name}
 
   jpa:
-    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    open-in-view: true
+
+  sql:
+    init:
+      mode: always
+
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.xml
+    drop-first: true
+
+jwt:
+  secret-key: ${JWT_SECRET:example-of-secret-not-for-production-use}
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
