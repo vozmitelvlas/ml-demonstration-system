@@ -54,19 +54,19 @@ export default function MyOrganisations(){
                 </div>
 
                 <div className={styles.content}>
-                    <div className={styles.limit}>
-                        <h2>Название организации - <span>Название</span></h2>
-
+                    <div className={styles.info}>
+                        <div>
+                            <h2>Название организации - <span>Название</span></h2>
+                        </div>
                         <div>
                             <h2>Описание:</h2>
                             <textarea defaultValue={"ADASAlasdair"} disabled></textarea>
                         </div>
-
                         <div>
                             <h2>Установка лимита для участников организации:</h2>
                             <div className={styles.limits}>
                                 <Select
-                                    className={"limits-select"}
+                                    className={"limits-select naked-input"}
                                     options={limitOptions}
                                     // onChange={handleSelectChange}
                                     closeMenuOnSelect={false}
@@ -77,8 +77,6 @@ export default function MyOrganisations(){
                                 <button className={styles.button}>Сохранить</button>
                             </div>
                         </div>
-
-
                     </div>
 
                     <div  className={styles.users}>

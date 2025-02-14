@@ -8,7 +8,7 @@ export const customStyle = {
         border: "1px solid var(--accent-color)",
         color: "var(--accent-color)",
         marginTop: "10px",
-        marginBottom: "10px"
+        marginBottom: "10px",
 
     }),
     container: (provided) => ({
@@ -19,6 +19,14 @@ export const customStyle = {
         backgroundColor: "white",
 
     }),
+    valueContainer: (provided, state) => ({
+        ...provided,
+        maxWidth: "300px",
+    }),
+    // multiValue: (provided, state) => ({
+    //     ...provided,
+    //     maxWidth: "200px",
+    // }),
     option: (provided, state) => ({
         ...provided,
         backgroundColor: state.isFocused ? "var(--accent-color)" : "white",

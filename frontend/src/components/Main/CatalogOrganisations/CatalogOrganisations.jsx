@@ -137,7 +137,7 @@ export default function CatalogOrganisations() {
                             <table className="change-container__table tableHover naked-input">
                                 <tbody>
                                 <tr>
-                                    <td>Название</td>
+                                    <td>Название<span> *</span></td>
                                     <td className="text-center"><input type="text" defaultValue={""}/></td>
                                 </tr>
                                 <tr>
@@ -146,7 +146,7 @@ export default function CatalogOrganisations() {
                                 </tr>
 
                                 <tr onMouseEnter={setFirstMultiBackColor} onMouseLeave={setSecondMultiBackColor}>
-                                    <td>Доступные модели</td>
+                                    <td>Доступные модели<span> *</span></td>
                                     <td>
                                         <Select
                                             className="multi-select"

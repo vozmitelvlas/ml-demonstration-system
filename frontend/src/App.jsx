@@ -16,7 +16,6 @@ import SignUp from "./components/Main/SignInUp/SignUp.jsx";
 import PasswordRecover from "./components/Main/SignInUp/PasswordRecover.jsx";
 import MyOrganisations from "./components/Main/MyOrganisations/MyOrganisations.jsx";
 import { useDispatch, useSelector } from "react-redux";
-import axios from "axios";
 
 
 function ProtectedRoute({ isAuthenticated }) {

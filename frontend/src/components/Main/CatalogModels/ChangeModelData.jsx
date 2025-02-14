@@ -1,11 +1,12 @@
 import React, {useEffect, useState} from "react";
 import "../ChangeData.css"
-
+import styles from "./ModelData.module.css"
 import Button from "../Button/Button.jsx";
 import DataHeader from "../Headers/DataHeader.jsx";
 import {useNavigate, useParams} from "react-router-dom";
 import Select from "react-select";
 import {customStyle} from "../../utils/selectStyles.jsx";
+import alarmLogo from "../../../assets/alarm.svg"
 
 const options = [
     {value: 'O1', label: 'First'},
@@ -13,8 +14,9 @@ const options = [
 ];
 
 export default function ChangeModelData() {
-    let modelData = ["ID", "Название", "Версия", "Статус", "RunTime", "Тип задачи", "URL модели", "Образ модели"]
+    let modelData = ["ID", "Название", "Версия", "Статус", "RunTime", "Тип задачи", "URL модели"]
     const [activeBut, setActiveBut] = useState("first");
+    const [alarm, setAlarm] = useState(null)
     let navigate = useNavigate()
     let {modelId} = useParams()
 
@@ -24,7 +26,10 @@ export default function ChangeModelData() {
         setSelectedValues(newValue);
     };
     let onChangeName = () => {
-        alert('Названия других версий данной модели также изменятся')
+        setAlarm('Названия других версий данной модели также изменятся')
+    }
+    const onBlurName = () => {
+        setAlarm(null)
     }
 
     return (
@@ -39,13 +44,16 @@ export default function ChangeModelData() {
                 </DataHeader>
 
                 {activeBut === "first" && (
-                    <div className="test">
+                    <div>
+                        <div className={styles.alarmContainer}>
+                            {alarm && <b className={styles.alarm}><a className="a-img"><img src={alarmLogo}/> </a> {alarm}</b>}
+                        </div>
                         <table className="change-container__table tableHover naked-input">
                             <tbody>
                             {modelData.map((title, index) => (
                                 <tr key={index}>
                                     <td>{title}</td>
-                                    <td className="text-center"><input type="text" onClick={onChangeName} defaultValue={"smt"}/></td>
+                                    <td className="text-center"><input type="text" onClick={onChangeName} onBlur={onBlurName} defaultValue={"smt"}/></td>
                                 </tr>
                             ))}
                             <tr>
@@ -54,6 +62,7 @@ export default function ChangeModelData() {
                             </tr>
                             </tbody>
                         </table>
+
                     </div>
                 )}
                 {activeBut === "second" && (
@@ -62,7 +71,7 @@ export default function ChangeModelData() {
                         <div className="select-container">
                             <p className="text-class">Организации с доступом к модели</p>
                             <Select
-                                className="limits-select"
+                                className="limits-select naked-input"
                                 isMulti
                                 options={options}
                                 onChange={handleSelectChange}
@@ -84,12 +93,12 @@ export default function ChangeModelData() {
                                 <td>Лимит запросов/нед</td>
                                 <td><input type="text" defaultValue={""}/></td>
                             </tr>
-
                             </tbody>
                         </table>
                     </div>
                 )}
             </div>
+
 
             <div className="delete-modal__buttons">
                 <Button onClick={() => {

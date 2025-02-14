@@ -15,6 +15,7 @@ import axios from "axios"
 import Select from "react-select";
 import {customStyle, firstStyle, secondStyle} from "../../utils/selectStyles.jsx";
 import {useSelector} from "react-redux";
+import {setUserInfo} from "../../store/user-slice.jsx";
 
 const options = [
     {value: 'O1', label: 'First'},
@@ -33,7 +34,6 @@ export default function CatalogModels({isAdminMode}) {
         let tr = event.target.closest("tr")
         setIsDeletingModel(true)
     }
-
     const toggleSidebar = () => {
         setIsOpen(!isOpen);
     };
@@ -169,16 +169,13 @@ export default function CatalogModels({isAdminMode}) {
                             <table className="change-container__table tableHover naked-input">
                                 <tbody>
                                 <tr>
-                                    <td>Название</td>
-                                    <td className="text-center"><input type="text" defaultValue={""}/></td>
-                                </tr>
-                                <tr>
-                                    <td>Название образа</td>
-                                    <td className="text-center"><input type="text" defaultValue={""}/></td>
+                                    <td>Название<span> *</span></td>
+                                    <td className="text-center"><input type="text" defaultValue={""} required/></td>
                                 </tr>
 
+
                                 <tr onMouseEnter={setFirstMultiBackColor} onMouseLeave={setSecondMultiBackColor}>
-                                    <td>Тип задачи</td>
+                                    <td>Тип задачи<span> *</span></td>
                                     <td>
                                         <Select
                                             isMulti
@@ -187,6 +184,7 @@ export default function CatalogModels({isAdminMode}) {
                                             placeholder={"Тип"}
                                             isSearchable
                                             styles={selectStyle}
+                                            required
                                         />
                                     </td>
                                 </tr>

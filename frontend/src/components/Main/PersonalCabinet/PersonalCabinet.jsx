@@ -75,24 +75,25 @@ export default function PersonalCabinet() {
                         <tbody>
                         <tr>
                             <td>Логин</td>
-                            <td className="text-center"><input defaultValue={""}/></td>
-                        </tr>
-                        <tr>
-                            <td>Фамилия</td>
-                            <td className="text-center"><input defaultValue={""}/></td>
-                        </tr>
-                        <tr>
-                            <td>Имя</td>
-                            <td className="text-center"><input defaultValue={""}/></td>
-                        </tr>
-                        <tr>
-                            <td>Отчество</td>
-                            <td className="text-center"><input defaultValue={""}/></td>
+                            <td className="text-center"><input type="text" defaultValue={"vlas_vozmitel"} disabled={true}/></td>
                         </tr>
                         <tr>
                             <td>E-mail</td>
-                            <td className="text-center"><input defaultValue={""}/></td>
+                            <td className="text-center"><input type="text" defaultValue={"vlas_vozmitel@mail.ru "} disabled={true}/></td>
                         </tr>
+                        <tr>
+                            <td>Фамилия</td>
+                            <td className="text-center"><input type="text" defaultValue={""}/></td>
+                        </tr>
+                        <tr>
+                            <td>Имя</td>
+                            <td className="text-center"><input type="text" defaultValue={""}/></td>
+                        </tr>
+                        <tr>
+                            <td>Отчество</td>
+                            <td className="text-center"><input type="text" defaultValue={""}/></td>
+                        </tr>
+
 
                         <tr>
                             <td>Описание</td>

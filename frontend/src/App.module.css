@@ -5,7 +5,7 @@
   height: 100vh;
 }
 .adminMain h1 {
-  color: #49C5BA;
+  color: var(--accent-color);
 }
 
 .mainContent{

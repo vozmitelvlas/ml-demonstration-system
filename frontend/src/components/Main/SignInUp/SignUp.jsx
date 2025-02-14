@@ -60,13 +60,13 @@ export default function SignUp() {
                 <form onSubmit={handleSubmit(sendFormData)}>
                     <div className={styles.data}>
                         <p className="text-class">Регистрация</p>
-                        <input type="text" placeholder="Логин" {...register("login")}/>
-                        <input type="text" placeholder="Фамилия" {...register("lastName")}/>
-                        <input type="text" placeholder="Имя" {...register("firstName")}/>
+                        <input type="text" placeholder="Логин" {...register("login")} required/>
+                        <input type="text" placeholder="Фамилия" {...register("lastName")} required/>
+                        <input type="text" placeholder="Имя" {...register("firstName")} required/>
                         <input type="text" placeholder="Отчество" {...register("patronymic")}/>
-                        <input type="email" placeholder="E-mail" {...register("email")}/>
-                        <input type="password" placeholder="Пароль" {...register("password")}/>
-                        <input type="password" placeholder="Повторите пароль" {...register("repeatPassword")}/>
+                        <input type="email" placeholder="E-mail" {...register("email")} required/>
+                        <input type="password" placeholder="Пароль" {...register("password")} required/>
+                        <input type="password" placeholder="Повторите пароль" {...register("repeatPassword")} required/>
                         {error && <span>{error}</span>}
                     </div>
 
@@ -74,7 +74,7 @@ export default function SignUp() {
                         <button type="submit" className={styles.button}>Зарегистрироваться
                         </button>
                         <p>Если есть аккант,
-                            <span className={styles.password} onClick={() => navigate("/")}>войдите</span>
+                            <span className={styles.password} onClick={() => navigate("/")}> войдите</span>
                         </p>
                     </div>
                 </form>

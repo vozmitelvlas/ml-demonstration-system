@@ -126,28 +126,28 @@ export default function CatalogUsers() {
                     <table className="change-container__table tableHover naked-input">
                         <tbody>
                         <tr>
-                            <td>Логин</td>
-                            <td className="text-center"><input type="text" defaultValue={""}/></td>
+                            <td>Логин<span> *</span></td>
+                            <td className="text-center"><input type="text" defaultValue={""} required/></td>
                         </tr>
                         <tr>
-                            <td>Фамилия</td>
-                            <td className="text-center"><input type="text" defaultValue={""}/></td>
+                            <td>Фамилия<span> *</span></td>
+                            <td className="text-center"><input type="text" defaultValue={""} required/></td>
                         </tr>
                         <tr>
-                            <td>Имя</td>
-                            <td className="text-center"><input type="text" defaultValue={""}/></td>
+                            <td>Имя<span> *</span></td>
+                            <td className="text-center"><input type="text" defaultValue={""} required/></td>
                         </tr>
                         <tr>
                             <td>Отчество</td>
                             <td className="text-center"><input type="text" defaultValue={""}/></td>
                         </tr>
                         <tr>
-                            <td>E-mail</td>
-                            <td className="text-center"><input type="text" defaultValue={""}/></td>
+                            <td>E-mail<span> *</span></td>
+                            <td className="text-center"><input type="text" defaultValue={""} required/></td>
                         </tr>
                         <tr>
-                            <td>Пароль</td>
-                            <td className="text-center"><input type="text" defaultValue={""}/></td>
+                            <td>Пароль<span> *</span></td>
+                            <td className="text-center"><input type="text" defaultValue={""} required/></td>
                         </tr>
 
                         <tr>

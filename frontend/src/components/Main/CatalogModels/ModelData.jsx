@@ -10,7 +10,7 @@ export default function ModelData() {
     let {modelId} = useParams()
     let navigate = useNavigate()
     const [activeBut, setActiveBut] = useState("first");
-    let modelData = ["ID", "Название", "Версия", "Статус", "RunTime", "Тип задачи", "URL модели", "Образ модели"]
+    let modelData = ["ID", "Название", "Версия", "Статус", "RunTime", "Тип задачи", "URL модели"]
 
     return (
         <div className="change-container">
@@ -23,7 +23,7 @@ export default function ModelData() {
                 </DataHeader>
 
                 {activeBut === "first" && (
-                    <div>
+                    <div className={styles.first}>
                         <table className="change-container__table naked-input">
                             <tbody>
                             {modelData.map((title, index) => (

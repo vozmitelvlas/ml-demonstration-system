@@ -52,8 +52,8 @@ export default function SignIn() {
                 <div className={styles.container}>
                     <div className={styles.data}>
                         <p className="text-class">Вход</p>
-                        <input type="text" placeholder="Логин" {...register("login")}/>
-                        <input type="password"placeholder="Пароль" {...register("password")}/>
+                        <input type="text" placeholder="Логин" {...register("login")} required/>
+                        <input type="password"placeholder="Пароль" {...register("password")} required/>
                         {error && <span>{error}</span>}
                         <button className={styles.button}>Войти</button>
                     </div>

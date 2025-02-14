@@ -57,6 +57,10 @@ export default function ChangeUserData() {
                                 <td className="text-center"><input type="text" defaultValue={""}/></td>
                             </tr>
                             <tr>
+                                <td>Email</td>
+                                <td className="text-center"><input type="text" defaultValue={""}/></td>
+                            </tr>
+                            <tr>
                                 <td>Фамилия</td>
                                 <td className="text-center"><input type="text" defaultValue={""}/></td>
                             </tr>
@@ -149,7 +153,6 @@ export default function ChangeUserData() {
                         </table>
                     </div>
                 )}
-
             </div>
 
             <div className="delete-modal__buttons">

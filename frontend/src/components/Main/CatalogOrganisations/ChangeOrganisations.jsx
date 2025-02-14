@@ -68,7 +68,7 @@ export default function ChangeOrganisations(){
                         <div className="limits">
                             <h2>Установка лимита для участников организации</h2>
                             <Select
-                                className="limits-select"
+                                className="limits-select naked-input"
                                 options={limitOptions}
                                 // onChange={handleSelectChange}
                                 closeMenuOnSelect={false}
