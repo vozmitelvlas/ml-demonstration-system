@@ -16,6 +16,17 @@
     padding: 15px;
     border-radius: 15px;
 }
+.data{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 350px;
+}
+.container form{
+    display: flex;
+    flex-direction: column;
+}
 .container input, button{
     width: 280px;
     margin: 8px;

@@ -8,7 +8,7 @@ import "../Table.css"
 import React, {useState} from "react";
 import Filter from "../Filter/Filter.jsx";
 import DeleteModal from "../../utils/DeleteModal.jsx";
-import Input from "../Input/Input.jsx";
+
 import Select from "react-select"
 import {customStyle, firstStyle, secondStyle} from "../../utils/selectStyles.jsx";
 
@@ -138,11 +138,11 @@ export default function CatalogOrganisations() {
                                 <tbody>
                                 <tr>
                                     <td>Название</td>
-                                    <td className="text-center"><Input></Input></td>
+                                    <td className="text-center"><input type="text" defaultValue={""}/></td>
                                 </tr>
                                 <tr>
                                     <td>Руководитель (логин)</td>
-                                    <td className="text-center"><Input></Input></td>
+                                    <td className="text-center"><input type="text" defaultValue={""}/></td>
                                 </tr>
 
                                 <tr onMouseEnter={setFirstMultiBackColor} onMouseLeave={setSecondMultiBackColor}>

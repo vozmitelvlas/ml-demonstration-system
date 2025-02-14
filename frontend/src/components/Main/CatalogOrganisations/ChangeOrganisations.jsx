@@ -1,6 +1,6 @@
 import DataHeader from "../Headers/DataHeader.jsx";
 import React, {useState} from "react";
-import Input from "../Input/Input.jsx";
+
 import Button from "../Button/Button.jsx";
 import {useNavigate} from "react-router-dom";
 import deleteLogo from "../../../assets/delete.svg";
@@ -44,15 +44,15 @@ export default function ChangeOrganisations(){
                             <tbody>
                             <tr>
                                 <td>Название</td>
-                                <td className="text-center"><Input>Пользователи</Input></td>
+                                <td className="text-center"><input type="text" defaultValue={""}/></td>
                             </tr>
                             <tr>
                                 <td>Руководитель (логин)</td>
-                                <td className="text-center"><Input>ivan_ivanov</Input></td>
+                                <td className="text-center"><input type="text" defaultValue={""}/></td>
                             </tr>
                             <tr>
                                 <td>Дата создания</td>
-                                <td className="text-center"><Input>17.12.2025</Input></td>
+                                <td className="text-center"><input type="text" defaultValue={""}/></td>
                             </tr>
                             <tr>
                                 <td>Описание</td>
@@ -101,8 +101,8 @@ export default function ChangeOrganisations(){
                             <tr>
                                 <td className="text-center">1</td>
                                 <td className="text-center">Graph-based segmentation model1</td>
-                                <td className="text-center"><Input>50</Input></td>
-                                <td className="text-center"><Input>1000</Input></td>
+                                <td className="text-center"><input type="text" defaultValue={""}/></td>
+                                <td className="text-center"><input type="text" defaultValue={""}/></td>
                                 <td className="text-center">
                                     <a className="a-img" onClick={onDeleteModelClick}><img src={deleteLogo}></img></a>
                                 </td>

@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import "../ChangeData.css"
-import Input from "../Input/Input.jsx";
+
 import Button from "../Button/Button.jsx";
 import DataHeader from "../Headers/DataHeader.jsx";
 import {useNavigate, useParams} from "react-router-dom";
@@ -45,7 +45,7 @@ export default function ChangeModelData() {
                             {modelData.map((title, index) => (
                                 <tr key={index}>
                                     <td>{title}</td>
-                                    <td className="text-center"><Input onClick={onChangeName}>something</Input></td>
+                                    <td className="text-center"><input type="text" onClick={onChangeName} defaultValue={"smt"}/></td>
                                 </tr>
                             ))}
                             <tr>
@@ -78,11 +78,11 @@ export default function ChangeModelData() {
                             <tbody>
                             <tr>
                                 <td>Лимит RPS</td>
-                                <td><Input>50</Input></td>
+                                <td><input type="text" defaultValue={""}/></td>
                             </tr>
                             <tr>
                                 <td>Лимит запросов/нед</td>
-                                <td><Input>1000</Input></td>
+                                <td><input type="text" defaultValue={""}/></td>
                             </tr>
 
                             </tbody>

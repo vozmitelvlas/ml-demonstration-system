@@ -8,13 +8,13 @@ import rejectLogo from "../../../assets/reject.svg"
 import {Link, useNavigate} from "react-router-dom";
 import "../ModalWindow.css"
 import "../select.css"
-import Input from "../Input/Input.jsx";
 import React, {useEffect, useState} from "react";
 import Filter from "../Filter/Filter.jsx";
 import DeleteModal from "../../utils/DeleteModal.jsx";
 import axios from "axios"
 import Select from "react-select";
 import {customStyle, firstStyle, secondStyle} from "../../utils/selectStyles.jsx";
+import {useSelector} from "react-redux";
 
 const options = [
     {value: 'O1', label: 'First'},
@@ -147,9 +147,15 @@ export default function CatalogModels({isAdminMode}) {
                     <Button classNames="filter-button" onClick={toggleSidebar}>Фильтр</Button>
                     {isAdminMode && (
                         <div className="options-buttons_right-down">
-                            <Button onClick={() => {navigate("/models")}}>Модели</Button>
-                            <Button onClick={() => {navigate("/users")}}>Пользователи</Button>
-                            <Button onClick={() => {navigate("/organisations")}}>Организации</Button>
+                            <Button onClick={() => {
+                                navigate("/models")
+                            }}>Модели</Button>
+                            <Button onClick={() => {
+                                navigate("/users")
+                            }}>Пользователи</Button>
+                            <Button onClick={() => {
+                                navigate("/organisations")
+                            }}>Организации</Button>
                         </div>
                     )}
                 </div>
@@ -164,11 +170,11 @@ export default function CatalogModels({isAdminMode}) {
                                 <tbody>
                                 <tr>
                                     <td>Название</td>
-                                    <td className="text-center"><Input></Input></td>
+                                    <td className="text-center"><input type="text" defaultValue={""}/></td>
                                 </tr>
                                 <tr>
                                     <td>Название образа</td>
-                                    <td className="text-center"><Input></Input></td>
+                                    <td className="text-center"><input type="text" defaultValue={""}/></td>
                                 </tr>
 
                                 <tr onMouseEnter={setFirstMultiBackColor} onMouseLeave={setSecondMultiBackColor}>

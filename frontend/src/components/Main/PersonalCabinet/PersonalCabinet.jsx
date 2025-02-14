@@ -1,12 +1,22 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import styles from "./PesonalCabinet.module.css"
 import Button from "../Button/Button.jsx";
 import user_logo from "../../../assets/user2.svg";
-import Input from "../Input/Input.jsx";
+import {useDispatch, useSelector} from "react-redux";
+
 
 
 export default function PersonalCabinet() {
+    let userInfo = useSelector((state) => state.user.info);
     const [isEditing, setIsEditing] = useState(false);
+
+    const [user, setUser] = useState({})
+    useEffect(() => {
+        if(userInfo){
+            setUser(userInfo?.user)
+        }
+    }, [userInfo]);
+
     let closeEditModal = (event) => {
         setIsEditing(false)
     }
@@ -29,28 +39,28 @@ export default function PersonalCabinet() {
                     <tbody>
                     <tr>
                         <td>Логин</td>
-                        <td>ivanov_ivan</td>
+                        <td>{user?.login}</td>
                     </tr>
                     <tr>
                         <td>Фамилия</td>
-                        <td>Ivanov</td>
+                        <td>{user?.lastName}</td>
                     </tr>
                     <tr>
                         <td>Имя</td>
-                        <td>Ivan</td>
+                        <td>{user?.firstName}</td>
                     </tr>
                     <tr>
                         <td>Отчество</td>
-                        <td>Jovanovich</td>
+                        <td>{user?.patronymic}</td>
                     </tr>
                     <tr>
                         <td>E-mail</td>
-                        <td>ivan@mail.ru</td>
+                        <td>{user?.email}</td>
                     </tr>
 
                     <tr>
                         <td>Описание</td>
-                        <td><textarea defaultValue={"ADASAlasdair"} disabled></textarea></td>
+                        <td><textarea disabled defaultValue={user?.description}></textarea></td>
                     </tr>
                     </tbody>
                 </table>
@@ -65,23 +75,23 @@ export default function PersonalCabinet() {
                         <tbody>
                         <tr>
                             <td>Логин</td>
-                            <td className="text-center"><Input>ivanov_ivan</Input></td>
+                            <td className="text-center"><input defaultValue={""}/></td>
                         </tr>
                         <tr>
                             <td>Фамилия</td>
-                            <td className="text-center"><Input>Ivanov</Input></td>
+                            <td className="text-center"><input defaultValue={""}/></td>
                         </tr>
                         <tr>
                             <td>Имя</td>
-                            <td className="text-center"><Input>Ivan</Input></td>
+                            <td className="text-center"><input defaultValue={""}/></td>
                         </tr>
                         <tr>
                             <td>Отчество</td>
-                            <td className="text-center"><Input>Jovanovich</Input></td>
+                            <td className="text-center"><input defaultValue={""}/></td>
                         </tr>
                         <tr>
                             <td>E-mail</td>
-                            <td className="text-center"><Input>ivan@mail.ru</Input></td>
+                            <td className="text-center"><input defaultValue={""}/></td>
                         </tr>
 
                         <tr>

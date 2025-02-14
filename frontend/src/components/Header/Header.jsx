@@ -4,9 +4,12 @@ import {useNavigate} from "react-router-dom";
 import exit from "../../assets/exit.svg";
 import menu from "../../assets/menu.svg";
 import styles from "./Header.module.css";
+import {useDispatch} from "react-redux";
+import {setUserInfo} from "../store/user-slice.jsx";
 
 export default function Header({login, isAdminMode, setIsAdminMode, isAdmin, isMainOrg}) {
-    let navigate = useNavigate();
+    const navigate = useNavigate();
+    const dispatch = useDispatch()
 
     const toggleAdminMode = (event) => {
         setIsAdminMode(!isAdminMode)
@@ -19,6 +22,11 @@ export default function Header({login, isAdminMode, setIsAdminMode, isAdmin, isM
             adminButton.textContent = "Режим администратора"
         }
     };
+    const onExitClick = () => {
+        // dispatch(setUserInfo({}))
+        setIsAdminMode(false)
+        navigate("/")
+    }
 
     return (
         <header className={isAdminMode ? styles.adminMode : styles.header}>
@@ -50,7 +58,7 @@ export default function Header({login, isAdminMode, setIsAdminMode, isAdmin, isM
                         )}
                     </div>
                 </div>
-                <a className="a-img" onClick={() => navigate("/")}><img src={exit} alt={"exit"} className={isAdminMode ? styles.whiteSvg : ""}></img></a>
+                <a className="a-img" onClick={onExitClick}><img src={exit} alt={"exit"} className={isAdminMode ? styles.whiteSvg : ""}></img></a>
             </div>
 
         </header>

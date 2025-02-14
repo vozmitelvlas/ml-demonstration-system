@@ -5,7 +5,7 @@ import editLogo from "../../../assets/edit.svg"
 import {Link, useNavigate} from "react-router-dom";
 import React, {useState} from "react";
 import Filter from "../Filter/Filter.jsx";
-import Input from "../Input/Input.jsx";
+
 import DeleteModal from "../../utils/DeleteModal.jsx";
 
 export default function CatalogUsers() {
@@ -127,27 +127,27 @@ export default function CatalogUsers() {
                         <tbody>
                         <tr>
                             <td>Логин</td>
-                            <td className="text-center"><Input></Input></td>
+                            <td className="text-center"><input type="text" defaultValue={""}/></td>
                         </tr>
                         <tr>
                             <td>Фамилия</td>
-                            <td className="text-center"><Input></Input></td>
+                            <td className="text-center"><input type="text" defaultValue={""}/></td>
                         </tr>
                         <tr>
                             <td>Имя</td>
-                            <td className="text-center"><Input></Input></td>
+                            <td className="text-center"><input type="text" defaultValue={""}/></td>
                         </tr>
                         <tr>
                             <td>Отчество</td>
-                            <td className="text-center"><Input></Input></td>
+                            <td className="text-center"><input type="text" defaultValue={""}/></td>
                         </tr>
                         <tr>
                             <td>E-mail</td>
-                            <td className="text-center"><Input></Input></td>
+                            <td className="text-center"><input type="text" defaultValue={""}/></td>
                         </tr>
                         <tr>
                             <td>Пароль</td>
-                            <td className="text-center"><Input></Input></td>
+                            <td className="text-center"><input type="text" defaultValue={""}/></td>
                         </tr>
 
                         <tr>

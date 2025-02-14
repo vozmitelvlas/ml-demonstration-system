@@ -10,11 +10,13 @@ import ChangeOrganisations from "./components/Main/CatalogOrganisations/ChangeOr
 import PersonalCabinet from "./components/Main/PersonalCabinet/PersonalCabinet.jsx";
 import SignIn from "./components/Main/SignInUp/SignIn.jsx";
 import { useLocation } from 'react-router-dom';
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import ModelData from "./components/Main/CatalogModels/ModelData.jsx";
 import SignUp from "./components/Main/SignInUp/SignUp.jsx";
 import PasswordRecover from "./components/Main/SignInUp/PasswordRecover.jsx";
 import MyOrganisations from "./components/Main/MyOrganisations/MyOrganisations.jsx";
+import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
 
 
 function ProtectedRoute({ isAuthenticated }) {
@@ -25,16 +27,32 @@ function ProtectedRoute({ isAuthenticated }) {
 }
 
 function App() {
-    let userLogin = "user_login";
+    const dispatch = useDispatch();
     const location = useLocation();
     const [isAdminMode, setIsAdminMode] = useState(false);
     const excludedPaths = ['/', '/signup', '/password'];
+    let userInfo = useSelector((state) => state.user.info);
+
+    const [isAdmin, setIsAdmin] = useState(false)
+    const [isMainOrg, setMainOrg] = useState(false)
+    const [login, setLogin] = useState("user_login")
+
+    useEffect(() => {
+        if(userInfo){
+            console.log(userInfo)
+            userInfo?.user?.roles.includes("ADMIN") ? setIsAdmin(true) : setIsAdmin(false)
+
+            setMainOrg(userInfo?.user?.roles.includes("ORGANIZATION_HEAD"))
+            setLogin(userInfo?.user?.login)
+        }
+    }, [userInfo, dispatch]);
+
 
     return (
         <div className={isAdminMode ? styles.adminMain : styles.main}>
             {
                 !excludedPaths.includes(location.pathname) &&
-                <Header login={userLogin} isMainOrg={true} isAdmin={true} isAdminMode={isAdminMode} setIsAdminMode={setIsAdminMode}/>
+                <Header login={login} isMainOrg={isMainOrg} isAdmin={isAdmin} isAdminMode={isAdminMode} setIsAdminMode={setIsAdminMode}/>
             }
             <div className={styles.mainContent}>
                 <Routes>
