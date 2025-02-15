@@ -58,9 +58,9 @@ export default function SignUp() {
         <div className={styles.signInUp}>
             <form onSubmit={handleSubmit(sendFormData)}>
                 <div className={styles.container}>
-                    <div className={styles.upData}>
+                    <div className={`${styles.upData} naked-input`}>
                         <h2>Регистрация в ML models</h2>
-                        <div className={`${styles.row} naked-input`}>
+                        <div className={`${styles.row}`}>
                             <div className={styles.inputDiv}>
                                 <label>Фамилия<span> *</span></label>
                                 <div>
@@ -76,7 +76,7 @@ export default function SignUp() {
                             </div>
                         </div>
 
-                        <div className={`${styles.row} naked-input`}>
+                        <div className={styles.row}>
                             <div className={styles.inputDiv}>
                                 <label>Отчество</label>
                                 <div>
@@ -92,7 +92,7 @@ export default function SignUp() {
                             </div>
                         </div>
 
-                        <div className={`${styles.row} naked-input`}>
+                        <div className={styles.row}>
                             <div className={styles.inputDiv}>
                                 <label>Электронная почта<span> *</span></label>
                                 <div>
@@ -101,7 +101,7 @@ export default function SignUp() {
                             </div>
                         </div>
 
-                        <div className={`${styles.row} naked-input`}>
+                        <div className={styles.row}>
                             <div className={styles.inputDiv}>
                                 <label>Пароль<span> *</span></label>
                                 <div>

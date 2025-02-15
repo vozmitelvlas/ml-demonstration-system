@@ -68,7 +68,7 @@ th.text-center {
 }
 .naked-input input{
     width: 250px;
-    /*text-align: center;*/
+    text-align: center;
 
     border: 1px solid var(--accent-color);
     background-color: rgba(73, 197, 186, 0.08);

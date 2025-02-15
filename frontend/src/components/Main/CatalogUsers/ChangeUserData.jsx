@@ -54,11 +54,15 @@ export default function ChangeUserData() {
                             <tbody>
                             <tr>
                                 <td>Логин</td>
-                                <td className="text-center"><input type="text" defaultValue={""}/></td>
+                                <td className="text-center"><input type="text" defaultValue={""} disabled/></td>
                             </tr>
                             <tr>
                                 <td>Email</td>
-                                <td className="text-center"><input type="text" defaultValue={""}/></td>
+                                <td className="text-center"><input type="text" defaultValue={""} disabled/></td>
+                            </tr>
+                            <tr>
+                                <td>Дата регистрации</td>
+                                <td className="text-center"><input type="text" defaultValue={""} disabled/></td>
                             </tr>
                             <tr>
                                 <td>Фамилия</td>
@@ -68,10 +72,7 @@ export default function ChangeUserData() {
                                 <td>Имя</td>
                                 <td className="text-center"><input type="text" defaultValue={""}/></td>
                             </tr>
-                            <tr>
-                                <td>Дата регистрации</td>
-                                <td className="text-center"><input type="text" defaultValue={""}/></td>
-                            </tr>
+
                             <tr>
                                 <td>Организация</td>
                                 <td>

@@ -19,7 +19,8 @@
     border-radius: 15px;
 }
 .container input{
-    height: calc(2.2rem + 2px);;
+    height: calc(2.2rem + 2px);
+    text-align: left;
 }
 .upData{
     display: flex;
