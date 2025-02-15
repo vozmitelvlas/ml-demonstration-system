@@ -139,6 +139,34 @@ export default function CatalogModels({isAdminMode}) {
                                 </td>
                             )}
                         </tr>
+                        <tr id="123">
+                            <td className="text-center">1</td>
+                            <td className="text-center">
+                                <a><img src={rejectLogo}></img></a>
+                            </td>
+                            <td className="text-center"><Link to={`/models/${1}/data`}>Graph-based segmentation
+                                model</Link>
+                            </td>
+                            <td className="text-center">#1</td>
+                            <td className="text-center">type</td>
+                            <td className="text-center">123123</td>
+                            <td className="text-center">
+                                <div className="URL">
+                                    dfpmpdmfpbpm/a/a/
+                                    <a className="a-img" name="copyLogo"><img src={copyLogo}></img></a>
+                                </div>
+                            </td>
+                            {isAdminMode && (
+                                <td className="text-center">
+                                    <Link className="a-img" to={`/models/${1}/edit`}><img src={editLogo}></img></Link>
+                                </td>
+                            )}
+                            {isAdminMode && (
+                                <td className="text-center">
+                                    <a className="a-img" onClick={onDeleteModelClick}><img src={deleteLogo}></img></a>
+                                </td>
+                            )}
+                        </tr>
                         </tbody>
                     </table>
                 </div>
