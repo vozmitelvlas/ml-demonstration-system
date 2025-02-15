@@ -50,12 +50,27 @@ export default function SignIn() {
         <div className={styles.signInUp}>
             <form onSubmit={handleSubmit(sendFormData)}>
                 <div className={styles.container}>
-                    <div className={styles.data}>
-                        <p className="text-class">Вход</p>
-                        <input type="text" placeholder="Логин" {...register("login")} required/>
-                        <input type="password"placeholder="Пароль" {...register("password")} required/>
+                    <div className={styles.inData}>
+                        <h2>Вход в ML models</h2>
+                        <div className={`${styles.row} naked-input`}>
+                            <div className={styles.inputDiv}>
+                                <div>
+                                    <input type="text" placeholder="Логин" {...register("login")} required/>
+                                </div>
+                            </div>
+                        </div>
+                        <div className={`${styles.row} naked-input`}>
+                            <div className={styles.inputDiv}>
+                                <div>
+                                    <input type="password" placeholder="Пароль" {...register("password")} required/>
+                                </div>
+                            </div>
+                        </div>
+
                         {error && <span>{error}</span>}
-                        <button className={styles.button}>Войти</button>
+                        <div className={styles.button}>
+                            <button className={styles.button}>Войти</button>
+                        </div>
                     </div>
 
                     <div>

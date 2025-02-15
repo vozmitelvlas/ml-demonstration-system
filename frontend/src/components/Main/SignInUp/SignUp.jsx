@@ -48,7 +48,7 @@ export default function SignUp() {
             navigate("/models")
         } catch (serverError) {
             if (serverError.response.status === 409) {
-                setError('form', { type: 'server', message: 'Пользователь с таким логином уже существует' })
+                setError('form', {type: 'server', message: 'Пользователь с таким логином уже существует'})
             }
         }
         // () => navigate("/models")
@@ -58,25 +58,76 @@ export default function SignUp() {
         <div className={styles.signInUp}>
             <div className={styles.container}>
                 <form onSubmit={handleSubmit(sendFormData)}>
-                    <div className={styles.data}>
-                        <p className="text-class">Регистрация</p>
-                        <input type="text" placeholder="Логин" {...register("login")} required/>
-                        <input type="text" placeholder="Фамилия" {...register("lastName")} required/>
-                        <input type="text" placeholder="Имя" {...register("firstName")} required/>
-                        <input type="text" placeholder="Отчество" {...register("patronymic")}/>
-                        <input type="email" placeholder="E-mail" {...register("email")} required/>
-                        <input type="password" placeholder="Пароль" {...register("password")} required/>
-                        <input type="password" placeholder="Повторите пароль" {...register("repeatPassword")} required/>
+                    <div className={styles.upData}>
+                        <h2>Регистрация в ML models</h2>
+                        <div className={`${styles.row} naked-input`}>
+                            <div className={styles.inputDiv}>
+                                <label>Фамилия<span> *</span></label>
+                                <div>
+                                    <input type="text" placeholder="Иванов" {...register("lastName")}
+                                           required/>
+                                </div>
+                            </div>
+                            <div className={styles.inputDiv}>
+                                <label>Имя<span> *</span></label>
+                                <div>
+                                    <input type="text" placeholder="Иван" {...register("firstName")} required/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className={`${styles.row} naked-input`}>
+                            <div className={styles.inputDiv}>
+                                <label>Отчество</label>
+                                <div>
+                                    <input type="text" placeholder="Иванович" {...register("patronymic")}/>
+                                </div>
+                            </div>
+
+                            <div className={styles.inputDiv}>
+                                <label>Логин<span> *</span></label>
+                                <div>
+                                    <input type="text" placeholder="ivan_ivanov" {...register("login")} required/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className={`${styles.row} naked-input`}>
+                            <div className={styles.inputDiv}>
+                                <label>Электронная почта<span> *</span></label>
+                                <div>
+                                    <input type="email" placeholder="example@mail.ru" {...register("email")} required/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className={`${styles.row} naked-input`}>
+                            <div className={styles.inputDiv}>
+                                <label>Пароль<span> *</span></label>
+                                <div>
+                                    <input type="password" placeholder="******" {...register("password")} required/>
+                                </div>
+                            </div>
+
+                            <div className={styles.inputDiv}>
+                                <label>Повторите пароль<span> *</span></label>
+                                <div>
+                                    <input type="password"
+                                           placeholder="******" {...register("repeatPassword")}
+                                           required/>
+                                </div>
+                            </div>
+                        </div>
+
                         {error && <span>{error}</span>}
                     </div>
 
-                    <div>
-                        <button type="submit" className={styles.button}>Зарегистрироваться
-                        </button>
-                        <p>Если есть аккант,
-                            <span className={styles.password} onClick={() => navigate("/")}> войдите</span>
-                        </p>
+                    <div className={styles.button}>
+                        <button type="submit" className={styles.button}>Зарегистрироваться</button>
                     </div>
+                    <p>Если есть аккант,
+                        <span className={styles.password} onClick={() => navigate("/")}> войдите</span>
+                    </p>
                 </form>
             </div>
         </div>

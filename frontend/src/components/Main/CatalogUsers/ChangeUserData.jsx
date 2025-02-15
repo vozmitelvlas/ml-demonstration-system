@@ -101,7 +101,7 @@ export default function ChangeUserData() {
                             </tr>
                             <tr>
                                 <td>Описание</td>
-                                <td><textarea defaultValue={"Asdasd"}></textarea></td>
+                                <td><textarea></textarea></td>
                             </tr>
                             </tbody>
                         </table>

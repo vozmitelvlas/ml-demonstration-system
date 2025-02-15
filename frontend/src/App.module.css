@@ -1,7 +1,13 @@
 .main{
+  display: flex;
+  flex-direction: column; /* Вертикальное расположение элементов */
+
   height: 100vh;
 }
 .adminMain{
+  display: flex;
+  flex-direction: column;
+
   height: 100vh;
 }
 .adminMain h1 {
@@ -11,6 +17,6 @@
 .mainContent{
   display: flex;
   justify-content: center;
-  /*padding: 30px 30px 5px;*/
+  flex-grow: 1;
   height: 89%;
 }

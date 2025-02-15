@@ -8,14 +8,7 @@ import "../Table.css"
 import React, {useState} from "react";
 import Filter from "../Filter/Filter.jsx";
 import DeleteModal from "../../utils/DeleteModal.jsx";
-
-import Select from "react-select"
 import {customStyle, firstStyle, secondStyle} from "../../utils/selectStyles.jsx";
-
-const options = [
-    {value: 'O1', label: 'First'},
-    {value: 'O2', label: 'Second'}
-];
 
 export default function CatalogOrganisations() {
     let navigate = useNavigate()
@@ -139,26 +132,6 @@ export default function CatalogOrganisations() {
                                 <tr>
                                     <td>Название<span> *</span></td>
                                     <td className="text-center"><input type="text" defaultValue={""}/></td>
-                                </tr>
-                                <tr>
-                                    <td>Руководитель (логин)</td>
-                                    <td className="text-center"><input type="text" defaultValue={""}/></td>
-                                </tr>
-
-                                <tr onMouseEnter={setFirstMultiBackColor} onMouseLeave={setSecondMultiBackColor}>
-                                    <td>Доступные модели<span> *</span></td>
-                                    <td>
-                                        <Select
-                                            className="multi-select"
-                                            isMulti
-                                            options={options}
-                                            onChange={handleSelectChange}
-                                            closeMenuOnSelect={false}
-                                            placeholder={"Выбрать"}
-                                            isSearchable
-                                            styles={selectStyle}
-                                        />
-                                    </td>
                                 </tr>
                                 <tr>
                                     <td>Описание</td>

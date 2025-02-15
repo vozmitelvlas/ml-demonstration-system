@@ -62,39 +62,41 @@ export default function ChangeModelData() {
                             </tr>
                             </tbody>
                         </table>
-
                     </div>
                 )}
                 {activeBut === "second" && (
-                    <div>
-                        <h2>Видимость</h2>
-                        <div className="select-container">
-                            <p className="text-class">Организации с доступом к модели</p>
-                            <Select
-                                className="limits-select naked-input"
-                                isMulti
-                                options={options}
-                                onChange={handleSelectChange}
-                                closeMenuOnSelect={false}
-                                placeholder={"Выбрать"}
-                                isSearchable
-                                styles={customStyle}
-                            />
+                    <div className="second">
+                        <div>
+                            <h2>Видимость</h2>
+                            <div>
+                                <p className="text-class">Организации с доступом к модели</p>
+                                <Select
+                                    className="limits-select naked-input"
+                                    isMulti
+                                    options={options}
+                                    onChange={handleSelectChange}
+                                    closeMenuOnSelect={false}
+                                    placeholder={"Выбрать"}
+                                    isSearchable
+                                    styles={customStyle}
+                                />
+                            </div>
                         </div>
-
-                        <h2>Лимиты по умолчанию</h2>
-                        <table className="change-container__table tableHover naked-input">
-                            <tbody>
-                            <tr>
-                                <td>Лимит RPS</td>
-                                <td><input type="text" defaultValue={""}/></td>
-                            </tr>
-                            <tr>
-                                <td>Лимит запросов/нед</td>
-                                <td><input type="text" defaultValue={""}/></td>
-                            </tr>
-                            </tbody>
-                        </table>
+                        <div>
+                            <h2>Лимиты по умолчанию</h2>
+                            <table className="change-container__table tableHover naked-input">
+                                <tbody>
+                                <tr>
+                                    <td>Лимит RPS</td>
+                                    <td><input type="text" defaultValue={""}/></td>
+                                </tr>
+                                <tr>
+                                    <td>Лимит запросов/нед</td>
+                                    <td><input type="text" defaultValue={""}/></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 )}
             </div>
