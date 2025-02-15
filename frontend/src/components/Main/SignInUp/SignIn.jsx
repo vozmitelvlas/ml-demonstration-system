@@ -69,7 +69,7 @@ export default function SignIn() {
 
                         {error && <span>{error}</span>}
                         <div className={styles.button}>
-                            <button className={styles.button}>Войти</button>
+                            <button type="submit">Войти</button>
                         </div>
                     </div>
 

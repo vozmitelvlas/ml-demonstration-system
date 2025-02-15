@@ -56,8 +56,8 @@ export default function SignUp() {
 
     return (
         <div className={styles.signInUp}>
-            <div className={styles.container}>
-                <form onSubmit={handleSubmit(sendFormData)}>
+            <form onSubmit={handleSubmit(sendFormData)}>
+                <div className={styles.container}>
                     <div className={styles.upData}>
                         <h2>Регистрация в ML models</h2>
                         <div className={`${styles.row} naked-input`}>
@@ -120,16 +120,17 @@ export default function SignUp() {
                         </div>
 
                         {error && <span>{error}</span>}
+
+                        <div className={styles.button}>
+                            <button type="submit">Зарегистрироваться</button>
+                        </div>
                     </div>
 
-                    <div className={styles.button}>
-                        <button type="submit" className={styles.button}>Зарегистрироваться</button>
-                    </div>
                     <p>Если есть аккант,
                         <span className={styles.password} onClick={() => navigate("/")}> войдите</span>
                     </p>
-                </form>
-            </div>
+                </div>
+            </form>
         </div>
     )
 }
