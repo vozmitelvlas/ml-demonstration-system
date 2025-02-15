@@ -79,11 +79,10 @@ div.table-title {
 }
 
 .table-fill tr:hover td {
-    background: #49C5BA;
+    background: var(--accent-color);
     color: #FFFFFF;
     border-top: 1px solid #22262e;
 }
-
 .table-fill tr:first-child {
     border-top: none;
 }
@@ -97,7 +96,7 @@ div.table-title {
 }
 
 .table-fill tr:nth-child(odd):hover td {
-    background: #49C5BA;
+    background: var(--accent-color);
 }
 
 .table-fill tr:last-child td:first-child {
@@ -146,4 +145,13 @@ td.text-center {
 }
 td.text-right {
     text-align: right;
+}
+tr:hover input {
+    background-color: #ffffff;
+}
+tr:hover select {
+    background-color: white;
+}
+tr:hover textarea:not([disabled]) {
+    background-color: #ffffff;
 }

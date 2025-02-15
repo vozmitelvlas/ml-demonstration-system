@@ -1,25 +1,136 @@
-import Input from "../Input/Input.jsx";
 import React from "react";
 import {useNavigate} from "react-router-dom";
 import styles from "./SignIn.module.css"
+import {useForm} from "react-hook-form";
+import {yupResolver} from "@hookform/resolvers/yup";
+import axios from "axios";
+import {setUserInfo} from "../../store/user-slice.jsx";
+import {useDispatch} from "react-redux";
+import {signUpSchema} from "../../store/formSchema.jsx";
 
-export default function SignUp(){
-    let navigate = useNavigate()
 
-    return(
+export default function SignUp() {
+    const navigate = useNavigate()
+    const dispatch = useDispatch()
+    const {
+        register,
+        handleSubmit,
+        formState: {errors},
+        setError
+    } = useForm({
+        defaultValues: {
+            login: "",
+            email: "",
+            firstName: "",
+            lastName: "",
+            patronymic: "",
+            password: "",
+            repeatPassword: "",
+            description: ""
+        },
+        resolver: yupResolver(signUpSchema)
+    })
+
+    const firstErrorKey = Object.keys(errors)[0];
+    const error = firstErrorKey ? errors[firstErrorKey].message : ''
+
+    const sendFormData = async (formData) => {
+        console.log(formData)
+        try {
+            await axios
+                .post('http://localhost:8080/api/auth/register', formData)
+                .then((res) => {
+                    dispatch(setUserInfo(res.data))
+                    localStorage.setItem("login", formData.login);
+                    localStorage.setItem("password", formData.password);
+                });
+
+            navigate("/models")
+        } catch (serverError) {
+            if (serverError.response.status === 409) {
+                setError('form', {type: 'server', message: 'Пользователь с таким логином уже существует'})
+            }
+        }
+        // () => navigate("/models")
+    }
+
+    return (
         <div className={styles.signInUp}>
-            <div className={styles.container}>
-                <p className="text-class">Регистрация</p>
-                <Input placeholder="Логин"></Input>
-                <Input placeholder="Фамилия"></Input>
-                <Input placeholder="Имя"></Input>
-                <Input placeholder="Отчество"></Input>
-                <Input placeholder="E-mail"></Input>
-                <Input type="password" placeholder="Пароль"></Input>
-                <Input type="password" placeholder="Повторите пароль"></Input>
-                <button className={styles.button} onClick={() => navigate("/models")}>Зарегистрироваться</button>
-                <p>Если есть аккант, <span className={styles.password} onClick={() => navigate("/")}>войдите</span></p>
-            </div>
+            <form onSubmit={handleSubmit(sendFormData)}>
+                <div className={styles.container}>
+                    <div className={`${styles.upData} naked-input`}>
+                        <h2>Регистрация в ML models</h2>
+                        <div className={`${styles.row}`}>
+                            <div className={styles.inputDiv}>
+                                <label>Фамилия<span> *</span></label>
+                                <div>
+                                    <input type="text" placeholder="Иванов" {...register("lastName")}
+                                           required/>
+                                </div>
+                            </div>
+                            <div className={styles.inputDiv}>
+                                <label>Имя<span> *</span></label>
+                                <div>
+                                    <input type="text" placeholder="Иван" {...register("firstName")} required/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className={styles.row}>
+                            <div className={styles.inputDiv}>
+                                <label>Отчество</label>
+                                <div>
+                                    <input type="text" placeholder="Иванович" {...register("patronymic")}/>
+                                </div>
+                            </div>
+
+                            <div className={styles.inputDiv}>
+                                <label>Логин<span> *</span></label>
+                                <div>
+                                    <input type="text" placeholder="ivan_ivanov" {...register("login")} required/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className={styles.row}>
+                            <div className={styles.inputDiv}>
+                                <label>Электронная почта<span> *</span></label>
+                                <div>
+                                    <input type="email" placeholder="example@mail.ru" {...register("email")} required/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className={styles.row}>
+                            <div className={styles.inputDiv}>
+                                <label>Пароль<span> *</span></label>
+                                <div>
+                                    <input type="password" placeholder="******" {...register("password")} required/>
+                                </div>
+                            </div>
+
+                            <div className={styles.inputDiv}>
+                                <label>Повторите пароль<span> *</span></label>
+                                <div>
+                                    <input type="password"
+                                           placeholder="******" {...register("repeatPassword")}
+                                           required/>
+                                </div>
+                            </div>
+                        </div>
+
+                        {error && <span>{error}</span>}
+
+                        <div className={styles.button}>
+                            <button type="submit">Зарегистрироваться</button>
+                        </div>
+                    </div>
+
+                    <p>Если есть аккант,
+                        <span className={styles.password} onClick={() => navigate("/")}> войдите</span>
+                    </p>
+                </div>
+            </form>
         </div>
     )
 }

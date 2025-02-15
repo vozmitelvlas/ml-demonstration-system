@@ -1,20 +1,65 @@
 .signInUp{
     flex-grow: 1;
-    height: 780px;
+    height: 100%;
     display: flex;
     align-items: center;
     text-align: center;
     justify-content: center;
+
+    background-color: #ececec;
 }
 .container{
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    background-color: white;
 
-    background-color: #D3D8E8;
     padding: 15px;
     border-radius: 15px;
+}
+.container input{
+    height: calc(2.2rem + 2px);
+    text-align: left;
+}
+.upData{
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    width: 600px;
+    padding-right: 20px;
+}
+.inData{
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    width: 400px;
+    padding-right: 20px;
+}
+
+
+.row{
+    display: flex;
+    width: 100%;
+}
+.inputDiv{
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    width: 100%;
+    margin: 10px;
+
+    justify-content: center;
+}
+.inputDiv > div > input{
+    width: 100%;
+}
+.inputDiv > label{
+    margin-left: 15px;
+}
+.container form{
+    display: flex;
+    flex-direction: column;
 }
 .container input, button{
     width: 280px;
@@ -22,13 +67,15 @@
     border-radius: 0.6rem;
 }
 .button{
-    border-radius: 1rem;
-    background-color:#49C5BA;
-    cursor:pointer;
+}
+.button button{
+    height: 45px;
+    width: 100%;
     color:#ffffff;
+    background-color:var(--accent-color);
     font-size: 16px;
-    padding:7px 64px;
     border: unset;
+    cursor:pointer;
 }
 .button:hover {
     box-shadow: 0 0 0 1px rgb(253, 253, 253);
@@ -40,6 +87,6 @@
 
 .password{
     font-size: 14px;
-    color: #006AFF;
+    color: #49C5BA;
     cursor: pointer;
 }

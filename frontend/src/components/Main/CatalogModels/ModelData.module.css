@@ -1,3 +1,8 @@
+.first{
+    display: flex;
+    justify-content: center;
+}
+
 .uploadContainer {
     display: flex;
     flex-direction: column;
@@ -5,7 +10,7 @@
     padding: 20px;
     border-radius: 6px;
     text-align: center;
-    background-color: rgba(73, 197, 186, 0.09);
+    background-color: var(--light-accent-color);
     transition: background-color 0.3s;
 }
 .uploadContainer:hover {
@@ -13,13 +18,13 @@
 }
 .uploadContainer i {
     font-size: 4em;
-    color: #49C5BA;
+    color: var(--accent-color);
 }
 .upload{
     width: 400px;
     padding: 20px;
     border-radius: 6px;
-    border: 1px dashed #49C5BA;
+    border: 1px dashed var(--accent-color);
 }
 .uploadContainer input[type="file"] {
     opacity: 0;
@@ -34,7 +39,7 @@
 }
 .sendButton{
     border-radius: 1rem;
-    background-color:#49C5BA;
+    background-color: var(--accent-color);
     cursor:pointer;
     color:#ffffff;
     font-size: 16px;
@@ -47,4 +52,17 @@
 .sendButton:active {
     position:relative;
     top:1px;
+}
+.alarmContainer{
+    height: 30px;
+}
+.alarm{
+    color: #49C5BA;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+}
+.alarm a{
+    cursor: default;
 }

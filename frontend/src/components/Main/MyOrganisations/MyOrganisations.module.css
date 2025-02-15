@@ -1,7 +1,63 @@
 .users{
-    height: 600px;
-    overflow: auto;
+    text-align: left;
+    margin-right: 120px;
+    height: 100%;
+}
+.users h2{
+    margin-left: 30px;
 }
 .users td{
-    padding-right: 120px;
+    padding-right: 250px;
+}
+.table{
+    padding: 20px;
+    height: 500px;
+    overflow: auto;
+}
+.header{
+    display: flex;
+    margin: 30px 50px 0 50px;
+}
+.info{
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    text-align: left;
+    height: 100%;
+    margin-left: 120px;
+
+}
+.content{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    flex-grow: 1;
+    overflow: auto;
+}
+.content span{
+    color: var(--accent-color);
+    font-size: 24px;
+}
+.button{
+    border-radius: 1rem;
+    background-color: var(--accent-color);
+    cursor:pointer;
+    color:#ffffff;
+    font-size: 14px;
+    width: 120px;
+    height: 26px;
+
+    border: unset;
+}
+.button:hover {
+    box-shadow: 0 0 0 1px rgb(253, 253, 253);
+}
+.button:active {
+    position:relative;
+    top:1px;
+}
+.limits{
+    display: flex;
+    align-items: center;
 }

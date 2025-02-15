@@ -1,4 +1,4 @@
-import './App.css'
+import styles from './App.module.css'
 import Header from "./components/Header/Header.jsx";
 import CatalogModels from "./components/Main/CatalogModels/CatalogModels.jsx";
 import {Routes, Route, Outlet, Navigate} from "react-router-dom";
@@ -10,12 +10,12 @@ import ChangeOrganisations from "./components/Main/CatalogOrganisations/ChangeOr
 import PersonalCabinet from "./components/Main/PersonalCabinet/PersonalCabinet.jsx";
 import SignIn from "./components/Main/SignInUp/SignIn.jsx";
 import { useLocation } from 'react-router-dom';
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import ModelData from "./components/Main/CatalogModels/ModelData.jsx";
 import SignUp from "./components/Main/SignInUp/SignUp.jsx";
 import PasswordRecover from "./components/Main/SignInUp/PasswordRecover.jsx";
 import MyOrganisations from "./components/Main/MyOrganisations/MyOrganisations.jsx";
-import ChangeMyOrganisation from "./components/Main/MyOrganisations/ChangeMyOrganisation.jsx";
+import { useDispatch, useSelector } from "react-redux";
 
 
 function ProtectedRoute({ isAuthenticated }) {
@@ -26,18 +26,34 @@ function ProtectedRoute({ isAuthenticated }) {
 }
 
 function App() {
-    let userLogin = "user_login";
+    const dispatch = useDispatch();
     const location = useLocation();
     const [isAdminMode, setIsAdminMode] = useState(false);
     const excludedPaths = ['/', '/signup', '/password'];
+    let userInfo = useSelector((state) => state.user.info);
+
+    const [isAdmin, setIsAdmin] = useState(false)
+    const [isMainOrg, setMainOrg] = useState(false)
+    const [login, setLogin] = useState("user_login")
+
+    useEffect(() => {
+        if(userInfo){
+            console.log(userInfo)
+            userInfo?.user?.roles.includes("ADMIN") ? setIsAdmin(true) : setIsAdmin(false)
+
+            setMainOrg(userInfo?.user?.roles.includes("ORGANIZATION_HEAD"))
+            setLogin(userInfo?.user?.login)
+        }
+    }, [userInfo, dispatch]);
+
 
     return (
-        <div className="header-main">
+        <div className={isAdminMode ? styles.adminMain : styles.main}>
             {
                 !excludedPaths.includes(location.pathname) &&
-                <Header login={userLogin} isMainOrg={true} isAdmin={true} isAdminMode={isAdminMode} setIsAdminMode={setIsAdminMode}/>
+                <Header login={login} isMainOrg={isMainOrg} isAdmin={isAdmin} isAdminMode={isAdminMode} setIsAdminMode={setIsAdminMode}/>
             }
-            <div className="main-content">
+            <div className={styles.mainContent}>
                 <Routes>
                     <Route path="/" element={<SignIn />} />
                     <Route path="/signup" element={<SignUp />} />
@@ -52,11 +68,10 @@ function App() {
                     <Route path="/users" element={<CatalogUsers />} />
                     <Route path="/users/:userId/edit" element={<ChangeUserData />} />
 
-                    <Route path="/user/organisations" element={<MyOrganisations />} />
-                    <Route path="/user/organisations/:orgId/edit" element={<ChangeMyOrganisation />} />
+                    <Route path="/user/organisation" element={<MyOrganisations />} />
 
-                    <Route path="/users/organisations" element={<CatalogOrganisations />} />
-                    <Route path="/users/organisations/:orgId/edit" element={<ChangeOrganisations />} />
+                    <Route path="/organisations" element={<CatalogOrganisations />} />
+                    <Route path="/organisations/:orgId/edit" element={<ChangeOrganisations />} />
                 </Routes>
             </div>
         </div>

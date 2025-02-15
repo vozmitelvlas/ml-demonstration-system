@@ -1,0 +1,22 @@
+.main{
+  display: flex;
+  flex-direction: column; /* Вертикальное расположение элементов */
+
+  height: 100vh;
+}
+.adminMain{
+  display: flex;
+  flex-direction: column;
+
+  height: 100vh;
+}
+.adminMain h1 {
+  color: var(--accent-color);
+}
+
+.mainContent{
+  display: flex;
+  justify-content: center;
+  flex-grow: 1;
+  height: 89%;
+}

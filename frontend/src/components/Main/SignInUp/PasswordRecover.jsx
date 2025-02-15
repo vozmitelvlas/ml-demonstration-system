@@ -1,20 +1,28 @@
-import Input from "../Input/Input.jsx";
-import React from "react";
+
+import React, {useState} from "react";
 import {useNavigate} from "react-router-dom";
 import styles from "./SignIn.module.css"
 
 export default function PasswordRecover() {
     let navigate = useNavigate()
-    const handleEnterClick = () => {
+    const [email, setEmail] = useState("")
+
+    const sendFormData = (event) => {
+        event.preventDefault()
         navigate("/models")
+    }
+    const onEmailChange = ({target}) => {
+        setEmail(target.value)
     }
 
     return (
         <div className={styles.signInUp}>
             <div className={styles.container}>
-                <p className="text-class">Регистрация</p>
-                <Input type="password" placeholder="Введите email"></Input>
-                <button className={styles.button} onClick={handleEnterClick}>Восстановить</button>
+                <form onSubmit={sendFormData}>
+                    <p className="text-class">Восстановление пароля</p>
+                    <input value={email} type="email" placeholder="Введите email" onChange={onEmailChange}/>
+                    <button className={styles.button}>Восстановить</button>
+                </form>
             </div>
         </div>
     )

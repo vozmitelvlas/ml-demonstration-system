@@ -5,7 +5,7 @@ import editLogo from "../../../assets/edit.svg"
 import {Link, useNavigate} from "react-router-dom";
 import React, {useState} from "react";
 import Filter from "../Filter/Filter.jsx";
-import Input from "../Input/Input.jsx";
+
 import DeleteModal from "../../utils/DeleteModal.jsx";
 
 export default function CatalogUsers() {
@@ -111,9 +111,9 @@ export default function CatalogUsers() {
                 <div className="options-buttons">
                     <Button classNames="filter-button" onClick={toggleSidebar}>Фильтр</Button>
                     <div className="options-buttons_right-down">
-                        <Button>Мониторинг</Button>
-                        <Button onClick={() => {navigate("/users/organisations")}}>Организации</Button>
                         <Button onClick={() => {navigate("/models")}}>Модели</Button>
+                        <Button onClick={() => {navigate("/users")}}>Пользователи</Button>
+                        <Button onClick={() => {navigate("/organisations")}}>Организации</Button>
                     </div>
                 </div>
             </main>
@@ -121,38 +121,38 @@ export default function CatalogUsers() {
             <div className="add-modal-overlay add-modal-overlay_hidden">
                 <div className="add-user-modal">
                     <div className="add-modal__title">
-                        <h3>Добавление пользователя</h3>
+                        <h3>Новый пользователь</h3>
                     </div>
-                    <table className="change-container__table tableHover ">
+                    <table className="change-container__table tableHover naked-input">
                         <tbody>
                         <tr>
-                            <td>Логин</td>
-                            <td className="text-center"><Input></Input></td>
+                            <td>Логин<span> *</span></td>
+                            <td className="text-center"><input type="text" defaultValue={""} required/></td>
                         </tr>
                         <tr>
-                            <td>Фамилия</td>
-                            <td className="text-center"><Input></Input></td>
+                            <td>Фамилия<span> *</span></td>
+                            <td className="text-center"><input type="text" defaultValue={""} required/></td>
                         </tr>
                         <tr>
-                            <td>Имя</td>
-                            <td className="text-center"><Input></Input></td>
+                            <td>Имя<span> *</span></td>
+                            <td className="text-center"><input type="text" defaultValue={""} required/></td>
                         </tr>
                         <tr>
                             <td>Отчество</td>
-                            <td className="text-center"><Input></Input></td>
+                            <td className="text-center"><input type="text" defaultValue={""}/></td>
                         </tr>
                         <tr>
-                            <td>E-mail</td>
-                            <td className="text-center"><Input></Input></td>
+                            <td>E-mail<span> *</span></td>
+                            <td className="text-center"><input type="text" defaultValue={""} required/></td>
                         </tr>
                         <tr>
-                            <td>Пароль</td>
-                            <td className="text-center"><Input></Input></td>
+                            <td>Пароль<span> *</span></td>
+                            <td className="text-center"><input type="text" defaultValue={""} required/></td>
                         </tr>
 
                         <tr>
                             <td>Описание</td>
-                            <td className="text-center"><textarea id={"description"} rows="12" cols="50" defaultValue={""}></textarea></td>
+                            <td className="text-center"><textarea></textarea></td>
                         </tr>
                         </tbody>
                     </table>

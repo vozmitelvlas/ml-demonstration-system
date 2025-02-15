@@ -53,11 +53,9 @@
 .option{
     display: flex;
 }
-.option p{
-    font-size: 16px;
-}
 .option input{
     width: 18px;
+    color: #49C5BA;
 }
 
 .block {
@@ -84,6 +82,8 @@
 .buttons{
     display: flex;
     justify-content: center;
+    margin-bottom: 20px;
+    gap: 20px;
 }
 .buttons button{
     height: 35px;

@@ -1,12 +1,28 @@
 import DataHeader from "../Headers/DataHeader.jsx";
 import React, {useState} from "react";
-import Input from "../Input/Input.jsx";
 import Button from "../Button/Button.jsx";
 import {useNavigate} from "react-router-dom";
 import deleteLogo from "../../../assets/delete.svg";
 import DeleteModal from "../../utils/DeleteModal.jsx";
+import Select from "react-select";
+import {customStyle} from "../../utils/selectStyles.jsx";
 
-export default function ChangeOrganisations(){
+const limitOptions = [
+    {value: 'O1', label: 'Лимит организации'},
+    {value: 'O2', label: 'Лимиты модели'},
+    {value: 'O2', label: 'Лимиты пользователя'}
+];
+
+const options = [
+    {value: 'O1', label: 'First'},
+    {value: 'O2', label: 'Second'},
+    {value: 'O3', label: 'First'},
+    {value: 'O4', label: 'Second'},
+    {value: 'O5', label: 'First'},
+    {value: 'O6', label: 'Second'},
+];
+
+export default function ChangeOrganisations() {
     let navigate = useNavigate()
     const [activeBut, setActiveBut] = useState("first");
     let [isDeletingModel, setIsDeletingModel] = useState(false)
@@ -19,7 +35,7 @@ export default function ChangeOrganisations(){
         setIsDeletingModel(true)
     }
 
-    return(
+    return (
         <div className="change-container">
             <div>
                 <DataHeader
@@ -36,23 +52,15 @@ export default function ChangeOrganisations(){
                             <tbody>
                             <tr>
                                 <td>Название</td>
-                                <td className="text-center"><Input>Пользователи</Input></td>
-                            </tr>
-                            <tr>
-                                <td>Руководитель (логин)</td>
-                                <td className="text-center"><Input>ivan_ivanov</Input></td>
-                            </tr>
-                            <tr>
-                                <td>Лимит</td>
-                                <td className="text-center"><Input>30</Input></td>
+                                <td className="text-center"><input type="text" defaultValue={""}/></td>
                             </tr>
                             <tr>
                                 <td>Дата создания</td>
-                                <td className="text-center"><Input>17.12.2025</Input></td>
+                                <td className="text-center"><input type="text" defaultValue={""} disabled/></td>
                             </tr>
                             <tr>
                                 <td>Описание</td>
-                                <td ><textarea id={"description"} rows="6" cols="47" defaultValue={"ADASAlasdair"}></textarea></td>
+                                <td><textarea defaultValue={"ADASAlasdair"}></textarea></td>
                             </tr>
                             </tbody>
                         </table>
@@ -60,53 +68,74 @@ export default function ChangeOrganisations(){
                 )}
 
                 {activeBut === "second" && (
-                    <div>
-                        <div className="limits">
-                            <h2>Установка лимита для участников организации</h2>
-                            <select>
-                                <option value="default">Лимит организации</option>
-                                <option value="modelLimit">Лимиты модели </option>
-                                <option value="userLimit">Лимиты пользователя </option>
-                            </select>
+                    <div className="second">
+                        <div>
+                            <h2>Установка лимитов и моделей</h2>
+                            <div className="selects">
+                                <Select
+                                    className="limits-select naked-input"
+                                    options={limitOptions}
+                                    // onChange={handleSelectChange}
+                                    closeMenuOnSelect={false}
+                                    placeholder={"Лимит"}
+                                    isSearchable
+                                    styles={customStyle}
+                                />
+                                <Select
+                                    className="limits-select naked-input"
+                                    isMulti
+                                    options={options}
+                                    // onChange={handleSelectChange}
+                                    closeMenuOnSelect={false}
+                                    placeholder={"Модели"}
+                                    isSearchable
+                                    styles={customStyle}
+                                />
+                            </div>
                         </div>
-
-                        <h2>Доступные организации модели</h2>
-                        <table className="change-container__table tableHover naked-input">
-                            <thead>
-                            <tr>
-                                <th className="text-center">
-                                    <strong>ID</strong>
-                                </th>
-                                <th className="text-center">
-                                    <strong>Название</strong>
-                                </th>
-                                <th className="text-center">
-                                    <strong>Лимит RPS</strong>
-                                </th>
-                                <th className="text-center">
-                                    <strong>Лимит запросов/нед</strong>
-                                </th>
-                                <th></th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td className="text-center">1</td>
-                                <td className="text-center">Graph-based segmentation model1</td>
-                                <td className="text-center"><Input>50</Input></td>
-                                <td className="text-center"><Input>1000</Input></td>
-                                <td className="text-center">
-                                    <a className="a-img" onClick={onDeleteModelClick}><img src={deleteLogo}></img></a>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
+                        <div>
+                            <h2>Доступные организации модели</h2>
+                            <table className="change-container__table tableHover naked-input">
+                                <thead>
+                                <tr>
+                                    <th className="text-center">
+                                        <strong>ID</strong>
+                                    </th>
+                                    <th className="text-center">
+                                        <strong>Название</strong>
+                                    </th>
+                                    <th className="text-center">
+                                        <strong>Лимит RPS</strong>
+                                    </th>
+                                    <th className="text-center">
+                                        <strong>Лимит запросов/нед</strong>
+                                    </th>
+                                    <th></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td className="text-center">1</td>
+                                    <td className="text-center">Graph-based segmentation model1</td>
+                                    <td className="text-center"><input type="text" defaultValue={""}/>
+                                    </td>
+                                    <td className="text-center"><input type="text" defaultValue={""}/></td>
+                                    <td className="text-center">
+                                        <a className="a-img" onClick={onDeleteModelClick}><img
+                                            src={deleteLogo}></img></a>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 )}
             </div>
 
             <div className="delete-modal__buttons">
-                <Button onClick={() => {navigate("/users/organisations")}}>Назад</Button>
+                <Button onClick={() => {
+                    navigate("/organisations")
+                }}>Назад</Button>
                 <Button>Сохранить</Button>
             </div>
 
