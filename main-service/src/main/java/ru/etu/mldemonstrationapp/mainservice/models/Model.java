@@ -1,5 +1,6 @@
 package ru.etu.mldemonstrationapp.mainservice.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,10 +28,12 @@ public class Model implements Serializable {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "model_id")
+    @JsonIgnore
     private ModelInfo modelInfo;
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "model_id")
+    @JsonIgnore
     private List<ModelVersion> modelVersions = new ArrayList<>();
 
     @OneToOne
@@ -45,4 +48,18 @@ public class Model implements Serializable {
     @Column(nullable = false)
     private Instant createdAt;
 
+    public String getRuntime() {
+        return modelInfo.getRuntime();
+    }
+
+    public String getProblemType() {
+        return modelInfo.getProblemType();
+    }
+
+    public List<String> getVersions() {
+        return modelVersions.stream().map(version ->
+                        "/api/models/%d/versions/%d".formatted(modelId, version.getModelVersionId()))
+                .toList();
+
+    }
 }

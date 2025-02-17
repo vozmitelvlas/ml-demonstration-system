@@ -1,15 +1,10 @@
 package ru.etu.mldemonstrationapp.mainservice.models;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import ru.etu.mldemonstrationapp.mainservice.models.dto.CreateModelRequest;
-import ru.etu.mldemonstrationapp.mainservice.models.dto.ModelVersionResponse;
-import ru.etu.mldemonstrationapp.mainservice.models.dto.UpdateModelRequest;
 
-import jakarta.validation.Valid;
 import java.util.List;
 
 @Service
@@ -27,37 +22,13 @@ public class ModelService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Model not found"));
     }
 
-    @Transactional
-    public Model createModel(@Valid CreateModelRequest request) {
-        Model model = new Model();
-        model.setName(request.name());
-        model.setModelInfo(request.modelInfo());
-        model.setLimit(request.limit());
-        return modelRepository.save(model);
-    }
-
-    @Transactional
-    public Model updateModel(Long id, @Valid UpdateModelRequest request) {
-        Model model = getModelById(id);
-        model.setName(request.name());
-        model.setModelInfo(request.modelInfo());
-        model.setLimit(request.limit());
-        return modelRepository.save(model);
-    }
-
-    @Transactional
-    public void deleteModel(Long id) {
-        Model model = getModelById(id);
-        modelRepository.delete(model);
-    }
-
-    public ModelVersionResponse getModelVersionById(Long id) {
-        return modelVersionRepository.findModelVersionById(id)
+    public ModelVersion getModelVersionById(Long id) {
+        return modelVersionRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Model version not found"));
     }
 
-    public List<ModelVersionResponse> getAllModelVersions() {
-        return modelVersionRepository.findModelVersions();
+    public List<ModelVersion> getAllModelVersions() {
+        return modelVersionRepository.findAll();
     }
 }
 
