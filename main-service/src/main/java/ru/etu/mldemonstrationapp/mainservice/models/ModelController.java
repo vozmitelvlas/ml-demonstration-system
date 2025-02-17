@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.etu.mldemonstrationapp.mainservice.models.dto.ModelVersionResponse;
 
 import java.util.List;
 
@@ -29,12 +28,12 @@ public class ModelController {
     }
 
     @GetMapping("/versions/{id}")
-    public ResponseEntity<ModelVersionResponse> getModelVersionById(@PathVariable Long id) {
+    public ResponseEntity<ModelVersion> getModelVersionById(@PathVariable Long id) {
         return ResponseEntity.ok(modelService.getModelVersionById(id));
     }
 
     @GetMapping("/versions")
-    public ResponseEntity<List<ModelVersionResponse>> getAllModelVersions() {
+    public ResponseEntity<List<ModelVersion>> getAllModelVersions() {
         return ResponseEntity.ok(modelService.getAllModelVersions());
     }
 }

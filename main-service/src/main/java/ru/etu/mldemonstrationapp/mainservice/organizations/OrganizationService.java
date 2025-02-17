@@ -5,8 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import ru.etu.mldemonstrationapp.mainservice.organizations.dto.CreateOrganizationRequest;
-import ru.etu.mldemonstrationapp.mainservice.organizations.dto.UpdateOrganizationRequest;
+import ru.etu.mldemonstrationapp.mainservice.admin.organizations.dto.CreateOrganizationRequest;
+import ru.etu.mldemonstrationapp.mainservice.admin.organizations.dto.UpdateOrganizationRequest;
 
 import java.time.Instant;
 import java.util.List;

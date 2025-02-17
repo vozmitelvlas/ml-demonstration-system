@@ -1,7 +1,8 @@
 package ru.etu.mldemonstrationapp.mainservice.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,7 +17,6 @@ import java.io.Serializable;
 @Table(name = "model_info")
 public class ModelInfo implements Serializable {
     @Id
-    @JsonIgnore
     private Long modelId;
 
     private String runtime;

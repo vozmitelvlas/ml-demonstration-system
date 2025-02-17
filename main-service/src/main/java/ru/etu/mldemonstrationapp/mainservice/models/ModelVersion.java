@@ -1,6 +1,6 @@
 package ru.etu.mldemonstrationapp.mainservice.models;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -41,4 +41,24 @@ public class ModelVersion implements Serializable {
     @CreationTimestamp
     @Column(nullable = false)
     private Instant createdAt;
+
+    public Long getModelId() {
+        return model.getModelId();
+    }
+
+    public String getModelName() {
+        return model.getName();
+    }
+
+    public String getRuntime() {
+        return model.getRuntime();
+    }
+
+    public String getProblemType() {
+        return model.getProblemType();
+    }
+
+    public Limit getLimit() {
+        return model.getLimit();
+    }
 }

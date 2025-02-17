@@ -1,6 +1,7 @@
 package ru.etu.mldemonstrationapp.mainservice.users;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,6 +14,7 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @Data
@@ -45,8 +47,17 @@ public class User implements Serializable {
     private String description;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "organization_id", nullable = false)
     private Organization organization;
+
+    @JsonProperty(value = "organization")
+    public Map<String, Object> getOrganization() {
+        return Map.of(
+                "organizationId", organization.getOrganizationId(),
+                "href", "/api/organizations/%d".formatted(organization.getOrganizationId())
+        );
+    }
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

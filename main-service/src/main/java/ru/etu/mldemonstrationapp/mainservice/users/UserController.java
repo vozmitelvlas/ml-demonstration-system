@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.etu.mldemonstrationapp.mainservice.auth.JwtToken;
 import ru.etu.mldemonstrationapp.mainservice.users.dto.NewPasswordRequest;
 import ru.etu.mldemonstrationapp.mainservice.users.dto.UpdatePasswordRequest;
-import ru.etu.mldemonstrationapp.mainservice.users.dto.UpdateUserRequest;
 
 import java.util.List;
 
@@ -42,26 +41,20 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserById(token.userId()));
     }
 
-    @Operation(description = "Update your own user profile")
-    @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
-    @PutMapping("/profile")
-    public ResponseEntity<User> updateProfile(@AuthenticationPrincipal JwtToken token, @Valid @RequestBody UpdateUserRequest request) {
-        return ResponseEntity.ok(userService.updateUser(token.userId(), request));
+
+    @Operation(description = "Set a new password using a password reset token")
+    @ApiResponse(useReturnTypeSchema = true, responseCode = "204")
+    @PostMapping("/profile/password/reset")
+    public ResponseEntity<Void> setNewPassword(@AuthenticationPrincipal JwtToken jwtToken, @Valid @RequestBody NewPasswordRequest newPasswordRequest) {
+        userService.setUserPassword(jwtToken.userId(), newPasswordRequest.password());
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(description = "Update password with confirmation of the old one")
     @ApiResponse(useReturnTypeSchema = true, responseCode = "204")
-    @PatchMapping("/profile/password-change")
+    @PutMapping("/profile/password")
     public ResponseEntity<Void> updatePassword(@AuthenticationPrincipal JwtToken jwtToken, @Valid @RequestBody UpdatePasswordRequest updatePasswordRequest) {
         userService.updateUserPassword(jwtToken.userId(), updatePasswordRequest);
-        return ResponseEntity.noContent().build();
-    }
-
-    @Operation(description = "Set a new password using a password reset token")
-    @ApiResponse(useReturnTypeSchema = true, responseCode = "204")
-    @PostMapping("/profile/password-change")
-    public ResponseEntity<Void> setNewPassword(@AuthenticationPrincipal JwtToken jwtToken, @Valid @RequestBody NewPasswordRequest newPasswordRequest) {
-        userService.setUserPassword(jwtToken.userId(), newPasswordRequest.password());
         return ResponseEntity.noContent().build();
     }
 
