@@ -52,7 +52,7 @@ public class User implements Serializable {
     private Organization organization;
 
     @JsonProperty(value = "organization")
-    public Map<String, Object> getOrganization() {
+    public Map<String, Object> getOrganizationReference() {
         return Map.of(
                 "organizationId", organization.getOrganizationId(),
                 "href", "/api/organizations/%d".formatted(organization.getOrganizationId())
