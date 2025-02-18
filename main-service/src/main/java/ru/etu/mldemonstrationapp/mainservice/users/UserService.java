@@ -95,7 +95,10 @@ public class UserService {
 
     @Transactional
     public void setUserPassword(Long id, String password) {
-        User user = userRepository.findById(id).orElseThrow();
+        User user = userRepository.findById(id).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "User not found")
+        );
         user.setPassword(passwordEncoder.encode(password));
         userRepository.save(user);
     }

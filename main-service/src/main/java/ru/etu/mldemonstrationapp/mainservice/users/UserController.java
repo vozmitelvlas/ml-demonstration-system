@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ru.etu.mldemonstrationapp.mainservice.auth.JwtToken;
@@ -42,6 +43,7 @@ public class UserController {
     }
 
 
+    @Secured({"PASSWORD_RESET"})
     @Operation(description = "Set a new password using a password reset token")
     @ApiResponse(useReturnTypeSchema = true, responseCode = "204")
     @PostMapping("/profile/password/reset")
