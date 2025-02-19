@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import ru.etu.mldemonstrationapp.mainservice.admin.organizations.dto.CreateOrganizationRequest;
 import ru.etu.mldemonstrationapp.mainservice.admin.organizations.dto.UpdateOrganizationRequest;
+import ru.etu.mldemonstrationapp.mainservice.organizations.dto.ModelOrganizationLimitResponse;
 import ru.etu.mldemonstrationapp.mainservice.users.User;
 import ru.etu.mldemonstrationapp.mainservice.users.UserRepository;
 
@@ -39,11 +40,11 @@ public class OrganizationService {
                 dto.description(),
                 Collections.emptyList(),
                 OrganizationLimitsType.ORGANIZATION_LIMITS,
+                Collections.emptyList(),
                 Instant.now(),
                 Instant.now()
         ));
     }
-
 
     @Transactional
     public Organization updateOrganization(Long organizationId, UpdateOrganizationRequest dto) {
@@ -79,5 +80,4 @@ public class OrganizationService {
         }
         organizationRepository.deleteById(organizationId);
     }
-
 }

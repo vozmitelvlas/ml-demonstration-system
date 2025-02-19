@@ -9,12 +9,12 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import ru.etu.mldemonstrationapp.mainservice.organizations.Organization;
+import ru.etu.mldemonstrationapp.mainservice.users.dto.OrganizationReferenceResponse;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Entity
 @Data
@@ -29,8 +29,8 @@ public class User implements Serializable {
     @Column(nullable = false, unique = true)
     private String login;
 
-    @JsonIgnore
     @Column(nullable = false)
+    @JsonIgnore
     private String password;
 
     @Column(nullable = false, unique = true)
@@ -47,15 +47,15 @@ public class User implements Serializable {
     private String description;
 
     @ManyToOne
-    @JsonIgnore
     @JoinColumn(name = "organization_id", nullable = false)
+    @JsonIgnore
     private Organization organization;
 
     @JsonProperty(value = "organization")
-    public Map<String, Object> getOrganizationReference() {
-        return Map.of(
-                "organizationId", organization.getOrganizationId(),
-                "href", "/api/organizations/%d".formatted(organization.getOrganizationId())
+    public OrganizationReferenceResponse getOrganizationReference() {
+        return new OrganizationReferenceResponse(
+                organization.getOrganizationId(),
+                "/api/organizations/%d".formatted(organization.getOrganizationId())
         );
     }
 

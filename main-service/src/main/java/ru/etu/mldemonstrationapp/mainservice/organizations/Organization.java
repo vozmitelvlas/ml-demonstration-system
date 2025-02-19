@@ -1,12 +1,14 @@
 package ru.etu.mldemonstrationapp.mainservice.organizations;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import ru.etu.mldemonstrationapp.mainservice.organizations.dto.ModelOrganizationLimitResponse;
 import ru.etu.mldemonstrationapp.mainservice.users.User;
 
 import java.io.Serializable;
@@ -37,6 +39,11 @@ public class Organization implements Serializable {
     @Enumerated(EnumType.STRING)
     private OrganizationLimitsType limitsType;
 
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "organization_id")
+    @JsonIgnore
+    private List<ModelOrganizationLimit> modelsLimits;
+
     @UpdateTimestamp
     @Column(nullable = false)
     private Instant updatedAt;
@@ -44,4 +51,14 @@ public class Organization implements Serializable {
     @CreationTimestamp
     @Column(nullable = false)
     private Instant createdAt;
+
+    public List<ModelOrganizationLimitResponse> getModelsLimits() {
+        return modelsLimits.stream().map(modelOrganizationLimit ->
+                new ModelOrganizationLimitResponse(
+                        modelOrganizationLimit.getLimit(),
+                        modelOrganizationLimit.getModel().getModelId(),
+                        modelOrganizationLimit.getModel().getName(),
+                        "/api/models/%d".formatted(modelOrganizationLimit.getModel().getModelId())
+                )).toList();
+    }
 }

@@ -10,6 +10,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ru.etu.mldemonstrationapp.mainservice.auth.JwtToken;
+import ru.etu.mldemonstrationapp.mainservice.organizations.dto.ModelOrganizationLimitResponse;
 import ru.etu.mldemonstrationapp.mainservice.organizations.dto.UpdateLimitsTypeRequest;
 import ru.etu.mldemonstrationapp.mainservice.users.User;
 
@@ -33,6 +34,12 @@ public class OrganizationController {
     @GetMapping("/{id}/members")
     public List<User> getOrganizationMembers(@PathVariable Long id) {
         return organizationService.getOrganization(id).getMembers();
+    }
+
+    @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
+    @GetMapping("/{id}/models-limits")
+    public List<ModelOrganizationLimitResponse> getModelsLimits(@PathVariable Long id) {
+        return organizationService.getOrganization(id).getModelsLimits();
     }
 
     @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
