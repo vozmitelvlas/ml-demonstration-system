@@ -24,6 +24,8 @@
                 <constraints unique="true"
                              foreignKeyName="models_limit_id_fkey"
                              references="limits(limit_id)"
+                             nullable="false"
+                             deleteCascade="true"
                 />
             </column>
             <column name="other_data" type="jsonb"/>
@@ -228,6 +230,7 @@
                                  constraintName="models_users_limits_limit_id_fkey"
                                  referencedTableName="limits"
                                  referencedColumnNames="limit_id"
+                                 deleteCascade="true"
         />
         <addUniqueConstraint tableName="models_users_limits" columnNames="model_id, user_id"/>
 

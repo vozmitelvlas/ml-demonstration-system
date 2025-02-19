@@ -1,35 +1,29 @@
 package ru.etu.mldemonstrationapp.mainservice.organizations;
 
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import ru.etu.mldemonstrationapp.mainservice.models.Limit;
 import ru.etu.mldemonstrationapp.mainservice.models.Model;
 
-import java.io.Serializable;
-
 @Entity
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+@Data
 @Table(name = "models_organizations_limits")
-public class ModelOrganizationLimit implements Serializable {
-    @Id
-    private Long limitId;
-
-    @ManyToOne
-    @JsonBackReference
-    @JoinColumn(name = "organization_id", nullable = false)
-    private Organization organization;
-
+public class ModelOrganizationLimit extends Limit {
     @ManyToOne
     @JoinColumn(name = "model_id", nullable = false)
+    @JsonIgnore
     private Model model;
 
-    @OneToOne(cascade = CascadeType.ALL, optional = false)
-    @PrimaryKeyJoinColumn(name = "limit_id")
-    private Limit limit;
+    @ManyToOne
+    @JoinColumn(name = "organization_id", nullable = false)
+    @JsonIgnore
+    private Organization organization;
 }

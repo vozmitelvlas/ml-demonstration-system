@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import ru.etu.mldemonstrationapp.mainservice.admin.organizations.dto.CreateOrganizationRequest;
 import ru.etu.mldemonstrationapp.mainservice.admin.organizations.dto.UpdateOrganizationRequest;
-import ru.etu.mldemonstrationapp.mainservice.organizations.dto.ModelOrganizationLimitResponse;
 import ru.etu.mldemonstrationapp.mainservice.users.User;
 import ru.etu.mldemonstrationapp.mainservice.users.UserRepository;
 
@@ -78,6 +77,7 @@ public class OrganizationService {
         if (organizationRepository.containsUsers(organizationId)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Organization contains users");
         }
+        organizationRepository.deleteAllOrganizationsLimits(organizationId);
         organizationRepository.deleteById(organizationId);
     }
 }
