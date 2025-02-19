@@ -37,7 +37,7 @@ public class Model implements Serializable {
     private List<ModelVersion> modelVersions = new ArrayList<>();
 
     @OneToOne
-    @JoinColumn(name = "model_id")
+    @JoinColumn(name = "limit_id")
     private Limit limit;
 
     @UpdateTimestamp
