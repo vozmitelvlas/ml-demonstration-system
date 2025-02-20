@@ -4,13 +4,10 @@ import {useNavigate} from "react-router-dom";
 import axios from "axios";
 import {useForm} from 'react-hook-form';
 import {yupResolver} from '@hookform/resolvers/yup';
-import {useDispatch} from "react-redux";
-import {setUserInfo} from "../../store/user-slice.jsx";
 import {signInSchema} from "../../store/formSchema.jsx";
 
-export default function SignIn() {
+export default function SignIn({setUserData}) {
     const navigate = useNavigate()
-    const dispatch = useDispatch()
     const {
         register,
         handleSubmit,
@@ -32,10 +29,7 @@ export default function SignIn() {
             await axios
                 .post('http://localhost:8080/api/auth/login', formData)
                 .then((res) => {
-                    dispatch(setUserInfo(res.data))
-
-                    localStorage.setItem("login", formData.login);
-                    localStorage.setItem("password", formData.password);
+                    setUserData(res.data.user)
                     localStorage.setItem("accessToken", res.data.accessToken)
                 });
 

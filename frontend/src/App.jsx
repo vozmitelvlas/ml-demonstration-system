@@ -15,7 +15,6 @@ import ModelData from "./components/Main/CatalogModels/ModelData.jsx";
 import SignUp from "./components/Main/SignInUp/SignUp.jsx";
 import PasswordRecover from "./components/Main/SignInUp/PasswordRecover.jsx";
 import MyOrganisations from "./components/Main/MyOrganisations/MyOrganisations.jsx";
-import { useDispatch, useSelector } from "react-redux";
 
 
 function ProtectedRoute({ isAuthenticated }) {
@@ -26,24 +25,23 @@ function ProtectedRoute({ isAuthenticated }) {
 }
 
 function App() {
-    const dispatch = useDispatch();
     const location = useLocation();
     const [isAdminMode, setIsAdminMode] = useState(false);
     const excludedPaths = ['/', '/signup', '/password'];
-    let userInfo = useSelector((state) => state.user.info);
 
     const [isAdmin, setIsAdmin] = useState(false)
     const [isMainOrg, setMainOrg] = useState(false)
-    const [login, setLogin] = useState("user_login")
+    const [login, setLogin] = useState("")
+    const [userData, setUserData] = useState({})
 
     useEffect(() => {
-        if(userInfo){
-            userInfo?.user?.roles.includes("ADMIN") ? setIsAdmin(true) : setIsAdmin(false)
+        if(userData){
+            userData?.roles?.includes("ADMIN") ? setIsAdmin(true) : setIsAdmin(false)
 
-            setMainOrg(userInfo?.user?.roles.includes("ORGANIZATION_HEAD"))
-            setLogin(userInfo?.user?.login)
+            setMainOrg(userData?.roles?.includes("ORGANIZATION_HEAD"))
+            setLogin(userData?.login)
         }
-    }, [userInfo, dispatch]);
+    }, [userData]);
 
 
     return (
@@ -54,11 +52,11 @@ function App() {
             }
             <div className={styles.mainContent}>
                 <Routes>
-                    <Route path="/" element={<SignIn />} />
-                    <Route path="/signup" element={<SignUp />} />
+                    <Route path="/" element={<SignIn setUserData={setUserData}/>} />
+                    <Route path="/signup" element={<SignUp setUserData={setUserData}/>} />
                     <Route path="/password" element={<PasswordRecover />} />
 
-                    <Route path="/user" element={<PersonalCabinet />} />
+                    <Route path="/user" element={<PersonalCabinet userData={userData}/>} />
                     <Route path="/models" element={<CatalogModels isAdminMode={isAdminMode} />} />
 
                     <Route path="/models/:modelId/versions/:versionId" element={<ChangeModelData />} />

@@ -140,11 +140,11 @@ export default function ChangeModelData() {
                                 <tbody>
                                 <tr>
                                     <td>Лимит RPS</td>
-                                    <td><input type="text" defaultValue={""}/></td>
+                                    <td><input type="text" defaultValue={model?.limit?.rps}/></td>
                                 </tr>
                                 <tr>
                                     <td>Лимит запросов/нед</td>
-                                    <td><input type="text" defaultValue={""}/></td>
+                                    <td><input type="text" defaultValue={model?.limit?.requestsPerWeek}/></td>
                                 </tr>
                                 </tbody>
                             </table>

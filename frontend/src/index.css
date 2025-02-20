@@ -79,7 +79,7 @@ input[type="email"],
 input[type="date"]{
     height: calc(1.7rem + 2px);
     width: calc(14rem + 2px);
-    font-size: 16px;
+    font-size: 18px;
     color: #212529;
     background-color: #fff;
     background-clip: padding-box;

@@ -14,8 +14,6 @@ import DeleteModal from "../../utils/DeleteModal.jsx";
 import apiClient from "../../utils/axios.jsx"
 import Select from "react-select";
 import {customStyle, firstStyle, secondStyle} from "../../utils/selectStyles.jsx";
-import {useSelector} from "react-redux";
-import {setUserInfo} from "../../store/user-slice.jsx";
 import {getDateFormat} from "../../utils/DateAndTime.jsx";
 
 const options = [
@@ -27,26 +25,36 @@ export default function CatalogModels({isAdminMode}) {
     const navigate = useNavigate()
     const [isOpen, setIsOpen] = useState(false);
     const [isDeletingModel, setIsDeletingModel] = useState(false)
+    const [tmpId, setTmpId] = useState([])
 
     const [models, setModels] = useState([])
     useEffect(() => {
         try {
             apiClient.get('admin/models/versions').then((res) => {
-                console.log(res.data)
                 setModels(res.data)
             });
         } catch (serverError) {
-            console.log(serverError)
+            console.error(serverError)
         }
-    }, []);
+    }, [isDeletingModel]);
 
     let closeDeleteModal = () => {
         setIsDeletingModel(false)
     }
     let onDeleteModelClick = (event) => {
         let tr = event.target.closest("tr")
+        setTmpId(tr.dataset.id.split(" "))
         setIsDeletingModel(true)
     }
+    const onConfirmDeletingModel = async () => {
+        try {
+            await apiClient.delete(`/admin/models/${tmpId[0]}/versions/${tmpId[1]}`);
+        } catch (serverError) {
+            console.error(serverError)
+        }
+        setIsDeletingModel(false)
+    }
+
     const toggleSidebar = () => {
         setIsOpen(!isOpen);
     };
@@ -125,16 +133,19 @@ export default function CatalogModels({isAdminMode}) {
                         </thead>
                         <tbody>
                         {models.map(model => (
-                            <tr key={model.modelVersionId}>
-                                <td className="text-center">{model.modelId}</td>
+                            <tr key={`${model?.modelId}${model?.modelVersionId}`}
+                                data-id={`${model?.modelId} ${model?.modelVersionId}`}>
+
+                                <td className="text-center">{model?.modelId}</td>
                                 <td className="text-center">
                                     <a><img src={acceptLogo}></img></a>
                                 </td>
-                                <td className="text-center"><Link to={`/models/${model.modelId}/data`}>{model.modelName}</Link>
+                                <td className="text-center"><Link
+                                    to={`/models/${model?.modelId}/data`}>{model?.modelName}</Link>
                                 </td>
-                                <td className="text-center">{model.versionName}</td>
-                                <td className="text-center">{model.modelInfo.problemType}</td>
-                                <td className="text-center">{getDateFormat(new Date(model.createdAt))}</td>
+                                <td className="text-center">{model?.versionName}</td>
+                                <td className="text-center">{model?.modelInfo?.problemType}</td>
+                                <td className="text-center">{getDateFormat(new Date(model?.createdAt))}</td>
                                 <td className="text-center">
                                     <div className="URL">
                                         {model.uri}
@@ -143,14 +154,18 @@ export default function CatalogModels({isAdminMode}) {
                                 </td>
                                 {isAdminMode && (
                                     <td className="text-center">
-                                        <Link className="a-img" to={`/models/${model.modelId}/versions/${model.modelVersionId}`}><img src={editLogo}></img></Link>
+                                        <Link className="a-img"
+                                              to={`/models/${model?.modelId}/versions/${model?.modelVersionId}`}><img
+                                            src={editLogo}></img></Link>
                                     </td>
                                 )}
                                 {isAdminMode && (
                                     <td className="text-center">
-                                        <a className="a-img" onClick={onDeleteModelClick}><img src={deleteLogo}></img></a>
+                                        <a className="a-img" onClick={onDeleteModelClick}><img
+                                            src={deleteLogo}></img></a>
                                     </td>
                                 )}
+
                             </tr>
                         ))}
                         </tbody>
@@ -215,7 +230,7 @@ export default function CatalogModels({isAdminMode}) {
                         </div>
                     </div>
                 </div>
-                <DeleteModal open={isDeletingModel} onNo={closeDeleteModal}></DeleteModal>
+                <DeleteModal open={isDeletingModel} onNo={closeDeleteModal} onYes={onConfirmDeletingModel}></DeleteModal>
             </main>
         </>
     )

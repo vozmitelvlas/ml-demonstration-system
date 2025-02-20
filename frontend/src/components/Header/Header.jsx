@@ -4,12 +4,9 @@ import {useNavigate} from "react-router-dom";
 import exit from "../../assets/exit.svg";
 import menu from "../../assets/menu.svg";
 import styles from "./Header.module.css";
-import {useDispatch} from "react-redux";
-import {setUserInfo} from "../store/user-slice.jsx";
 
 export default function Header({login, isAdminMode, setIsAdminMode, isAdmin, isMainOrg}) {
     const navigate = useNavigate();
-    const dispatch = useDispatch()
 
     const toggleAdminMode = (event) => {
         setIsAdminMode(!isAdminMode)
@@ -23,7 +20,6 @@ export default function Header({login, isAdminMode, setIsAdminMode, isAdmin, isM
         }
     };
     const onExitClick = () => {
-        // dispatch(setUserInfo({}))
         setIsAdminMode(false)
         navigate("/")
     }

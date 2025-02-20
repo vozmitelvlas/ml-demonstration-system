@@ -2,22 +2,12 @@ import React, {useEffect, useState} from 'react';
 import styles from "./PesonalCabinet.module.css"
 import Button from "../Button/Button.jsx";
 import user_logo from "../../../assets/user2.svg";
-import {useDispatch, useSelector} from "react-redux";
 
 
-
-export default function PersonalCabinet() {
-    let userInfo = useSelector((state) => state.user.info);
+export default function PersonalCabinet({userData}) {
     const [isEditing, setIsEditing] = useState(false);
 
-    const [user, setUser] = useState({})
-    useEffect(() => {
-        if(userInfo){
-            setUser(userInfo?.user)
-        }
-    }, [userInfo]);
-
-    let closeEditModal = (event) => {
+    let closeEditModal = () => {
         setIsEditing(false)
     }
 
@@ -39,28 +29,28 @@ export default function PersonalCabinet() {
                     <tbody>
                     <tr>
                         <td>Логин</td>
-                        <td>{user?.login}</td>
+                        <td>{userData?.login}</td>
                     </tr>
                     <tr>
                         <td>Фамилия</td>
-                        <td>{user?.lastName}</td>
+                        <td>{userData?.lastName}</td>
                     </tr>
                     <tr>
                         <td>Имя</td>
-                        <td>{user?.firstName}</td>
+                        <td>{userData?.firstName}</td>
                     </tr>
                     <tr>
                         <td>Отчество</td>
-                        <td>{user?.patronymic}</td>
+                        <td>{userData?.patronymic}</td>
                     </tr>
                     <tr>
                         <td>E-mail</td>
-                        <td>{user?.email}</td>
+                        <td>{userData?.email}</td>
                     </tr>
 
                     <tr>
                         <td>Описание</td>
-                        <td><textarea disabled defaultValue={user?.description}></textarea></td>
+                        <td><textarea disabled defaultValue={userData?.description}></textarea></td>
                     </tr>
                     </tbody>
                 </table>

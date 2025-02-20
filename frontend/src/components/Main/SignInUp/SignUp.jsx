@@ -4,14 +4,11 @@ import styles from "./SignIn.module.css"
 import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
 import axios from "axios";
-import {setUserInfo} from "../../store/user-slice.jsx";
-import {useDispatch} from "react-redux";
 import {signUpSchema} from "../../store/formSchema.jsx";
 
 
-export default function SignUp() {
+export default function SignUp({setUserData}) {
     const navigate = useNavigate()
-    const dispatch = useDispatch()
     const {
         register,
         handleSubmit,
@@ -40,18 +37,15 @@ export default function SignUp() {
             await axios
                 .post('http://localhost:8080/api/auth/register', formData)
                 .then((res) => {
-                    dispatch(setUserInfo(res.data))
-                    localStorage.setItem("login", formData.login);
-                    localStorage.setItem("password", formData.password);
+                    setUserData(res.data.user)
                 });
 
             navigate("/models")
         } catch (serverError) {
             if (serverError.response.status === 409) {
-                setError('form', {type: 'server', message: 'Пользователь с таким логином уже существует'})
+                setError('form', {type: 'server', message: 'Пользователь уже существует'})
             }
         }
-        // () => navigate("/models")
     }
 
     return (
