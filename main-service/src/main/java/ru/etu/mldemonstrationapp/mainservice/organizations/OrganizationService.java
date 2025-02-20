@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import ru.etu.mldemonstrationapp.mainservice.admin.organizations.dto.CreateOrganizationRequest;
 import ru.etu.mldemonstrationapp.mainservice.admin.organizations.dto.UpdateOrganizationRequest;
+import ru.etu.mldemonstrationapp.mainservice.models.Limit;
+import ru.etu.mldemonstrationapp.mainservice.models.LimitRepository;
 import ru.etu.mldemonstrationapp.mainservice.users.User;
 import ru.etu.mldemonstrationapp.mainservice.users.UserRepository;
 
@@ -18,6 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OrganizationService {
     private final OrganizationRepository organizationRepository;
+    private final LimitRepository limitRepository;
     private final UserRepository userRepository;
 
     public Organization getOrganization(Long id) {
@@ -39,11 +42,11 @@ public class OrganizationService {
                 dto.description(),
                 Collections.emptyList(),
                 OrganizationLimitsType.ORGANIZATION_LIMITS,
+                Collections.emptyList(),
                 Instant.now(),
                 Instant.now()
         ));
     }
-
 
     @Transactional
     public Organization updateOrganization(Long organizationId, UpdateOrganizationRequest dto) {
@@ -65,7 +68,7 @@ public class OrganizationService {
                 user.getRoles().stream().noneMatch(role -> role.getName().equals("ADMIN"))) {
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN,
-                    "You do not have permission to change limits type of this organization"
+                    "You do not have permission to change limits type for this organization"
             );
         }
         organization.setLimitsType(limitsType);
@@ -73,11 +76,23 @@ public class OrganizationService {
     }
 
     @Transactional
+    public void removeAccessToModel(Long organizationId, Long modelId) {
+        Organization organization = organizationRepository.findById(organizationId).orElseThrow();
+        var limitsIds = organization.getLimits().stream()
+                .filter(limit -> limit.getModel().getModelId().equals(modelId))
+                .map(Limit::getLimitId)
+                .toList();
+        limitRepository.deleteAllByIdInBatch(limitsIds);
+        organizationRepository.save(organization);
+    }
+
+
+    @Transactional
     public void deleteOrganization(Long organizationId) {
         if (organizationRepository.containsUsers(organizationId)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Organization contains users");
         }
+        organizationRepository.deleteAllOrganizationsLimits(organizationId);
         organizationRepository.deleteById(organizationId);
     }
-
 }

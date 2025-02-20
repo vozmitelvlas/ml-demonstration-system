@@ -11,10 +11,14 @@ public interface ModelRepository extends JpaRepository<Model, Long> {
 
     @Modifying
     @Query("""
-            DELETE FROM Model m
-            WHERE m.modelId = :modelId AND NOT EXISTS (
+            DELETE FROM Limit l
+            WHERE l.limitId IN (
+                SELECT m.limit.limitId FROM Model m
+                JOIN model.limit
+                WHERE m.modelId = :modelId)
+             AND NOT EXISTS (
                 SELECT m from Model m
-                INNER JOIN ModelVersion mv ON mv.model.modelId = m.modelId
+                JOIN ModelVersion mv ON mv.model.modelId = m.modelId
                 WHERE m.modelId = :modelId
             )
             """)

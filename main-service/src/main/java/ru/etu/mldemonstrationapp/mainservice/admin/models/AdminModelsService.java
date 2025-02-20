@@ -113,6 +113,8 @@ public class AdminModelsService {
         ModelVersion modelVersion = modelVersionRepository.findById(id).orElseThrow();
         Long modelId = modelVersion.getModel().getModelId();
         modelVersionRepository.delete(modelVersion);
+
+        // Limit entity is removed because the model will be removed by cascade
         modelRepository.deleteModelIfVersionsListEmpty(modelId);
     }
 }

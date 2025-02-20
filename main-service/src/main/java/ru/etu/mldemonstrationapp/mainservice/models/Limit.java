@@ -13,6 +13,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "limits")
+@Inheritance(strategy = InheritanceType.JOINED)
 public class Limit implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
