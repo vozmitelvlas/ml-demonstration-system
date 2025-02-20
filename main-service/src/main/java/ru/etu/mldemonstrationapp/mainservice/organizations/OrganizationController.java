@@ -37,9 +37,17 @@ public class OrganizationController {
     }
 
     @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
-    @GetMapping("/{id}/models-limits")
+    @GetMapping("/{id}/models")
     public List<ModelOrganizationLimitResponse> getModelsLimits(@PathVariable Long id) {
         return organizationService.getOrganization(id).getModelsLimits();
+    }
+
+    @ApiResponse(useReturnTypeSchema = true, responseCode = "204")
+    @DeleteMapping("/{organizationId}/models/{modelId}")
+    public ResponseEntity<Void> removeAccessToModel(@PathVariable Long organizationId,
+                                                 @PathVariable Long modelId) {
+        organizationService.removeAccessToModel(organizationId, modelId);
+        return ResponseEntity.noContent().build();
     }
 
     @ApiResponse(useReturnTypeSchema = true, responseCode = "200")

@@ -39,7 +39,7 @@ public class Organization implements Serializable {
     @Enumerated(EnumType.STRING)
     private OrganizationLimitsType limitsType;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "organization_id")
     @JsonIgnore
     private List<ModelOrganizationLimit> limits = new ArrayList<>();
