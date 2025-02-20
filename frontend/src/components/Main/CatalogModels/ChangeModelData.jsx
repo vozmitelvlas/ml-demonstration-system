@@ -7,6 +7,7 @@ import {useNavigate, useParams} from "react-router-dom";
 import Select from "react-select";
 import {customStyle} from "../../utils/selectStyles.jsx";
 import alarmLogo from "../../../assets/alarm.svg"
+import apiClient from "../../utils/axios.jsx";
 
 const options = [
     {value: 'O1', label: 'First'},
@@ -18,7 +19,18 @@ export default function ChangeModelData() {
     const [activeBut, setActiveBut] = useState("first");
     const [alarm, setAlarm] = useState(null)
     let navigate = useNavigate()
-    let {modelId} = useParams()
+    let {modelId, versionId} = useParams()
+
+    const [model, setModel] = useState({})
+    useEffect(() => {
+        try {
+            apiClient.get(`/admin/models/${modelId}/versions/${versionId}`).then((res) => {
+                setModel(res.data)
+            })
+        } catch (error) {
+            console.log(error)
+        }
+    }, []);
 
     const [selectedValues, setSelectedValues] = useState([]);
     const handleSelectChange = (newValue) => {
@@ -46,19 +58,59 @@ export default function ChangeModelData() {
                 {activeBut === "first" && (
                     <div>
                         <div className={styles.alarmContainer}>
-                            {alarm && <b className={styles.alarm}><a className="a-img"><img src={alarmLogo}/> </a> {alarm}</b>}
+                            {alarm &&
+                                <b className={styles.alarm}><a className="a-img"><img src={alarmLogo}/> </a> {alarm}
+                                </b>}
                         </div>
                         <table className="change-container__table tableHover naked-input">
                             <tbody>
-                            {modelData.map((title, index) => (
-                                <tr key={index}>
-                                    <td>{title}</td>
-                                    <td className="text-center"><input type="text" onClick={onChangeName} onBlur={onBlurName} defaultValue={"smt"}/></td>
-                                </tr>
-                            ))}
+                            <tr>
+                                <td>ID</td>
+                                <td className="text-center">
+                                    <input type="text" defaultValue={model?.modelId}/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Название</td>
+                                <td className="text-center">
+                                    <input type="text" onBlur={onBlurName} onChange={onChangeName}
+                                           defaultValue={model?.modelName}/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Версия</td>
+                                <td className="text-center">
+                                    <input type="text" defaultValue={model?.versionName}/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Статус</td>
+                                <td className="text-center">
+                                    <input type="text" defaultValue={"ok"}/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>RunTime</td>
+                                <td className="text-center">
+                                    <input type="text" defaultValue={model?.modelInfo?.runtime}/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Тип задачи</td>
+                                <td className="text-center">
+                                    <input type="text" defaultValue={model?.modelInfo?.problemType}/>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>URI модели</td>
+                                <td className="text-center">
+                                    <input type="text" defaultValue={model.uri}/>
+                                </td>
+                            </tr>
                             <tr>
                                 <td>Описание</td>
-                                <td><textarea defaultValue={"ADASAlasdair"}></textarea></td>
+                                <td><textarea defaultValue={model.description}></textarea></td>
                             </tr>
                             </tbody>
                         </table>

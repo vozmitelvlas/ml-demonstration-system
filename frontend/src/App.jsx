@@ -38,7 +38,6 @@ function App() {
 
     useEffect(() => {
         if(userInfo){
-            console.log(userInfo)
             userInfo?.user?.roles.includes("ADMIN") ? setIsAdmin(true) : setIsAdmin(false)
 
             setMainOrg(userInfo?.user?.roles.includes("ORGANIZATION_HEAD"))
@@ -62,7 +61,7 @@ function App() {
                     <Route path="/user" element={<PersonalCabinet />} />
                     <Route path="/models" element={<CatalogModels isAdminMode={isAdminMode} />} />
 
-                    <Route path="/models/:modelId/edit" element={<ChangeModelData />} />
+                    <Route path="/models/:modelId/versions/:versionId" element={<ChangeModelData />} />
                     <Route path="/models/:modelId/data" element={<ModelData />} />
 
                     <Route path="/users" element={<CatalogUsers />} />

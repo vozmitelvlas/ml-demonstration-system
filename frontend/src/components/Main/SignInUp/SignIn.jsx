@@ -14,7 +14,7 @@ export default function SignIn() {
     const {
         register,
         handleSubmit,
-        formState: { errors},
+        formState: {errors},
         setError
     } = useForm({
         defaultValues: {
@@ -36,12 +36,13 @@ export default function SignIn() {
 
                     localStorage.setItem("login", formData.login);
                     localStorage.setItem("password", formData.password);
+                    localStorage.setItem("accessToken", res.data.accessToken)
                 });
 
             navigate("/models")
         } catch (serverError) {
             if (serverError.response.status === 401) {
-                setError('form', { type: 'server', message: 'Неверный логин или пароль' })
+                setError('form', {type: 'server', message: 'Неверный логин или пароль'})
             }
         }
     }

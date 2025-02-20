@@ -108,7 +108,6 @@ input[type="radio"] {
 }
 
 input::placeholder {
-    font-family: 'Inter', sans-serif;
     font-size: 14px;
     color: #212529;
     opacity: 0.4;
