@@ -31,7 +31,7 @@ export default function CatalogModels({isAdminMode}) {
     const [models, setModels] = useState([])
     useEffect(() => {
         try {
-            apiClient.get('/models').then((res) => {
+            apiClient.get('admin/models/versions').then((res) => {
                 console.log(res.data)
                 setModels(res.data)
             });
@@ -124,37 +124,35 @@ export default function CatalogModels({isAdminMode}) {
                         </tr>
                         </thead>
                         <tbody>
-                        {models.map((model) =>
-                            model.modelVersions.map((version) => (
-                                <tr key={version.modelVersionId}>
-                                    <td className="text-center">{model.modelId}</td>
-                                            <td className="text-center">
-                                                <a><img src={acceptLogo}></img></a>
-                                            </td>
-                                    <td className="text-center"><Link to={`/models/${model.modelId}/data`}>{model.name}</Link>
-                                    </td>
-                                    <td className="text-center">{version.versionName}</td>
-                                    <td className="text-center">{model.modelInfo.problemType}</td>
-                                    <td className="text-center">{getDateFormat(new Date(model.createdAt))}</td>
+                        {models.map(model => (
+                            <tr key={model.modelVersionId}>
+                                <td className="text-center">{model.modelId}</td>
+                                <td className="text-center">
+                                    <a><img src={acceptLogo}></img></a>
+                                </td>
+                                <td className="text-center"><Link to={`/models/${model.modelId}/data`}>{model.modelName}</Link>
+                                </td>
+                                <td className="text-center">{model.versionName}</td>
+                                <td className="text-center">{model.modelInfo.problemType}</td>
+                                <td className="text-center">{getDateFormat(new Date(model.createdAt))}</td>
+                                <td className="text-center">
+                                    <div className="URL">
+                                        {model.uri}
+                                        <a className="a-img" name="copyLogo"><img src={copyLogo}></img></a>
+                                    </div>
+                                </td>
+                                {isAdminMode && (
                                     <td className="text-center">
-                                        <div className="URL">
-                                            {version.uri}
-                                            <a className="a-img" name="copyLogo"><img src={copyLogo}></img></a>
-                                        </div>
+                                        <Link className="a-img" to={`/models/${model.modelId}/versions/${model.modelVersionId}`}><img src={editLogo}></img></Link>
                                     </td>
-                                    {isAdminMode && (
-                                        <td className="text-center">
-                                            <Link className="a-img" to={`/models/${model.modelId}/versions/${version.modelVersionId}`}><img src={editLogo}></img></Link>
-                                        </td>
-                                    )}
-                                    {isAdminMode && (
-                                        <td className="text-center">
-                                            <a className="a-img" onClick={onDeleteModelClick}><img src={deleteLogo}></img></a>
-                                        </td>
-                                    )}
-                                </tr>
-                            ))
-                        )}
+                                )}
+                                {isAdminMode && (
+                                    <td className="text-center">
+                                        <a className="a-img" onClick={onDeleteModelClick}><img src={deleteLogo}></img></a>
+                                    </td>
+                                )}
+                            </tr>
+                        ))}
                         </tbody>
                     </table>
                 </div>
