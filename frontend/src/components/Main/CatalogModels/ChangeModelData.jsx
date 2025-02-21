@@ -6,47 +6,131 @@ import DataHeader from "../Headers/DataHeader.jsx";
 import {useNavigate, useParams} from "react-router-dom";
 import Select from "react-select";
 import {customStyle} from "../../utils/selectStyles.jsx";
+import acceptLogo from "../../../assets/accept.svg"
 import alarmLogo from "../../../assets/alarm.svg"
 import apiClient from "../../utils/axios.jsx";
+import {rejectLogo} from "../../../assets/reject.js";
+import {useForm} from "react-hook-form";
+import {yupResolver} from "@hookform/resolvers/yup";
+import {changeModelDataSchema, signInSchema} from "../../store/formSchema.jsx";
+import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx"
 
 const options = [
     {value: 'O1', label: 'First'},
     {value: 'O2', label: 'Second'}
 ];
+const modelDataForSend = {
+    modelName: "",
+    versionName: "",
+    description: "",
+    uri: "",
+    runtime: "",
+    problemType: "",
+}
+const modelDataForDisplay = {
+    modelId: "",
+    status: "ok",
+    updatedAt: "",
+    createdAt: "",
+}
+const limitDataForSend = {
+    rps: 0,
+    requestsPerWeek: 0,
+}
 
 export default function ChangeModelData() {
-    let modelData = ["ID", "Название", "Версия", "Статус", "RunTime", "Тип задачи", "URL модели"]
     const [activeBut, setActiveBut] = useState("first");
     const [alarm, setAlarm] = useState(null)
-    let navigate = useNavigate()
-    let {modelId, versionId} = useParams()
-
-    const [model, setModel] = useState({})
-    useEffect(() => {
-        try {
-            apiClient.get(`/admin/models/${modelId}/versions/${versionId}`).then((res) => {
-                setModel(res.data)
-            })
-        } catch (error) {
-            console.log(error)
-        }
-    }, []);
-
+    const navigate = useNavigate()
+    const {modelId, versionId} = useParams()
+    const [logo, setLogo] = useState(rejectLogo)
+    const [modelData, setModelData] = useState(modelDataForSend);
+    const [displayData, setDisplayData] = useState(modelDataForDisplay)
+    const [limit, setLimit] = useState(limitDataForSend)
     const [selectedValues, setSelectedValues] = useState([]);
+
     const handleSelectChange = (newValue) => {
         console.log(newValue)
         setSelectedValues(newValue);
     };
-    let onChangeName = () => {
+    const {
+        register,
+        handleSubmit,
+        formState: {errors},
+        reset,
+    } = useForm({
+        resolver: yupResolver(changeModelDataSchema)
+    })
+
+    useEffect(() => {
+        try {
+            apiClient.get(`/admin/models/${modelId}/versions/${versionId}`).then((res) => {
+                const dataForEdit = {
+                    modelName: res.data.modelName,
+                    versionName: res.data.versionName,
+                    description: res.data.description,
+                    uri: res.data.uri,
+                    runtime: res.data.modelInfo.runtime,
+                    problemType: res.data.modelInfo.problemType,
+                }
+                const dataForDisplay = {
+                    modelId: res.data.modelId,
+                    status: "ok",
+                    createdAt: res.data.createdAt,
+                    updatedAt: res.data.updatedAt,
+                }
+                const limitData = {
+                    rps: res.data.limit.rps,
+                    requestsPerWeek: res.data.limit.requestsPerWeek
+                }
+
+                setModelData(res.data)
+                setDisplayData(dataForDisplay)
+                setLimit(limitData)
+
+                reset(dataForEdit)
+                setAlarm(null)
+            })
+        } catch (error) {
+            console.log(error)
+        }
+    }, [activeBut]);
+
+    useEffect(() => {
+        const firstErrorKey = Object.keys(errors)[0];
+        if (firstErrorKey) {
+            setLogo(alarmLogo)
+            setAlarm(errors[firstErrorKey].message)
+        }
+    }, [errors]);
+
+
+    const onChangeName = () => {
+        setLogo(alarmLogo)
         setAlarm('Названия других версий данной модели также изменятся')
     }
     const onBlurName = () => {
         setAlarm(null)
     }
+    const onSaveModelData = async (modelData) => {
+        try {
+            await apiClient.put(`/admin/models/${modelId}/versions/${versionId}`, modelData);
+            setLogo(acceptLogo)
+            setAlarm('Изменения сохранены')
+        } catch (error) {
+            console.error(error);
+        }
+
+        // try {
+        //     await apiClient.put(`/admin/models/${modelId}/versions/${versionId}/limit`, limit);
+        // } catch (error) {
+        //     console.error(error);
+        // }
+    }
 
     return (
         <div className="change-container">
-            <div>
+
                 <DataHeader
                     activeBut={activeBut}
                     setActiveBut={setActiveBut}
@@ -55,70 +139,91 @@ export default function ChangeModelData() {
                     Изменение данных модели
                 </DataHeader>
 
-                {activeBut === "first" && (
-                    <div>
-                        <div className={styles.alarmContainer}>
-                            {alarm &&
-                                <b className={styles.alarm}><a className="a-img"><img src={alarmLogo}/> </a> {alarm}
-                                </b>}
-                        </div>
-                        <table className="change-container__table tableHover naked-input">
-                            <tbody>
-                            <tr>
-                                <td>ID</td>
-                                <td className="text-center">
-                                    <input type="text" defaultValue={model?.modelId}/>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Название</td>
-                                <td className="text-center">
-                                    <input type="text" onBlur={onBlurName} onChange={onChangeName}
-                                           defaultValue={model?.modelName}/>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Версия</td>
-                                <td className="text-center">
-                                    <input type="text" defaultValue={model?.versionName}/>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Статус</td>
-                                <td className="text-center">
-                                    <input type="text" defaultValue={"ok"}/>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>RunTime</td>
-                                <td className="text-center">
-                                    <input type="text" defaultValue={model?.modelInfo?.runtime}/>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Тип задачи</td>
-                                <td className="text-center">
-                                    <input type="text" defaultValue={model?.modelInfo?.problemType}/>
-                                </td>
-                            </tr>
+                <AlarmMsg logo={logo} alarm={alarm}></AlarmMsg>
 
-                            <tr>
-                                <td>URI модели</td>
-                                <td className="text-center">
-                                    <input type="text" defaultValue={model.uri}/>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Описание</td>
-                                <td><textarea defaultValue={model.description}></textarea></td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                {activeBut === "first" && (
+                    <form onSubmit={handleSubmit(onSaveModelData)}>
+                        <div>
+                            <table className="change-container__table tableHover naked-input">
+                                <tbody>
+                                <tr>
+                                    <td>ID</td>
+                                    <td className="text-center">
+                                        <input type="text" value={displayData.modelId} disabled/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Статус</td>
+                                    <td className="text-center">
+                                        <input type="text" value={displayData.status} disabled/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Название</td>
+                                    <td className="text-center">
+                                        <input
+                                            type="text"
+                                            {...register("modelName")}
+                                            onChange={e => {
+                                                onChangeName();
+                                                register("modelName").onChange(e).then(r => {
+                                                });
+                                            }}
+                                            onBlur={e => {
+                                                onBlurName();
+                                                register("modelName").onBlur(e).then(r => {
+                                                });
+                                            }}
+                                        />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Версия</td>
+                                    <td className="text-center">
+                                        <input type="text" {...register("versionName")}/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>RunTime</td>
+                                    <td className="text-center">
+                                        <input type="text" {...register("runtime")}/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Тип задачи</td>
+                                    <td className="text-center">
+                                        <input type="text" {...register("problemType")}/>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>URI модели</td>
+                                    <td className="text-center">
+                                        <input type="text" {...register("uri")}/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Описание</td>
+                                    <td>
+                                        <textarea name="description"{...register("description")}></textarea>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div className="delete-modal__buttons">
+                            <Button type="button" onClick={() => {
+                                navigate("/models")
+                            }}>Назад</Button>
+                            <Button type="submit">Сохранить</Button>
+                        </div>
+                    </form>
+
                 )}
+
                 {activeBut === "second" && (
                     <div className="second">
-                        <div>
+                        <div className="select-container">
                             <h2>Видимость</h2>
                             <div>
                                 <p className="text-class">Организации с доступом к модели</p>
@@ -140,28 +245,34 @@ export default function ChangeModelData() {
                                 <tbody>
                                 <tr>
                                     <td>Лимит RPS</td>
-                                    <td><input type="text" defaultValue={model?.limit?.rps}/></td>
+                                    <td>
+                                        <input
+                                            type="text"
+                                            defaultValue={limit.rps}
+                                        />
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td>Лимит запросов/нед</td>
-                                    <td><input type="text" defaultValue={model?.limit?.requestsPerWeek}/></td>
+                                    <td>
+                                        <input
+                                            type="text"
+                                            defaultValue={limit.requestsPerWeek}
+                                        />
+                                    </td>
                                 </tr>
                                 </tbody>
                             </table>
                         </div>
+
+                        <div className="delete-modal__buttons">
+                            <Button type="button" onClick={() => {
+                                navigate("/models")
+                            }}>Назад</Button>
+                            <Button type="submit">Сохранить</Button>
+                        </div>
                     </div>
                 )}
-            </div>
-
-
-            <div className="delete-modal__buttons">
-                <Button onClick={() => {
-                    navigate("/models")
-                }}>Назад</Button>
-                <Button>Сохранить</Button>
-            </div>
         </div>
-
     )
-
 }

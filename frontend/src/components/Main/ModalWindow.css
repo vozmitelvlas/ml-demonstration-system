@@ -71,6 +71,7 @@
     gap: 100px;
     align-items: center;
     margin-top: 20px;
+    margin-bottom: 20px;
 }
 .add-modal__buttons{
     display: flex;

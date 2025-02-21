@@ -49,3 +49,18 @@ export const signInSchema = yup.object()
             .max(255, 'Неверный пароль. Должно быть не больше 255 символов'),
 
     })
+
+export const changeModelDataSchema = yup.object()
+        .shape({
+                modelName: yup.string()
+                    .required('Поля должны быть заполнены'),
+                versionName: yup.string()
+                    .required('Поля должны быть заполнены'),
+                description: yup.string(),
+                uri: yup.string()
+                    .required('Поля должны быть заполнены'),
+                runtime: yup.string()
+                    .required('Поля должны быть заполнены'),
+                problemType: yup.string()
+                    .required('Поля должны быть заполнены'),
+        })

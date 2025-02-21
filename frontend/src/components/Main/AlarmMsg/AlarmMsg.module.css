@@ -1,0 +1,13 @@
+.alarmContainer{
+    height: 30px;
+}
+.alarm{
+    color: #49C5BA;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+}
+.alarm a{
+    cursor: default;
+}
