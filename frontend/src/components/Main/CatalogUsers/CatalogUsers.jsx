@@ -14,6 +14,7 @@ export default function CatalogUsers() {
     const navigate = useNavigate()
     const [isDeletingModel, setIsDeletingModel] = useState(false)
     const [isOpen, setIsOpen] = useState(false);
+    const [tmpUserId, setTmpUserId] = useState("")
 
     const [users, setUsers] = useState([])
     useEffect(() => {
@@ -31,6 +32,8 @@ export default function CatalogUsers() {
     }
     const onDeleteUserClick = (event) => {
         let tr = event.target.closest("tr")
+
+        setTmpUserId(tr.dataset.id)
         setIsDeletingModel(true)
     }
     const toggleSidebar = () => {
@@ -46,6 +49,15 @@ export default function CatalogUsers() {
         editModal.classList.remove("add-modal-overlay_hidden")
 
     };
+
+    const onConfirmDeletingUser = async () => {
+        try {
+            await apiClient.delete(`/admin/users/${tmpUserId}`);
+        } catch (serverError) {
+            console.error(serverError)
+        }
+        setIsDeletingModel(false)
+    }
 
     return (
         <>
@@ -101,7 +113,8 @@ export default function CatalogUsers() {
                         </thead>
                         <tbody>
                         {users.map(user => (
-                            <tr>
+                            <tr key={user.userId}
+                                data-id={user.userId}>
                                 <td className="text-center">
                                     <input type="checkbox"/>
                                 </td>
@@ -177,7 +190,7 @@ export default function CatalogUsers() {
                     </div>
                 </div>
             </div>
-            <DeleteModal open={isDeletingModel} onNo={closeDeleteModal}></DeleteModal>
+            <DeleteModal open={isDeletingModel} onNo={closeDeleteModal} onYes={onConfirmDeletingUser}></DeleteModal>
         </>
 
     )

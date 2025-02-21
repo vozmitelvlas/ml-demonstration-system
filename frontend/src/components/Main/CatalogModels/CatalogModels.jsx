@@ -25,7 +25,7 @@ export default function CatalogModels({isAdminMode}) {
     const navigate = useNavigate()
     const [isOpen, setIsOpen] = useState(false);
     const [isDeletingModel, setIsDeletingModel] = useState(false)
-    const [tmpId, setTmpId] = useState([])
+    const [tmpModelId, setTmpModelId] = useState([])
 
     const [models, setModels] = useState([])
     useEffect(() => {
@@ -43,12 +43,12 @@ export default function CatalogModels({isAdminMode}) {
     }
     let onDeleteModelClick = (event) => {
         let tr = event.target.closest("tr")
-        setTmpId(tr.dataset.id.split(" "))
+        setTmpModelId(tr.dataset.id.split(" "))
         setIsDeletingModel(true)
     }
     const onConfirmDeletingModel = async () => {
         try {
-            await apiClient.delete(`/admin/models/${tmpId[0]}/versions/${tmpId[1]}`);
+            await apiClient.delete(`/admin/models/${tmpModelId[0]}/versions/${tmpModelId[1]}`);
         } catch (serverError) {
             console.error(serverError)
         }
