@@ -52,6 +52,7 @@ public class Organization implements Serializable {
     @Column(nullable = false)
     private Instant createdAt;
 
+    @JsonIgnore
     public List<ModelOrganizationLimitResponse> getModelsLimits() {
         return limits.stream().map(modelOrganizationLimit ->
                 new ModelOrganizationLimitResponse(
