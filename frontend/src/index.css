@@ -69,7 +69,7 @@ textarea {
     resize: none;
 }
 
-textarea:not([disabled]):hover {
+textarea:hover {
     background-color: white;
 }
 
@@ -78,7 +78,7 @@ input[type="password"],
 input[type="email"],
 input[type="date"]{
     height: calc(2rem + 2px);
-    width: calc(14rem + 2px);
+    width: calc(12rem + 2px);
     font-size: 18px;
     color: #212529;
     background-color: #fff;

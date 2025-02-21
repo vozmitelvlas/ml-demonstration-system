@@ -35,21 +35,30 @@
     text-shadow: -1px -1px 1px rgba(248, 9, 9, 0.1);
     border-bottom: 3px solid #e8e8e8;
 }
-.change-container__table > .select-td td{
-    padding-left: 90px;
-}
 
-.tableHover tr:hover td {
+.change-container__table tr:hover td {
     background: var(--accent-color);
     color: #FFFFFF;
 
 }
-.tableHover tr:nth-child(odd):hover td {
+.change-container__table tr:nth-child(odd):hover td {
     background: var(--accent-color);
 }
-.tableHover tr:hover td select{
+.change-container__table tr:hover td select{
     background: white;
 }
+
+/*.tableHover tr:hover td {*/
+/*    background: var(--accent-color);*/
+/*    color: #FFFFFF;*/
+
+/*}*/
+/*.tableHover tr:nth-child(odd):hover td {*/
+/*    background: var(--accent-color);*/
+/*}*/
+/*.tableHover tr:hover td select{*/
+/*    background: white;*/
+/*}*/
 .change-content{
     display: flex;
     flex-direction: column;
@@ -69,22 +78,21 @@ th.text-center {
 .naked-input{
 }
 .naked-input input{
-    width: 350px;
+    /*width: 350px;*/
     text-align: center;
-
     border: 1px solid var(--accent-color);
     background-color: rgba(73, 197, 186, 0.08);
 
     box-shadow: 0 0 0 0 rgba(158, 158, 158, 0.25);
 }
-/*.naked-input input::placeholder{*/
-/*    font-family: 'Inter', sans-serif;*/
-/*    font-size: 24px;*/
-/*    color: black;*/
-/*    opacity: 1;*/
-/*}*/
+.data-input input{
+    width: 350px;
+}
+.limits-input input{
+    margin: unset;
+}
 .limits-select{
-    width: 300px;
+    margin: unset;
 }
 .to-center{
     display: flex;
@@ -95,4 +103,7 @@ th.text-center {
 .selects{
     display: flex;
     gap: 20px;
+}
+.user-models{
+    width: 1200px;
 }

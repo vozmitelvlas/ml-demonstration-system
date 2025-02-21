@@ -152,6 +152,6 @@ tr:hover input {
 tr:hover select {
     background-color: white;
 }
-tr:hover textarea:not([disabled]) {
+tr:hover textarea {
     background-color: #ffffff;
 }

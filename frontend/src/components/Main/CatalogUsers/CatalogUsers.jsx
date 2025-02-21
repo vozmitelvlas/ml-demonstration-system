@@ -3,32 +3,45 @@ import Button from "../Button/Button.jsx";
 import deleteLogo from "../../../assets/delete.svg";
 import editLogo from "../../../assets/edit.svg"
 import {Link, useNavigate} from "react-router-dom";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import Filter from "../Filter/Filter.jsx";
 
 import DeleteModal from "../../utils/DeleteModal.jsx";
+import apiClient from "../../utils/axios.jsx";
+import {getDateFormat} from "../../utils/DateAndTime.jsx";
 
 export default function CatalogUsers() {
-    let navigate = useNavigate()
-    let [isDeletingModel, setIsDeletingModel] = useState(false)
-    let [isOpen, setIsOpen] = useState(false);
+    const navigate = useNavigate()
+    const [isDeletingModel, setIsDeletingModel] = useState(false)
+    const [isOpen, setIsOpen] = useState(false);
 
-    let closeDeleteModal = () => {
+    const [users, setUsers] = useState([])
+    useEffect(() => {
+        try {
+            apiClient.get('/admin/users').then((res) => {
+                setUsers(res.data)
+            });
+        } catch (serverError) {
+            console.error(serverError)
+        }
+    }, [isDeletingModel]);
+
+    const closeDeleteModal = () => {
         setIsDeletingModel(false)
     }
-    let onDeleteUserClick = (event) => {
+    const onDeleteUserClick = (event) => {
         let tr = event.target.closest("tr")
         setIsDeletingModel(true)
     }
-    let toggleSidebar = () => {
+    const toggleSidebar = () => {
         setIsOpen(!isOpen);
     };
 
-    let closeAddModal = (event) => {
+    const closeAddModal = (event) => {
         let editModal = event.target.closest(".add-modal-overlay")
         editModal.classList.add("add-modal-overlay_hidden")
     }
-    let openAddModal = () => {
+    const openAddModal = () => {
         let editModal = document.querySelector(".add-modal-overlay")
         editModal.classList.remove("add-modal-overlay_hidden")
 
@@ -87,23 +100,25 @@ export default function CatalogUsers() {
                         </tr>
                         </thead>
                         <tbody>
-                        <tr>
-                            <td className="text-center">
-                                <input type="checkbox"/>
-                            </td>
-                            <td className="text-center">Ivanov</td>
-                            <td className="text-center">Ivan</td>
-                            <td className="text-center">ivanov_ivan</td>
-                            <td className="text-center">ivanovIvan@mail.ru</td>
-                            <td className="text-center">Пользователи</td>
-                            <td className="text-center">13.01.25</td>
-                            <td className="text-center">
-                                <Link className="a-img" to={`/users/${1}/edit`}><img src={editLogo}></img></Link>
-                            </td>
-                            <td className="text-center">
-                                <a  className="a-img" onClick={onDeleteUserClick}><img src={deleteLogo}></img></a>
-                            </td>
-                        </tr>
+                        {users.map(user => (
+                            <tr>
+                                <td className="text-center">
+                                    <input type="checkbox"/>
+                                </td>
+                                <td className="text-center">{user?.lastName}</td>
+                                <td className="text-center">{user?.firstName}</td>
+                                <td className="text-center">{user?.login}</td>
+                                <td className="text-center">{user?.email}</td>
+                                <td className="text-center">{user?.organization?.name}</td>
+                                <td className="text-center">{getDateFormat(new Date(user?.createdAt))}</td>
+                                <td className="text-center">
+                                    <Link className="a-img" to={`/users/${user?.userId}/edit`}><img src={editLogo}></img></Link>
+                                </td>
+                                <td className="text-center">
+                                    <a  className="a-img" onClick={onDeleteUserClick}><img src={deleteLogo}></img></a>
+                                </td>
+                            </tr>
+                        ))}
                         </tbody>
                     </table>
                 </div>

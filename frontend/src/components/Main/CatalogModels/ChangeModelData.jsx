@@ -9,11 +9,11 @@ import {customStyle} from "../../utils/selectStyles.jsx";
 import acceptLogo from "../../../assets/accept.svg"
 import alarmLogo from "../../../assets/alarm.svg"
 import apiClient from "../../utils/axios.jsx";
-import {rejectLogo} from "../../../assets/reject.js";
 import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
 import {changeModelDataSchema, signInSchema} from "../../store/formSchema.jsx";
 import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx"
+import deleteLogo from "../../../assets/delete.svg";
 
 const options = [
     {value: 'O1', label: 'First'},
@@ -43,8 +43,8 @@ export default function ChangeModelData() {
     const [alarm, setAlarm] = useState(null)
     const navigate = useNavigate()
     const {modelId, versionId} = useParams()
-    const [logo, setLogo] = useState(rejectLogo)
-    const [modelData, setModelData] = useState(modelDataForSend);
+    const [logo, setLogo] = useState(alarmLogo)
+    const [modelData, setModelData] = useState({});
     const [displayData, setDisplayData] = useState(modelDataForDisplay)
     const [limit, setLimit] = useState(limitDataForSend)
     const [selectedValues, setSelectedValues] = useState([]);
@@ -143,7 +143,7 @@ export default function ChangeModelData() {
                 {activeBut === "first" && (
                     <form onSubmit={handleSubmit(onSaveModelData)} className="change-content">
                         <div>
-                            <table className="change-container__table tableHover naked-input">
+                            <table className="change-container__table naked-input data-input">
                                 <tbody>
                                 <tr>
                                     <td>ID</td>
