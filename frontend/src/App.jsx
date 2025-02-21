@@ -59,8 +59,8 @@ function App() {
                     <Route path="/user" element={<PersonalCabinet userData={userData}/>} />
                     <Route path="/models" element={<CatalogModels isAdminMode={isAdminMode} />} />
 
-                    <Route path="/models/:modelId/versions/:versionId" element={<ChangeModelData />} />
-                    <Route path="/models/:modelId/data" element={<ModelData />} />
+                    <Route path="/models/:modelId/versions/:versionId/edit" element={<ChangeModelData />} />
+                    <Route path="/models/:modelId/versions/:versionId/data" element={<ModelData />} />
 
                     <Route path="/users" element={<CatalogUsers />} />
                     <Route path="/users/:userId/edit" element={<ChangeUserData />} />

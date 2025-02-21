@@ -141,7 +141,7 @@ export default function CatalogModels({isAdminMode}) {
                                     <a><img src={acceptLogo}></img></a>
                                 </td>
                                 <td className="text-center"><Link
-                                    to={`/models/${model?.modelId}/data`}>{model?.modelName}</Link>
+                                    to={`/models/${model?.modelId}/versions/${model?.modelVersionId}/data`}>{model?.modelName}</Link>
                                 </td>
                                 <td className="text-center">{model?.versionName}</td>
                                 <td className="text-center">{model?.modelInfo?.problemType}</td>
@@ -155,7 +155,7 @@ export default function CatalogModels({isAdminMode}) {
                                 {isAdminMode && (
                                     <td className="text-center">
                                         <Link className="a-img"
-                                              to={`/models/${model?.modelId}/versions/${model?.modelVersionId}`}><img
+                                              to={`/models/${model?.modelId}/versions/${model?.modelVersionId}/edit`}><img
                                             src={editLogo}></img></Link>
                                     </td>
                                 )}

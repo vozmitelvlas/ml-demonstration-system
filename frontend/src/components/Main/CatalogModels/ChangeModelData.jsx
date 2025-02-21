@@ -130,7 +130,6 @@ export default function ChangeModelData() {
 
     return (
         <div className="change-container">
-
                 <DataHeader
                     activeBut={activeBut}
                     setActiveBut={setActiveBut}
@@ -142,7 +141,7 @@ export default function ChangeModelData() {
                 <AlarmMsg logo={logo} alarm={alarm}></AlarmMsg>
 
                 {activeBut === "first" && (
-                    <form onSubmit={handleSubmit(onSaveModelData)}>
+                    <form onSubmit={handleSubmit(onSaveModelData)} className="change-content">
                         <div>
                             <table className="change-container__table tableHover naked-input">
                                 <tbody>
@@ -222,7 +221,7 @@ export default function ChangeModelData() {
                 )}
 
                 {activeBut === "second" && (
-                    <div className="second">
+                    <form className="change-content">
                         <div className="select-container">
                             <h2>Видимость</h2>
                             <div>
@@ -271,7 +270,7 @@ export default function ChangeModelData() {
                             }}>Назад</Button>
                             <Button type="submit">Сохранить</Button>
                         </div>
-                    </div>
+                    </form>
                 )}
         </div>
     )
