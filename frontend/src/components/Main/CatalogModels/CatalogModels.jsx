@@ -132,19 +132,19 @@ export default function CatalogModels({isAdminMode}) {
                         </thead>
                         <tbody>
                         {models.map(model => (
-                            <tr key={`${model?.modelId}${model?.modelVersionId}`}
-                                data-id={`${model?.modelId} ${model?.modelVersionId}`}>
+                            <tr key={`${model.modelId}${model.modelVersionId}`}
+                                data-id={`${model.modelId} ${model.modelVersionId}`}>
 
-                                <td className="text-center">{model?.modelId}</td>
+                                <td className="text-center">{model.modelId}</td>
                                 <td className="text-center">
                                     <a><img src={acceptLogo}></img></a>
                                 </td>
                                 <td className="text-center"><Link
-                                    to={`/models/${model?.modelId}/versions/${model?.modelVersionId}/data`}>{model?.modelName}</Link>
+                                    to={`/models/${model.modelId}/versions/${model.modelVersionId}/data`}>{model.modelName}</Link>
                                 </td>
                                 <td className="text-center">{model?.versionName}</td>
                                 <td className="text-center">{model?.modelInfo?.problemType}</td>
-                                <td className="text-center">{getDateFormat(new Date(model?.createdAt))}</td>
+                                <td className="text-center">{getDateFormat(new Date(model.createdAt))}</td>
                                 <td className="text-center">
                                     <div className="URL">
                                         {model.uri}
@@ -154,7 +154,7 @@ export default function CatalogModels({isAdminMode}) {
                                 {isAdminMode && (
                                     <td className="text-center">
                                         <Link className="a-img"
-                                              to={`/models/${model?.modelId}/versions/${model?.modelVersionId}/edit`}><img
+                                              to={`/models/${model.modelId}/versions/${model.modelVersionId}/edit`}><img
                                             src={editLogo}></img></Link>
                                     </td>
                                 )}

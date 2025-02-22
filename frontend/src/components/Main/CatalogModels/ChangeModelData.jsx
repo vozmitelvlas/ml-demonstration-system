@@ -14,24 +14,14 @@ import {yupResolver} from "@hookform/resolvers/yup";
 import {changeModelDataSchema, signInSchema} from "../../store/formSchema.jsx";
 import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx"
 import deleteLogo from "../../../assets/delete.svg";
-import error from "eslint-plugin-react/lib/util/error.js";
 
 const options = [
     {value: 'O1', label: 'First'},
     {value: 'O2', label: 'Second'}
 ];
-const modelDataForSend = {
-    modelName: "",
-    versionName: "",
-    description: "",
-    uri: "",
-    runtime: "",
-    problemType: "",
-}
 const modelDataForDisplay = {
     modelId: "",
     status: "ok",
-    updatedAt: "",
     createdAt: "",
 }
 const limitDataForSend = {
@@ -47,7 +37,7 @@ export default function ChangeModelData() {
     const [logo, setLogo] = useState(alarmLogo)
     const [modelData, setModelData] = useState({});
     const [displayData, setDisplayData] = useState(modelDataForDisplay)
-    const [limit, setLimit] = useState(limitDataForSend)
+    const [limit, setLimit] = useState({})
     const [selectedValues, setSelectedValues] = useState([]);
 
     const handleSelectChange = (newValue) => {
@@ -77,7 +67,6 @@ export default function ChangeModelData() {
                 modelId: res.data.modelId,
                 status: "ok",
                 createdAt: res.data.createdAt,
-                updatedAt: res.data.updatedAt,
             }
             const limitData = {
                 rps: res.data.limit.rps,
@@ -87,7 +76,6 @@ export default function ChangeModelData() {
             setModelData(res.data)
             setDisplayData(dataForDisplay)
             setLimit(limitData)
-
             reset(dataForEdit)
             setAlarm(null)
         }).catch(error => {

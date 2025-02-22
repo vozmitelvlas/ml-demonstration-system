@@ -25,6 +25,7 @@ export default function SignIn({setUserData}) {
     const error = firstErrorKey ? errors[firstErrorKey].message : ''
 
     const sendFormData = async (formData) => {
+        console.log(formData)
         try {
             const res =  await axios.post('http://localhost:8080/api/auth/login', formData)
             setUserData(res.data.user)

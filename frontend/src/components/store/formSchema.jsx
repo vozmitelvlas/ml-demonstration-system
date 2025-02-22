@@ -51,16 +51,24 @@ export const signInSchema = yup.object()
     })
 
 export const changeModelDataSchema = yup.object()
-        .shape({
-                modelName: yup.string()
-                    .required('Поля должны быть заполнены'),
-                versionName: yup.string()
-                    .required('Поля должны быть заполнены'),
-                description: yup.string(),
-                uri: yup.string()
-                    .required('Поля должны быть заполнены'),
-                runtime: yup.string()
-                    .required('Поля должны быть заполнены'),
-                problemType: yup.string()
-                    .required('Поля должны быть заполнены'),
-        })
+    .shape({
+        modelName: yup.string()
+            .required('Поля должны быть заполнены'),
+        versionName: yup.string()
+            .required('Поля должны быть заполнены'),
+        description: yup.string(),
+        uri: yup.string()
+            .required('Поля должны быть заполнены'),
+        runtime: yup.string()
+            .required('Поля должны быть заполнены'),
+        problemType: yup.string()
+            .required('Поля должны быть заполнены'),
+    })
+
+export const changeUserDataSchema = yup.object()
+    .shape({
+        lastName: yup.string()
+            .required('Поля должны быть заполнены'),
+        firstName: yup.string()
+            .required('Поля должны быть заполнены'),
+    })

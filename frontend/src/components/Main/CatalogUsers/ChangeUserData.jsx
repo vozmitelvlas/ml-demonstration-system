@@ -11,6 +11,10 @@ import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx";
 import alarmLogo from "../../../assets/alarm.svg";
 import acceptLogo from "../../../assets/accept.svg";
 import apiClient from "../../utils/axios.jsx";
+import {useForm} from "react-hook-form";
+import {yupResolver} from "@hookform/resolvers/yup";
+import {changeUserDataSchema} from "../../store/formSchema.jsx";
+import {getDateFormat} from "../../utils/DateAndTime.jsx";
 
 const roleOptions = [
     {value: 'O1', label: 'Администратор'},
@@ -21,24 +25,64 @@ const orgOptions = [
     {value: 'O1', label: 'Администраторы'},
     {value: 'O2', label: 'Пользователи'},
 ];
+const userDataForDisplay = {
+    login: "",
+    email: "ok",
+    createdAt: "",
+}
+
 
 export default function ChangeUserData() {
     let navigate = useNavigate()
     const {userId} = useParams()
     const [activeBut, setActiveBut] = useState("first");
     let [isDeletingModel, setIsDeletingModel] = useState(false)
+    const [displayData, setDisplayData] = useState(userDataForDisplay)
     const [logo, setLogo] = useState(alarmLogo)
     const [alarm, setAlarm] = useState(null)
 
+    const {
+        register,
+        handleSubmit,
+        formState: {errors},
+        reset,
+    } = useForm({
+        resolver: yupResolver(changeUserDataSchema)
+    })
 
-    const [userInfo, setUserInfo] = useState({})
+
+    const [userData, setUserData] = useState({})
     useEffect(() => {
-        try {
-            apiClient.get(`/admin/users/${userId}`).then((res) => {})
-        } catch (error) {
-            console.log(error)
-        }
+            apiClient.get(`/admin/users/${userId}`).then((res) => {
+                const dataForEdit = {
+                    lastName: res.data.lastName,
+                    firstName: res.data.firstName,
+                    patronymic: res.data.patronymic,
+                    description: res.data.description,
+
+                }
+                const dataForDisplay = {
+                    login: res.data.login,
+                    email: res.data.email,
+                    createdAt: res.data.createdAt,
+                }
+
+                setUserData(res.data)
+                setDisplayData(dataForDisplay)
+                reset(dataForEdit)
+                console.log(res.data)
+            }).catch(error => {
+                console.log(error)
+            })
     }, [activeBut]);
+    useEffect(() => {
+        const firstErrorKey = Object.keys(errors)[0];
+        if (firstErrorKey) {
+            console.log(errors)
+            setLogo(alarmLogo)
+            setAlarm(errors[firstErrorKey].message)
+        }
+    }, [errors]);
 
     let closeDeleteModal = () => {
         setIsDeletingModel(false)
@@ -54,6 +98,16 @@ export default function ChangeUserData() {
     const setSecondMultiBackColor = () => {
         setSelectStyles((prev) => secondStyle(prev));
     }
+    const onSaveUserData = async (userData) => {
+        console.log(userData)
+        // try {
+        //     await apiClient.put(`/admin/users/${userId}`, userData);
+        //     setLogo(acceptLogo)
+        //     setAlarm('Изменения сохранены')
+        // } catch (error) {
+        //     console.error(error);
+        // }
+    }
 
     return (
         <div className="change-container">
@@ -68,29 +122,39 @@ export default function ChangeUserData() {
                 <AlarmMsg logo={logo} alarm={alarm}></AlarmMsg>
 
                 {activeBut === "first" && (
-                    <div className="change-content">
+                    <form onSubmit={handleSubmit(onSaveUserData)} className="change-content">
                         <div>
                             <table className="change-container__table naked-input data-input">
                                 <tbody>
                                 <tr>
                                     <td>Логин</td>
-                                    <td className="text-center"><input type="text" defaultValue={""} disabled/></td>
+                                    <td className="text-center">
+                                        <input type="text" value={displayData.login} disabled/>
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td>Email</td>
-                                    <td className="text-center"><input type="text" defaultValue={""} disabled/></td>
+                                    <td className="text-center">
+                                        <input type="text" value={displayData.email} disabled/>
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td>Дата регистрации</td>
-                                    <td className="text-center"><input type="text" defaultValue={""} disabled/></td>
+                                    <td className="text-center">
+                                        <input type="text" value={getDateFormat(new Date(displayData.createdAt))} disabled/>
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td>Фамилия</td>
-                                    <td className="text-center"><input type="text" defaultValue={""}/></td>
+                                    <td className="text-center">
+                                        <input type="text" {...register("lastName")}/>
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td>Имя</td>
-                                    <td className="text-center"><input type="text" defaultValue={""}/></td>
+                                    <td className="text-center">
+                                        <input type="text" {...register("firstName")}/>
+                                    </td>
                                 </tr>
 
                                 <tr>
@@ -122,19 +186,21 @@ export default function ChangeUserData() {
                                 </tr>
                                 <tr>
                                     <td>Описание</td>
-                                    <td><textarea></textarea></td>
+                                    <td>
+                                        <textarea {...register("description")}></textarea>
+                                    </td>
                                 </tr>
                                 </tbody>
                             </table>
                         </div>
                         <div className="delete-modal__buttons">
-                            <Button onClick={() => {
+                            <Button type="button" onClick={() => {
                                 navigate("/users")
                             }}>Назад</Button>
-                            <Button>Сохранить</Button>
+                            <Button type="submit">Сохранить</Button>
                         </div>
 
-                    </div>
+                    </form>
                 )}
                 {activeBut === "second" && (
                     <form className="change-content">
