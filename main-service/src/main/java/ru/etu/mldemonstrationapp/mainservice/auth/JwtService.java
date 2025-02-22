@@ -24,7 +24,7 @@ public class JwtService {
 
     private SecretKey secretKey;
 
-    private final Duration accessTokenTtl = Duration.ofMinutes(5);
+    private final Duration accessTokenTtl = Duration.ofDays(1);
     private final Duration resetTokenTtl = Duration.ofMinutes(5);
 
     public final static String AUTH_TOKEN_COOKIE_NAME = "x-auth-token";
