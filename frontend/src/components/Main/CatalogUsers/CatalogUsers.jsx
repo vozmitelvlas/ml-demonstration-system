@@ -116,14 +116,14 @@ export default function CatalogUsers() {
                                 <td className="text-center">
                                     <input type="checkbox"/>
                                 </td>
-                                <td className="text-center">{user?.lastName}</td>
-                                <td className="text-center">{user?.firstName}</td>
-                                <td className="text-center">{user?.login}</td>
-                                <td className="text-center">{user?.email}</td>
-                                <td className="text-center">{user?.organization?.href}</td>
-                                <td className="text-center">{getDateFormat(new Date(user?.createdAt))}</td>
+                                <td className="text-center">{user.lastName}</td>
+                                <td className="text-center">{user.firstName}</td>
+                                <td className="text-center">{user.login}</td>
+                                <td className="text-center">{user.email}</td>
+                                <td className="text-center">{user.organization.name}</td>
+                                <td className="text-center">{getDateFormat(new Date(user.createdAt))}</td>
                                 <td className="text-center">
-                                    <Link className="a-img" to={`/users/${user?.userId}/edit`}><img
+                                    <Link className="a-img" to={`/users/${user.userId}/edit`}><img
                                         src={editLogo}></img></Link>
                                 </td>
                                 <td className="text-center">

@@ -41,7 +41,6 @@ export default function ChangeModelData() {
     const [selectedValues, setSelectedValues] = useState([]);
 
     const handleSelectChange = (newValue) => {
-        console.log(newValue)
         setSelectedValues(newValue);
     };
     const {

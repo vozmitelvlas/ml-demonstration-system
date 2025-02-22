@@ -55,11 +55,11 @@ export default function ModelData() {
                             </tr>
                             <tr>
                                 <td>RunTime</td>
-                                <td className="text-center">{modelData?.modelInfo?.runtime}</td>
+                                <td className="text-center">{modelData.runtime}</td>
                             </tr>
                             <tr>
                                 <td>Тип задачи</td>
-                                <td className="text-center">{modelData?.modelInfo?.problemType}</td>
+                                <td className="text-center">{modelData.problemType}</td>
                             </tr>
                             <tr>
                                 <td>URI модели</td>

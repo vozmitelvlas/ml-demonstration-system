@@ -142,8 +142,8 @@ export default function CatalogModels({isAdminMode}) {
                                 <td className="text-center"><Link
                                     to={`/models/${model.modelId}/versions/${model.modelVersionId}/data`}>{model.modelName}</Link>
                                 </td>
-                                <td className="text-center">{model?.versionName}</td>
-                                <td className="text-center">{model?.problemType}</td>
+                                <td className="text-center">{model.versionName}</td>
+                                <td className="text-center">{model.problemType}</td>
                                 <td className="text-center">{getDateFormat(new Date(model.createdAt))}</td>
                                 <td className="text-center">
                                     <div className="URL">

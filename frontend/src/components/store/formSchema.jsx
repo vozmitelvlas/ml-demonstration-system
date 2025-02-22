@@ -68,7 +68,12 @@ export const changeModelDataSchema = yup.object()
 export const changeUserDataSchema = yup.object()
     .shape({
         lastName: yup.string()
-            .required('Поля должны быть заполнены'),
+            .required('Фамилия должна быть указана'),
         firstName: yup.string()
-            .required('Поля должны быть заполнены'),
+            .required('Имя должно быть указано'),
+        selectRoles: yup
+            .array(
+                yup.object({ value: yup.string(), label: yup.string() }) // Каждый элемент массива должен быть объектом
+            )
+            .min(1, "Выберите хотя бы одну роль")
     })
