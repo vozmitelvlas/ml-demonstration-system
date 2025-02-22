@@ -55,6 +55,7 @@ public class User implements Serializable {
     public OrganizationReferenceResponse getOrganizationReference() {
         return new OrganizationReferenceResponse(
                 organization.getOrganizationId(),
+                organization.getName(),
                 "/api/organizations/%d".formatted(organization.getOrganizationId())
         );
     }
