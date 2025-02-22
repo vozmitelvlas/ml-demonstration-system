@@ -68,5 +68,22 @@ public class OrganizationController {
         return ResponseEntity.noContent().build();
     }
 
-
+    @Secured({"ROLE_ORGANIZATION_HEAD", "ROLE_ADMIN"})
+    @PostMapping("/{organizationId}/models/{modelId}/limits")
+    public ResponseEntity<ModelOrganizationLimit> createModelLimit(
+            @PathVariable Long organizationId,
+            @PathVariable Long modelId,
+            @RequestBody ModelOrganizationLimit limit) {
+        return ResponseEntity.ok(organizationService.createModelLimit(organizationId, modelId, limit));
+    }
+    
+    @Secured({"ROLE_ORGANIZATION_HEAD", "ROLE_ADMIN"})
+    @PutMapping("/{organizationId}/models/{modelId}/limits")
+    public ResponseEntity<ModelOrganizationLimit> updateModelLimit(
+            @PathVariable Long organizationId,
+            @PathVariable Long modelId,
+            @RequestBody ModelOrganizationLimit limit) {
+        return ResponseEntity.ok(organizationService.updateModelLimit(organizationId, modelId, limit));
+    }
+    
 }

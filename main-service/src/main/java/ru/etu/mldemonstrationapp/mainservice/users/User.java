@@ -46,6 +46,9 @@ public class User implements Serializable {
 
     private String description;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<ModelUserLimit> limits = new ArrayList<>();
+
     @ManyToOne
     @JoinColumn(name = "organization_id", nullable = false)
     @JsonIgnore
