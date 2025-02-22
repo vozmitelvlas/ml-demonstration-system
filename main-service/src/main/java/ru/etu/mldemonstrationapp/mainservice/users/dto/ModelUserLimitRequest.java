@@ -7,5 +7,8 @@ public record ModelUserLimitRequest(
     Long modelId,
 
     @NotNull(message = "Limit ID cannot be null")
-    Long limitId
+    Long limitId,
+
+    @NotNull(message = "User ID cannot be null")
+    Long userId
 ) {}

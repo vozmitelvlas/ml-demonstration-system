@@ -9,10 +9,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.etu.mldemonstrationapp.mainservice.admin.users.dto.CreateUserRequest;
 import ru.etu.mldemonstrationapp.mainservice.admin.users.dto.UpdateUserRequest;
+import ru.etu.mldemonstrationapp.mainservice.users.ModelUserLimit;
 import ru.etu.mldemonstrationapp.mainservice.users.User;
+import ru.etu.mldemonstrationapp.mainservice.users.dto.ModelUserLimitRequest;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @SecurityRequirement(name = "jwt-bearer")
@@ -57,5 +60,30 @@ public class AdminUserController {
         adminUserService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
+
+    @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
+    @GetMapping("/{userId}/limits/{modelId}")
+    public Optional<ModelUserLimit> getUserLimits(@PathVariable Long userId, @PathVariable Long modelId) {
+        return adminUserService.getUserLimits(userId, modelId);
+    }
+
+    @ApiResponse(useReturnTypeSchema = true, responseCode = "201")
+    @PostMapping("/limits")
+    public ResponseEntity<ModelUserLimit> createUserLimit(@Valid @RequestBody ModelUserLimitRequest request, UriComponentsBuilder uriComponentsBuilder) {
+        ModelUserLimit modelUserLimit = adminUserService.createUserLimit(request);
+        return ResponseEntity
+                .created(uriComponentsBuilder
+                        .replacePath("/api/admin/users/{userId}/limits/{modelId}")
+                        .build(Map.of("userId", request.userId(), "modelId", request.modelId()))
+                )
+                .body(modelUserLimit);
+    }
+
+    @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
+    @PutMapping("/limits/{id}")
+    public ModelUserLimit updateUserLimit(@PathVariable Long id, @Valid @RequestBody ModelUserLimitRequest request) {
+        return adminUserService.updateUserLimit(id, request);
+    }
 }
+
 

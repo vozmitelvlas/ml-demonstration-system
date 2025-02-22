@@ -8,13 +8,10 @@ import ru.etu.mldemonstrationapp.mainservice.models.Model;
 @Entity
 @Data
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @Table(name = "models_users_limits")
-public class ModelUserLimit {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+public class ModelUserLimit extends Limit{
     @ManyToOne
     @JoinColumn(name = "model_id", nullable = false)
     private Model model;
