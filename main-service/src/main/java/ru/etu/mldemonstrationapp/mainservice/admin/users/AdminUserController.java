@@ -63,26 +63,23 @@ public class AdminUserController {
 
     @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
     @GetMapping("/{userId}/limits/{modelId}")
-    public Optional<ModelUserLimit> getUserLimits(@PathVariable Long userId, @PathVariable Long modelId) {
-        return adminUserService.getUserLimits(userId, modelId);
+    public ResponseEntity<ModelUserLimit> getUserLimits(@PathVariable Long userId, @PathVariable Long modelId) {
+        Optional<ModelUserLimit> limit = adminUserService.getUserLimits(userId, modelId);
+        return limit.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @ApiResponse(useReturnTypeSchema = true, responseCode = "201")
     @PostMapping("/limits")
-    public ResponseEntity<ModelUserLimit> createUserLimit(@Valid @RequestBody ModelUserLimitRequest request, UriComponentsBuilder uriComponentsBuilder) {
-        ModelUserLimit modelUserLimit = adminUserService.createUserLimit(request);
-        return ResponseEntity
-                .created(uriComponentsBuilder
-                        .replacePath("/api/admin/users/{userId}/limits/{modelId}")
-                        .build(Map.of("userId", request.userId(), "modelId", request.modelId()))
-                )
-                .body(modelUserLimit);
+    public ResponseEntity<ModelUserLimit> createUserLimit(@Valid @RequestBody ModelUserLimitRequest request) {
+        ModelUserLimit limit = adminUserService.createUserLimit(request);
+        return ResponseEntity.ok(limit);
     }
 
     @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
-    @PutMapping("/limits/{id}")
-    public ModelUserLimit updateUserLimit(@PathVariable Long id, @Valid @RequestBody ModelUserLimitRequest request) {
-        return adminUserService.updateUserLimit(id, request);
+    @PutMapping("/limits")
+    public ResponseEntity<ModelUserLimit> updateUserLimit(@Valid @RequestBody ModelUserLimitRequest request, @RequestBody ModelUserLimit updatedLimit) {
+        ModelUserLimit limit = adminUserService.updateUserLimit(request, updatedLimit);
+        return ResponseEntity.ok(limit);
     }
 }
 

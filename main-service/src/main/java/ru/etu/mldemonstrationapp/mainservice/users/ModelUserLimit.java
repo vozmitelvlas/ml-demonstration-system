@@ -19,8 +19,4 @@ public class ModelUserLimit extends Limit{
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
-    @ManyToOne
-    @JoinColumn(name = "limit_id", nullable = false)
-    private Limit limit;
 }

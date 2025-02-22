@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import ru.etu.mldemonstrationapp.mainservice.admin.users.dto.CreateUserRequest;
 import ru.etu.mldemonstrationapp.mainservice.admin.users.dto.UpdateUserRequest;
-import ru.etu.mldemonstrationapp.mainservice.models.Limit;
 import ru.etu.mldemonstrationapp.mainservice.models.Model;
 import ru.etu.mldemonstrationapp.mainservice.models.LimitRepository;
 import ru.etu.mldemonstrationapp.mainservice.models.ModelRepository;
@@ -129,31 +128,21 @@ public class AdminUserService {
     public ModelUserLimit createUserLimit(ModelUserLimitRequest request) {
         Model model = modelRepository.findById(request.modelId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Model not found"));
-        Limit limit = limitRepository.findById(request.limitId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Limit not found"));
         User user = userRepository.findById(request.userId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-        ModelUserLimit modelUserLimit = new ModelUserLimit(model, user, limit);
+        ModelUserLimit modelUserLimit = new ModelUserLimit(model, user);
         return limitRepository.save(modelUserLimit);
     }
 
     @Transactional
-    public ModelUserLimit updateUserLimit(Long id, ModelUserLimitRequest request) {
-        ModelUserLimit modelUserLimit = limitRepository.findByUserIdAndModelId(request.userId(), request.modelId())
+    public ModelUserLimit updateUserLimit(ModelUserLimitRequest request, ModelUserLimit updatedLimit) {
+        ModelUserLimit existingLimit = limitRepository.findByUserIdAndModelId(request.userId(), request.modelId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Limit not found"));
 
-        Model model = modelRepository.findById(request.modelId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Model not found"));
-        Limit limit = limitRepository.findById(request.limitId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Limit not found"));
-        User user = userRepository.findById(request.userId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-
-        modelUserLimit.setModel(model);
-        modelUserLimit.setUser(user);
-        modelUserLimit.setLimit(limit);
-
-        return limitRepository.save(modelUserLimit);
+        existingLimit.setRps(updatedLimit.getRps());
+        existingLimit.setRequestsPerWeek(updatedLimit.getRequestsPerWeek());
+        
+        return limitRepository.save(existingLimit);
     }
 }
