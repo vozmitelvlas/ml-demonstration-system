@@ -14,6 +14,7 @@ import {yupResolver} from "@hookform/resolvers/yup";
 import {changeModelDataSchema, signInSchema} from "../../store/formSchema.jsx";
 import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx"
 import deleteLogo from "../../../assets/delete.svg";
+import error from "eslint-plugin-react/lib/util/error.js";
 
 const options = [
     {value: 'O1', label: 'First'},
@@ -63,37 +64,35 @@ export default function ChangeModelData() {
     })
 
     useEffect(() => {
-        try {
-            apiClient.get(`/admin/models/${modelId}/versions/${versionId}`).then((res) => {
-                const dataForEdit = {
-                    modelName: res.data.modelName,
-                    versionName: res.data.versionName,
-                    description: res.data.description,
-                    uri: res.data.uri,
-                    runtime: res.data.modelInfo.runtime,
-                    problemType: res.data.modelInfo.problemType,
-                }
-                const dataForDisplay = {
-                    modelId: res.data.modelId,
-                    status: "ok",
-                    createdAt: res.data.createdAt,
-                    updatedAt: res.data.updatedAt,
-                }
-                const limitData = {
-                    rps: res.data.limit.rps,
-                    requestsPerWeek: res.data.limit.requestsPerWeek
-                }
+        apiClient.get(`/admin/models/${modelId}/versions/${versionId}`).then((res) => {
+            const dataForEdit = {
+                modelName: res.data.modelName,
+                versionName: res.data.versionName,
+                description: res.data.description,
+                uri: res.data.uri,
+                runtime: res.data.modelInfo.runtime,
+                problemType: res.data.modelInfo.problemType,
+            }
+            const dataForDisplay = {
+                modelId: res.data.modelId,
+                status: "ok",
+                createdAt: res.data.createdAt,
+                updatedAt: res.data.updatedAt,
+            }
+            const limitData = {
+                rps: res.data.limit.rps,
+                requestsPerWeek: res.data.limit.requestsPerWeek
+            }
 
-                setModelData(res.data)
-                setDisplayData(dataForDisplay)
-                setLimit(limitData)
+            setModelData(res.data)
+            setDisplayData(dataForDisplay)
+            setLimit(limitData)
 
-                reset(dataForEdit)
-                setAlarm(null)
-            })
-        } catch (error) {
+            reset(dataForEdit)
+            setAlarm(null)
+        }).catch(error => {
             console.log(error)
-        }
+        })
     }, [activeBut]);
 
     useEffect(() => {
@@ -130,148 +129,148 @@ export default function ChangeModelData() {
 
     return (
         <div className="change-container">
-                <DataHeader
-                    activeBut={activeBut}
-                    setActiveBut={setActiveBut}
-                    firstButton="ИНФОРМАЦИЯ"
-                    secondButton="ОГРАНИЧЕНИЯ">
-                    Изменение данных модели
-                </DataHeader>
+            <DataHeader
+                activeBut={activeBut}
+                setActiveBut={setActiveBut}
+                firstButton="ИНФОРМАЦИЯ"
+                secondButton="ОГРАНИЧЕНИЯ">
+                Изменение данных модели
+            </DataHeader>
 
-                <AlarmMsg logo={logo} alarm={alarm}></AlarmMsg>
+            <AlarmMsg logo={logo} alarm={alarm}></AlarmMsg>
 
-                {activeBut === "first" && (
-                    <form onSubmit={handleSubmit(onSaveModelData)} className="change-content">
+            {activeBut === "first" && (
+                <form onSubmit={handleSubmit(onSaveModelData)} className="change-content">
+                    <div>
+                        <table className="change-container__table naked-input data-input">
+                            <tbody>
+                            <tr>
+                                <td>ID</td>
+                                <td className="text-center">
+                                    <input type="text" value={displayData.modelId} disabled/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Статус</td>
+                                <td className="text-center">
+                                    <input type="text" value={displayData.status} disabled/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Название</td>
+                                <td className="text-center">
+                                    <input
+                                        type="text"
+                                        {...register("modelName")}
+                                        onChange={e => {
+                                            onChangeName();
+                                            register("modelName").onChange(e).then(r => {
+                                            });
+                                        }}
+                                        onBlur={e => {
+                                            onBlurName();
+                                            register("modelName").onBlur(e).then(r => {
+                                            });
+                                        }}
+                                    />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Версия</td>
+                                <td className="text-center">
+                                    <input type="text" {...register("versionName")}/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>RunTime</td>
+                                <td className="text-center">
+                                    <input type="text" {...register("runtime")}/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Тип задачи</td>
+                                <td className="text-center">
+                                    <input type="text" {...register("problemType")}/>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>URI модели</td>
+                                <td className="text-center">
+                                    <input type="text" {...register("uri")}/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Описание</td>
+                                <td>
+                                    <textarea name="description"{...register("description")}></textarea>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div className="delete-modal__buttons">
+                        <Button type="button" onClick={() => {
+                            navigate("/models")
+                        }}>Назад</Button>
+                        <Button type="submit">Сохранить</Button>
+                    </div>
+                </form>
+
+            )}
+
+            {activeBut === "second" && (
+                <form className="change-content">
+                    <div className="select-container">
+                        <h2>Видимость</h2>
                         <div>
-                            <table className="change-container__table naked-input data-input">
-                                <tbody>
-                                <tr>
-                                    <td>ID</td>
-                                    <td className="text-center">
-                                        <input type="text" value={displayData.modelId} disabled/>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Статус</td>
-                                    <td className="text-center">
-                                        <input type="text" value={displayData.status} disabled/>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Название</td>
-                                    <td className="text-center">
-                                        <input
-                                            type="text"
-                                            {...register("modelName")}
-                                            onChange={e => {
-                                                onChangeName();
-                                                register("modelName").onChange(e).then(r => {
-                                                });
-                                            }}
-                                            onBlur={e => {
-                                                onBlurName();
-                                                register("modelName").onBlur(e).then(r => {
-                                                });
-                                            }}
-                                        />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Версия</td>
-                                    <td className="text-center">
-                                        <input type="text" {...register("versionName")}/>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>RunTime</td>
-                                    <td className="text-center">
-                                        <input type="text" {...register("runtime")}/>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Тип задачи</td>
-                                    <td className="text-center">
-                                        <input type="text" {...register("problemType")}/>
-                                    </td>
-                                </tr>
+                            <p className="text-class">Организации с доступом к модели</p>
+                            <Select
+                                className="limits-select naked-input"
+                                isMulti
+                                options={options}
+                                onChange={handleSelectChange}
+                                closeMenuOnSelect={false}
+                                placeholder={"Выбрать"}
+                                isSearchable
+                                styles={customStyle}
+                            />
+                        </div>
+                    </div>
+                    <div>
+                        <h2>Лимиты по умолчанию</h2>
+                        <table className="change-container__table tableHover naked-input">
+                            <tbody>
+                            <tr>
+                                <td>Лимит RPS</td>
+                                <td>
+                                    <input
+                                        type="text"
+                                        defaultValue={limit.rps}
+                                    />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Лимит запросов/нед</td>
+                                <td>
+                                    <input
+                                        type="text"
+                                        defaultValue={limit.requestsPerWeek}
+                                    />
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
 
-                                <tr>
-                                    <td>URI модели</td>
-                                    <td className="text-center">
-                                        <input type="text" {...register("uri")}/>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Описание</td>
-                                    <td>
-                                        <textarea name="description"{...register("description")}></textarea>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div className="delete-modal__buttons">
-                            <Button type="button" onClick={() => {
-                                navigate("/models")
-                            }}>Назад</Button>
-                            <Button type="submit">Сохранить</Button>
-                        </div>
-                    </form>
-
-                )}
-
-                {activeBut === "second" && (
-                    <form className="change-content">
-                        <div className="select-container">
-                            <h2>Видимость</h2>
-                            <div>
-                                <p className="text-class">Организации с доступом к модели</p>
-                                <Select
-                                    className="limits-select naked-input"
-                                    isMulti
-                                    options={options}
-                                    onChange={handleSelectChange}
-                                    closeMenuOnSelect={false}
-                                    placeholder={"Выбрать"}
-                                    isSearchable
-                                    styles={customStyle}
-                                />
-                            </div>
-                        </div>
-                        <div>
-                            <h2>Лимиты по умолчанию</h2>
-                            <table className="change-container__table tableHover naked-input">
-                                <tbody>
-                                <tr>
-                                    <td>Лимит RPS</td>
-                                    <td>
-                                        <input
-                                            type="text"
-                                            defaultValue={limit.rps}
-                                        />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Лимит запросов/нед</td>
-                                    <td>
-                                        <input
-                                            type="text"
-                                            defaultValue={limit.requestsPerWeek}
-                                        />
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div className="delete-modal__buttons">
-                            <Button type="button" onClick={() => {
-                                navigate("/models")
-                            }}>Назад</Button>
-                            <Button type="submit">Сохранить</Button>
-                        </div>
-                    </form>
-                )}
+                    <div className="delete-modal__buttons">
+                        <Button type="button" onClick={() => {
+                            navigate("/models")
+                        }}>Назад</Button>
+                        <Button type="submit">Сохранить</Button>
+                    </div>
+                </form>
+            )}
         </div>
     )
 }

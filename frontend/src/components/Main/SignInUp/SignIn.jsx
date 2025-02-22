@@ -26,13 +26,10 @@ export default function SignIn({setUserData}) {
 
     const sendFormData = async (formData) => {
         try {
-            await axios
-                .post('http://localhost:8080/api/auth/login', formData)
-                .then((res) => {
-                    setUserData(res.data.user)
-                    localStorage.setItem("accessToken", res.data.accessToken)
-                });
-
+            const res =  await axios.post('http://localhost:8080/api/auth/login', formData)
+            setUserData(res.data.user)
+            localStorage.setItem("accessToken", res.data.accessToken)
+            localStorage.setItem("userId", res.data.user.userId)
             navigate("/models")
         } catch (serverError) {
             if (serverError.response.status === 401) {

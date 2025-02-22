@@ -9,19 +9,20 @@ import CatalogOrganisations from "./components/Main/CatalogOrganisations/Catalog
 import ChangeOrganisations from "./components/Main/CatalogOrganisations/ChangeOrganisations.jsx";
 import PersonalCabinet from "./components/Main/PersonalCabinet/PersonalCabinet.jsx";
 import SignIn from "./components/Main/SignInUp/SignIn.jsx";
-import { useLocation } from 'react-router-dom';
+import {useLocation} from 'react-router-dom';
 import {useEffect, useState} from "react";
 import ModelData from "./components/Main/CatalogModels/ModelData.jsx";
 import SignUp from "./components/Main/SignInUp/SignUp.jsx";
 import PasswordRecover from "./components/Main/SignInUp/PasswordRecover.jsx";
 import MyOrganisations from "./components/Main/MyOrganisations/MyOrganisations.jsx";
+import apiClient from "./components/utils/axios.jsx";
 
 
-function ProtectedRoute({ isAuthenticated }) {
+function ProtectedRoute({isAuthenticated}) {
     if (!isAuthenticated) {
-        return <Navigate to="/signin" />;
+        return <Navigate to="/signin"/>;
     }
-    return <Outlet />;
+    return <Outlet/>;
 }
 
 function App() {
@@ -32,14 +33,25 @@ function App() {
     const [isAdmin, setIsAdmin] = useState(false)
     const [isMainOrg, setMainOrg] = useState(false)
     const [login, setLogin] = useState("")
-    const [userData, setUserData] = useState({})
+    const [userData, setUserData] = useState(null)
 
     useEffect(() => {
-        if(userData){
+        if (userData !== null) {
             userData?.roles?.includes("ADMIN") ? setIsAdmin(true) : setIsAdmin(false)
-
             setMainOrg(userData?.roles?.includes("ORGANIZATION_HEAD"))
             setLogin(userData?.login)
+
+        } else {
+            const userId = localStorage.getItem("userId")
+            if (userId) {
+                apiClient.get(`users/${userId}`)
+                    .then((res) => {
+                        setUserData(res.data)
+                    })
+                    .catch(error => {
+                        console.error(error)
+                    })
+            }
         }
     }, [userData]);
 
@@ -48,27 +60,28 @@ function App() {
         <div className={isAdminMode ? styles.adminMain : styles.main}>
             {
                 !excludedPaths.includes(location.pathname) &&
-                <Header login={login} isMainOrg={isMainOrg} isAdmin={isAdmin} isAdminMode={isAdminMode} setIsAdminMode={setIsAdminMode}/>
+                <Header login={login} isMainOrg={isMainOrg} isAdmin={isAdmin} isAdminMode={isAdminMode}
+                        setIsAdminMode={setIsAdminMode}/>
             }
             <div className={styles.mainContent}>
                 <Routes>
-                    <Route path="/" element={<SignIn setUserData={setUserData}/>} />
-                    <Route path="/signup" element={<SignUp setUserData={setUserData}/>} />
-                    <Route path="/password" element={<PasswordRecover />} />
+                    <Route path="/" element={<SignIn setUserData={setUserData}/>}/>
+                    <Route path="/signup" element={<SignUp setUserData={setUserData}/>}/>
+                    <Route path="/password" element={<PasswordRecover/>}/>
 
-                    <Route path="/user" element={<PersonalCabinet userData={userData}/>} />
-                    <Route path="/models" element={<CatalogModels isAdminMode={isAdminMode} />} />
+                    <Route path="/user" element={<PersonalCabinet userData={userData}/>}/>
+                    <Route path="/models" element={<CatalogModels isAdminMode={isAdminMode}/>}/>
 
-                    <Route path="/models/:modelId/versions/:versionId/edit" element={<ChangeModelData />} />
-                    <Route path="/models/:modelId/versions/:versionId/data" element={<ModelData />} />
+                    <Route path="/models/:modelId/versions/:versionId/edit" element={<ChangeModelData/>}/>
+                    <Route path="/models/:modelId/versions/:versionId/data" element={<ModelData/>}/>
 
-                    <Route path="/users" element={<CatalogUsers />} />
-                    <Route path="/users/:userId/edit" element={<ChangeUserData />} />
+                    <Route path="/users" element={<CatalogUsers/>}/>
+                    <Route path="/users/:userId/edit" element={<ChangeUserData/>}/>
 
-                    <Route path="/user/organisation" element={<MyOrganisations />} />
+                    <Route path="/user/organisation" element={<MyOrganisations/>}/>
 
-                    <Route path="/organisations" element={<CatalogOrganisations />} />
-                    <Route path="/organisations/:orgId/edit" element={<ChangeOrganisations />} />
+                    <Route path="/organisations" element={<CatalogOrganisations/>}/>
+                    <Route path="/organisations/:orgId/edit" element={<ChangeOrganisations/>}/>
                 </Routes>
             </div>
         </div>

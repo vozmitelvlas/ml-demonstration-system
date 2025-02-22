@@ -15,6 +15,7 @@ import apiClient from "../../utils/axios.jsx"
 import Select from "react-select";
 import {customStyle, firstStyle, secondStyle} from "../../utils/selectStyles.jsx";
 import {getDateFormat} from "../../utils/DateAndTime.jsx";
+import error from "eslint-plugin-react/lib/util/error.js";
 
 const options = [
     {value: 'O1', label: 'First'},
@@ -29,14 +30,12 @@ export default function CatalogModels({isAdminMode}) {
 
     const [models, setModels] = useState([])
     useEffect(() => {
-        try {
-            apiClient.get('admin/models/versions').then((res) => {
-                setModels(res.data)
-            });
-        } catch (serverError) {
-            console.error(serverError)
-        }
-    }, [isDeletingModel]);
+        apiClient.get('/models/versions').then((res) => {
+            setModels(res.data)
+        }).catch(error => {
+            console.error(error)
+        })
+    }, [isDeletingModel])
 
     let closeDeleteModal = () => {
         setIsDeletingModel(false)
@@ -230,7 +229,8 @@ export default function CatalogModels({isAdminMode}) {
                         </div>
                     </div>
                 </div>
-                <DeleteModal open={isDeletingModel} onNo={closeDeleteModal} onYes={onConfirmDeletingModel}></DeleteModal>
+                <DeleteModal open={isDeletingModel} onNo={closeDeleteModal}
+                             onYes={onConfirmDeletingModel}></DeleteModal>
             </main>
         </>
     )

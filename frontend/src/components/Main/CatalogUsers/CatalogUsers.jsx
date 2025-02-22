@@ -18,14 +18,12 @@ export default function CatalogUsers() {
 
     const [users, setUsers] = useState([])
     useEffect(() => {
-        try {
-            apiClient.get('/admin/users').then((res) => {
-                setUsers(res.data)
-            });
-        } catch (serverError) {
-            console.error(serverError)
-        }
-    }, [isDeletingModel]);
+        apiClient.get('/admin/users').then((res) => {
+            setUsers(res.data)
+        }).catch(error => {
+            console.error(error)
+        })
+    }, [isDeletingModel])
 
     const closeDeleteModal = () => {
         setIsDeletingModel(false)
@@ -125,10 +123,11 @@ export default function CatalogUsers() {
                                 <td className="text-center">{user?.organization?.name}</td>
                                 <td className="text-center">{getDateFormat(new Date(user?.createdAt))}</td>
                                 <td className="text-center">
-                                    <Link className="a-img" to={`/users/${user?.userId}/edit`}><img src={editLogo}></img></Link>
+                                    <Link className="a-img" to={`/users/${user?.userId}/edit`}><img
+                                        src={editLogo}></img></Link>
                                 </td>
                                 <td className="text-center">
-                                    <a  className="a-img" onClick={onDeleteUserClick}><img src={deleteLogo}></img></a>
+                                    <a className="a-img" onClick={onDeleteUserClick}><img src={deleteLogo}></img></a>
                                 </td>
                             </tr>
                         ))}
@@ -139,9 +138,15 @@ export default function CatalogUsers() {
                 <div className="options-buttons">
                     <Button classNames="filter-button" onClick={toggleSidebar}>Фильтр</Button>
                     <div className="options-buttons_right-down">
-                        <Button onClick={() => {navigate("/models")}}>Модели</Button>
-                        <Button onClick={() => {navigate("/users")}}>Пользователи</Button>
-                        <Button onClick={() => {navigate("/organisations")}}>Организации</Button>
+                        <Button onClick={() => {
+                            navigate("/models")
+                        }}>Модели</Button>
+                        <Button onClick={() => {
+                            navigate("/users")
+                        }}>Пользователи</Button>
+                        <Button onClick={() => {
+                            navigate("/organisations")
+                        }}>Организации</Button>
                     </div>
                 </div>
             </main>
