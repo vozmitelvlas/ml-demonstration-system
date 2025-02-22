@@ -1,6 +1,5 @@
 package ru.etu.mldemonstrationapp.mainservice.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,8 +15,11 @@ import java.io.Serializable;
 @Table(name = "model_info")
 public class ModelInfo implements Serializable {
     @Id
-    @JsonIgnore
     private Long modelId;
+
+    @OneToOne(cascade = CascadeType.ALL, optional = false)
+    @PrimaryKeyJoinColumn(name = "model_id")
+    private Model model;
 
     private String runtime;
 

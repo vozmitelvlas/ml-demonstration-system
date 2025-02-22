@@ -2,6 +2,7 @@ package ru.etu.mldemonstrationapp.mainservice.admin.models;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -11,12 +12,13 @@ import ru.etu.mldemonstrationapp.mainservice.admin.models.dto.CreateModelRequest
 import ru.etu.mldemonstrationapp.mainservice.admin.models.dto.CreateModelVersionRequest;
 import ru.etu.mldemonstrationapp.mainservice.admin.models.dto.UpdateModelVersionRequest;
 import ru.etu.mldemonstrationapp.mainservice.models.Model;
-import ru.etu.mldemonstrationapp.mainservice.models.dto.ModelVersionResponse;
+import ru.etu.mldemonstrationapp.mainservice.models.ModelVersion;
 
 import java.util.List;
 import java.util.Map;
 
 @RestController
+@SecurityRequirement(name = "jwt-bearer")
 @RequestMapping("/api/admin/models")
 @RequiredArgsConstructor
 public class AdminModelController {
@@ -39,14 +41,14 @@ public class AdminModelController {
     @Operation(description = "Get version of a model by model id and version id")
     @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
     @GetMapping("/{modelId}/versions/{versionId}")
-    public ModelVersionResponse getModelVersion(@PathVariable Long modelId, @PathVariable Long versionId) {
+    public ModelVersion getModelVersion(@PathVariable Long modelId, @PathVariable Long versionId) {
         return adminModelsService.getModelVersion(versionId);
     }
 
     @Operation(description = "Get all versions of all models")
     @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
     @GetMapping("/versions")
-    public List<ModelVersionResponse> getModelsVersions() {
+    public List<ModelVersion> getModelsVersions() {
         return adminModelsService.getModelsVersions();
     }
 
@@ -67,16 +69,16 @@ public class AdminModelController {
     @Operation(description = "Create a new version of an existing model")
     @ApiResponse(useReturnTypeSchema = true, responseCode = "201")
     @PostMapping("/{id}/versions")
-    public ResponseEntity<ModelVersionResponse> createModelVersion(@PathVariable Long id,
-                                                                   @Valid @RequestBody CreateModelVersionRequest createModelVersionRequest,
-                                                                   UriComponentsBuilder uriComponentsBuilder) {
-        ModelVersionResponse modelVersion = adminModelsService.createModelVersion(id, createModelVersionRequest);
+    public ResponseEntity<ModelVersion> createModelVersion(@PathVariable Long id,
+                                                           @Valid @RequestBody CreateModelVersionRequest createModelVersionRequest,
+                                                           UriComponentsBuilder uriComponentsBuilder) {
+        ModelVersion modelVersion = adminModelsService.createModelVersion(id, createModelVersionRequest);
         return ResponseEntity
                 .created(uriComponentsBuilder
                         .replacePath("/api/admin/models/{modelId}/versions/{versionId}")
                         .build(Map.of(
-                                "modelId", modelVersion.modelId(),
-                                "versionId", modelVersion.modelVersionId())
+                                "modelId", modelVersion.getModelId(),
+                                "versionId", modelVersion.getModelVersionId())
                         )
                 )
                 .body(modelVersion);
@@ -86,8 +88,8 @@ public class AdminModelController {
     @Operation(description = "Update model version")
     @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
     @PutMapping("/{modelId}/versions/{versionId}")
-    public ModelVersionResponse updateModel(@PathVariable Long modelId, @PathVariable Long versionId,
-                                            @Valid @RequestBody UpdateModelVersionRequest updateModelVersionRequest) {
+    public ModelVersion updateModel(@PathVariable Long modelId, @PathVariable Long versionId,
+                                    @Valid @RequestBody UpdateModelVersionRequest updateModelVersionRequest) {
         return adminModelsService.updateModelVersion(versionId, updateModelVersionRequest);
     }
 

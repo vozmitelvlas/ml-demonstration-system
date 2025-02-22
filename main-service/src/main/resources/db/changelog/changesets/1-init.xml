@@ -24,6 +24,8 @@
                 <constraints unique="true"
                              foreignKeyName="models_limit_id_fkey"
                              references="limits(limit_id)"
+                             nullable="false"
+                             deleteCascade="true"
                 />
             </column>
             <column name="other_data" type="jsonb"/>
@@ -36,7 +38,8 @@
         </createTable>
 
         <createTable tableName="model_versions">
-            <column name="model_version_id" type="bigint" autoIncrement="true" generationType="by default" startWith="1001">
+            <column name="model_version_id" type="bigint" autoIncrement="true" generationType="by default"
+                    startWith="1001">
                 <constraints primaryKey="true"/>
             </column>
             <column name="model_id" type="bigint">
@@ -73,13 +76,17 @@
         </createTable>
 
         <createTable tableName="organizations">
-            <column name="organization_id" type="bigint" autoIncrement="true" generationType="by default" startWith="1001">
+            <column name="organization_id" type="bigint" autoIncrement="true" generationType="by default"
+                    startWith="1001">
                 <constraints primaryKey="true"/>
             </column>
             <column name="name" type="varchar(255)">
                 <constraints nullable="false" unique="true"/>
             </column>
             <column name="description" type="text"/>
+            <column name="limits_type" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
             <column name="updated_at" type="timestamp" defaultValueComputed="current_timestamp">
                 <constraints nullable="false"/>
             </column>
@@ -223,6 +230,7 @@
                                  constraintName="models_users_limits_limit_id_fkey"
                                  referencedTableName="limits"
                                  referencedColumnNames="limit_id"
+                                 deleteCascade="true"
         />
         <addUniqueConstraint tableName="models_users_limits" columnNames="model_id, user_id"/>
 

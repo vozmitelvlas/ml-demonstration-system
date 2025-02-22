@@ -6,17 +6,17 @@ import java.util.List;
 
 public record UpdateUserRequest(
         @NotBlank(message = "First name cannot be blank")
-        @Size(max = 50, message = "First name should not exceed 50 characters")
+        @Size(min = 1, max = 255, message = "First name name must be between 1 and 255 characters")
         String firstName,
 
         @NotBlank(message = "Last name cannot be blank")
-        @Size(max = 50, message = "Last name should not exceed 50 characters")
+        @Size(min = 1, max = 255, message = "Last name name must be between 1 and 255 characters")
         String lastName,
 
-        @Size(max = 200, message = "Description should not exceed 200 characters")
+        @Size(max = 500, message = "Description should not exceed 500 characters")
         String description,
 
-        @Size(max = 50, message = "Patronymic should not exceed 50 characters")
+        @Size(max = 255, message = "Patronymic should not exceed 255 characters")
         String patronymic,
 
         Long organizationId,

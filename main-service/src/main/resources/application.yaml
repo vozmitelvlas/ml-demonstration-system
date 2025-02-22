@@ -14,6 +14,18 @@ spring:
     password: ${DB_PASSWORD}
     url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${spring.datasource.name}
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${SMTP_USERNAME:ml.demonstation.app@gmail.com}
+    password: ${SMTP_PASSWORD:aygeqlihaupwwnfn}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
   jpa:
     hibernate:
       ddl-auto: validate

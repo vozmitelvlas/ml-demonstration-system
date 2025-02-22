@@ -1,35 +1,25 @@
 package ru.etu.mldemonstrationapp.mainservice.admin.organizations;
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.etu.mldemonstrationapp.mainservice.organizations.Organization;
+import ru.etu.mldemonstrationapp.mainservice.organizations.OrganizationController;
 import ru.etu.mldemonstrationapp.mainservice.organizations.OrganizationService;
-import ru.etu.mldemonstrationapp.mainservice.organizations.dto.CreateOrganizationRequest;
-import ru.etu.mldemonstrationapp.mainservice.organizations.dto.UpdateOrganizationRequest;
+import ru.etu.mldemonstrationapp.mainservice.admin.organizations.dto.CreateOrganizationRequest;
+import ru.etu.mldemonstrationapp.mainservice.admin.organizations.dto.UpdateOrganizationRequest;
 
-import java.util.List;
 import java.util.Map;
 
 @RestController
+@SecurityRequirement(name = "jwt-bearer")
 @RequestMapping("/api/admin/organizations")
-@RequiredArgsConstructor
-public class AdminOrganizationController {
-    private final OrganizationService organizationService;
-
-    @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
-    @GetMapping("/{id}")
-    public Organization getOrganization(@PathVariable Long id) {
-        return organizationService.getOrganization(id);
-    }
-
-    @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
-    @GetMapping
-    public List<Organization> getOrganizations() {
-        return organizationService.getOrganizations();
+public class AdminOrganizationController extends OrganizationController {
+    public AdminOrganizationController(OrganizationService organizationService) {
+        super(organizationService);
     }
 
     @ApiResponse(useReturnTypeSchema = true, responseCode = "201")

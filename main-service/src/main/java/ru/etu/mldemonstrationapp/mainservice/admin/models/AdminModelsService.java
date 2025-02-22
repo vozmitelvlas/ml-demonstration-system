@@ -10,7 +10,6 @@ import ru.etu.mldemonstrationapp.mainservice.admin.models.dto.CreateModelRequest
 import ru.etu.mldemonstrationapp.mainservice.admin.models.dto.CreateModelVersionRequest;
 import ru.etu.mldemonstrationapp.mainservice.admin.models.dto.UpdateModelVersionRequest;
 import ru.etu.mldemonstrationapp.mainservice.models.*;
-import ru.etu.mldemonstrationapp.mainservice.models.dto.ModelVersionResponse;
 
 import java.time.Instant;
 import java.util.List;
@@ -29,12 +28,12 @@ public class AdminModelsService {
         return modelRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"));
     }
 
-    public ModelVersionResponse getModelVersion(Long versionId) {
-        return modelVersionRepository.findModelVersionById(versionId).orElseThrow();
+    public ModelVersion getModelVersion(Long versionId) {
+        return modelVersionRepository.findById(versionId).orElseThrow();
     }
 
-    public List<ModelVersionResponse> getModelsVersions() {
-        return modelVersionRepository.findModelVersions();
+    public List<ModelVersion> getModelsVersions() {
+        return modelVersionRepository.findAll();
     }
 
     @Transactional
@@ -64,12 +63,12 @@ public class AdminModelsService {
     }
 
     @Transactional
-    public ModelVersionResponse createModelVersion(Long modelId, CreateModelVersionRequest dto) {
+    public ModelVersion createModelVersion(Long modelId, CreateModelVersionRequest dto) {
         Model model = modelRepository.findById(modelId).orElseThrow();
         if (modelVersionRepository.versionNameUnique(model.getModelId(), dto.versionName())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Version name already in use");
         }
-        ModelVersion modelVersion = modelVersionRepository.save(new ModelVersion(
+        return modelVersionRepository.save(new ModelVersion(
                 null,
                 dto.versionName(),
                 dto.description(),
@@ -78,22 +77,11 @@ public class AdminModelsService {
                 Instant.now(),
                 Instant.now())
         );
-        return new ModelVersionResponse(
-                model.getModelId(),
-                model.getName(),
-                modelVersion.getModelVersionId(),
-                modelVersion.getVersionName(),
-                modelVersion.getDescription(),
-                modelVersion.getUri(),
-                model.getModelInfo(),
-                model.getLimit(),
-                modelVersion.getUpdatedAt(),
-                modelVersion.getCreatedAt()
-        );
+
     }
 
     @Transactional
-    public ModelVersionResponse updateModelVersion(Long versionId, UpdateModelVersionRequest dto) {
+    public ModelVersion updateModelVersion(Long versionId, UpdateModelVersionRequest dto) {
         ModelVersion modelVersion = modelVersionRepository.findById(versionId).orElseThrow();
         Model model = modelVersion.getModel();
 
@@ -117,18 +105,7 @@ public class AdminModelsService {
 
         modelRepository.save(model);
 
-        return new ModelVersionResponse(
-                model.getModelId(),
-                model.getName(),
-                modelVersion.getModelVersionId(),
-                modelVersion.getVersionName(),
-                modelVersion.getDescription(),
-                modelVersion.getUri(),
-                modelVersion.getModel().getModelInfo(),
-                modelVersion.getModel().getLimit(),
-                modelVersion.getUpdatedAt(),
-                modelVersion.getCreatedAt()
-        );
+        return modelVersion;
     }
 
     @Transactional
@@ -136,6 +113,8 @@ public class AdminModelsService {
         ModelVersion modelVersion = modelVersionRepository.findById(id).orElseThrow();
         Long modelId = modelVersion.getModel().getModelId();
         modelVersionRepository.delete(modelVersion);
+
+        // Limit entity is removed because the model will be removed by cascade
         modelRepository.deleteModelIfVersionsListEmpty(modelId);
     }
 }
