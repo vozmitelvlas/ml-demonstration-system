@@ -73,7 +73,13 @@ export const changeUserDataSchema = yup.object()
             .required('Имя должно быть указано'),
         selectRoles: yup
             .array(
-                yup.object({ value: yup.string(), label: yup.string() }) // Каждый элемент массива должен быть объектом
+                yup.object({value: yup.string(), label: yup.string()}) // Каждый элемент массива должен быть объектом
             )
             .min(1, "Выберите хотя бы одну роль")
+    })
+
+export const changeOrganisationsSchema = yup.object()
+    .shape({
+        name: yup.string()
+            .required('Название организации должно быть указано'),
     })

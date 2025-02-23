@@ -64,6 +64,12 @@
     flex-direction: column;
     justify-content: space-between;
     height: 100%;
+    align-items: center;
+}
+.change-orgs-content{
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
 }
 
 .select-container{
@@ -93,6 +99,7 @@ th.text-center {
 }
 .limits-select{
     margin: unset;
+    width: 250px;
 }
 .to-center{
     display: flex;
@@ -100,10 +107,14 @@ th.text-center {
     flex-direction: column;
     align-items: center;
 }
-.selects{
+.orgs-selects{
     display: flex;
+    justify-content: center;
     gap: 20px;
 }
-.user-models{
+.select-width{
+    width: 350px;
+}
+.user-models, .orgs-models{
     width: 1200px;
 }

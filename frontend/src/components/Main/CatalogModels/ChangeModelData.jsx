@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from "react";
 import "../ChangeData.css"
-import styles from "./ModelData.module.css"
 import Button from "../Button/Button.jsx";
 import DataHeader from "../Headers/DataHeader.jsx";
 import {useNavigate, useParams} from "react-router-dom";
@@ -11,7 +10,7 @@ import alarmLogo from "../../../assets/alarm.svg"
 import apiClient from "../../utils/axios.jsx";
 import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
-import {changeModelDataSchema, signInSchema} from "../../store/formSchema.jsx";
+import {changeModelDataSchema} from "../../store/formSchema.jsx";
 import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx"
 
 const options = [
@@ -29,19 +28,19 @@ const limitDataForSend = {
 }
 
 export default function ChangeModelData() {
-    const [activeBut, setActiveBut] = useState("first");
+    const [activeBut, setActiveBut] = useState("first")
     const [alarm, setAlarm] = useState(null)
     const navigate = useNavigate()
     const {modelId, versionId} = useParams()
     const [logo, setLogo] = useState(alarmLogo)
-    const [modelData, setModelData] = useState({});
+    const [modelData, setModelData] = useState({})
     const [displayData, setDisplayData] = useState(modelDataForDisplay)
     const [limit, setLimit] = useState({})
-    const [selectedValues, setSelectedValues] = useState([]);
+    const [selectedValues, setSelectedValues] = useState([])
 
     const handleSelectChange = (newValue) => {
         setSelectedValues(newValue);
-    };
+    }
     const {
         register,
         handleSubmit,
