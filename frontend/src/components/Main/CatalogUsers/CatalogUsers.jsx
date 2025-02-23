@@ -18,7 +18,7 @@ export default function CatalogUsers() {
 
     const [users, setUsers] = useState([])
     useEffect(() => {
-        apiClient.get('/admin/users').then((res) => {
+        apiClient.get('/api/admin/users').then((res) => {
             setUsers(res.data)
         }).catch(error => {
             console.error(error)
@@ -50,7 +50,7 @@ export default function CatalogUsers() {
 
     const onConfirmDeletingUser = async () => {
         try {
-            await apiClient.delete(`/admin/users/${tmpUserId}`);
+            await apiClient.delete(`/api/admin/users/${tmpUserId}`);
         } catch (serverError) {
             console.error(serverError)
         }

@@ -55,15 +55,17 @@ export default function ChangeUserData() {
 
     const [userData, setUserData] = useState({})
     useEffect(() => {
-        apiClient.get(`/admin/organizations`).then((res) => {
+        apiClient.get(`/api/admin/organizations`).then((res) => {
             let organisations = []
             res.data.forEach(org => {
                 organisations.push({value: org.organizationId, label: org.name})
             })
             setOrgOptions(organisations)
+        }).catch(error => {
+            console.error(error)
         })
 
-        apiClient.get(`/admin/users/${userId}`).then((res) => {
+        apiClient.get(`/api/admin/users/${userId}`).then((res) => {
             console.log(res.data)
             const dataForEdit = {
                 lastName: res.data.lastName,
@@ -115,7 +117,7 @@ export default function ChangeUserData() {
         console.log(userData)
 
         try {
-            await apiClient.put(`/admin/users/${userId}`, userData);
+            await apiClient.put(`/api/admin/users/${userId}`, userData);
             setLogo(acceptLogo)
             setAlarm('Изменения сохранены')
         } catch (error) {

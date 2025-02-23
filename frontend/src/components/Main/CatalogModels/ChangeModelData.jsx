@@ -53,7 +53,7 @@ export default function ChangeModelData() {
     })
 
     useEffect(() => {
-        apiClient.get(`/admin/models/${modelId}/versions/${versionId}`).then((res) => {
+        apiClient.get(`/api/admin/models/${modelId}/versions/${versionId}`).then((res) => {
             const dataForEdit = {
                 modelName: res.data.modelName,
                 versionName: res.data.versionName,
@@ -100,7 +100,7 @@ export default function ChangeModelData() {
     }
     const onSaveModelData = async (modelData) => {
         try {
-            await apiClient.put(`/admin/models/${modelId}/versions/${versionId}`, modelData);
+            await apiClient.put(`/api/admin/models/${modelId}/versions/${versionId}`, modelData);
             setLogo(acceptLogo)
             setAlarm('Изменения сохранены')
         } catch (error) {
@@ -108,7 +108,7 @@ export default function ChangeModelData() {
         }
 
         // try {
-        //     await apiClient.put(`/admin/models/${modelId}/versions/${versionId}/limit`, limit);
+        //     await apiClient.put(`/api/admin/models/${modelId}/versions/${versionId}/limit`, limit);
         // } catch (error) {
         //     console.error(error);
         // }

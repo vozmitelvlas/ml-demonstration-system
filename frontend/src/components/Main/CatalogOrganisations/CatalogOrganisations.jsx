@@ -5,16 +5,27 @@ import editLogo from "../../../assets/edit.svg"
 import {Link, useNavigate} from "react-router-dom";
 import "../Catalog.css"
 import "../Table.css"
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import Filter from "../Filter/Filter.jsx";
 import DeleteModal from "../../utils/DeleteModal.jsx";
 import {customStyle, firstStyle, secondStyle} from "../../utils/selectStyles.jsx";
+import apiClient from "../../utils/axios.jsx";
+import {getDateFormat} from "../../utils/DateAndTime.jsx";
 
 export default function CatalogOrganisations() {
     let navigate = useNavigate()
     const [isOpen, setIsOpen] = useState(false);
     let [isDeletingModel, setIsDeletingModel] = useState(false)
     const [selectedValues, setSelectedValues] = useState([]);
+
+    const [organisation, setOrganisation] = useState([])
+    useEffect(() => {
+        apiClient.get("/api/admin/organizations").then(res => {
+            setOrganisation(res.data)
+        }).catch(error => {
+            console.log(error)
+        })
+    }, []);
 
     const toggleSidebar = () => {
         setIsOpen(!isOpen);
@@ -75,10 +86,10 @@ export default function CatalogOrganisations() {
                         <thead>
                         <tr>
                             <th className="text-center">
-                                <strong>Название</strong>
+                                <strong>ID</strong>
                             </th>
                             <th className="text-center">
-                                <strong>Руководитель</strong>
+                                <strong>Название</strong>
                             </th>
                             <th className="text-center">
                                 <strong>Дата создания</strong>
@@ -88,20 +99,21 @@ export default function CatalogOrganisations() {
                         </tr>
                         </thead>
                         <tbody>
-                        <tr>
-                            <td className="text-center">Пользователи</td>
-                            <td className="text-center">ivan_ivanov</td>
-                            <td className="text-center">12.31.23</td>
-                            <td className="text-center">
-                                <Link className="a-img" to={`/organisations/${1}/edit`}><img
-                                    src={editLogo}></img></Link>
-                            </td>
-                            <td className="text-center">
-                                <a className="a-img" onClick={onDeleteOrgClick}><img src={deleteLogo}></img></a>
-                            </td>
-                        </tr>
-                        <tr>
-                        </tr>
+                        {organisation.map(org => (
+                            <tr key={org.organizationId}>
+                                <td className="text-center">{org.organizationId}</td>
+                                <td className="text-center">{org.name}</td>
+                                <td className="text-center">{getDateFormat(new Date(org.createdAt))}</td>
+                                <td className="text-center">
+                                    <Link className="a-img" to={`/organisations/${org.organizationId}/edit`}><img
+                                        src={editLogo}></img></Link>
+                                </td>
+                                <td className="text-center">
+                                    <a className="a-img" onClick={onDeleteOrgClick}><img src={deleteLogo}></img></a>
+                                </td>
+                            </tr>
+                        ))}
+
                         </tbody>
                     </table>
                 </div>

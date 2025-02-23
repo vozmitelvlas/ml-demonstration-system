@@ -44,7 +44,7 @@ function App() {
         } else {
             const userId = localStorage.getItem("userId")
             if (userId) {
-                apiClient.get(`users/${userId}`)
+                apiClient.get(`/api/users/${userId}`)
                     .then((res) => {
                         setUserData(res.data)
                     })

@@ -14,7 +14,7 @@ export default function ModelData() {
     const [modelData, setModelData] = useState({});
     useEffect(() => {
         try {
-            apiClient.get(`/models/versions/${versionId}`).then((res) => { // modelId?
+            apiClient.get(`/api/models/versions/${versionId}`).then((res) => { // modelId?
                 setModelData(res.data)
             })
         } catch (error) {

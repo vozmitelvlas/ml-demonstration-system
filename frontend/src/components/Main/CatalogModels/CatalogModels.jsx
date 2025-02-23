@@ -15,7 +15,6 @@ import apiClient from "../../utils/axios.jsx"
 import Select from "react-select";
 import {customStyle, firstStyle, secondStyle} from "../../utils/selectStyles.jsx";
 import {getDateFormat} from "../../utils/DateAndTime.jsx";
-import error from "eslint-plugin-react/lib/util/error.js";
 
 const options = [
     {value: 'O1', label: 'First'},
@@ -30,7 +29,7 @@ export default function CatalogModels({isAdminMode}) {
 
     const [models, setModels] = useState([])
     useEffect(() => {
-        apiClient.get('/models/versions').then((res) => {
+        apiClient.get('/api/models/versions').then((res) => {
             setModels(res.data)
         }).catch(error => {
             console.error(error)
@@ -47,7 +46,7 @@ export default function CatalogModels({isAdminMode}) {
     }
     const onConfirmDeletingModel = async () => {
         try {
-            await apiClient.delete(`/admin/models/${tmpModelId[0]}/versions/${tmpModelId[1]}`);
+            await apiClient.delete(`/api/admin/models/${tmpModelId[0]}/versions/${tmpModelId[1]}`);
         } catch (serverError) {
             console.error(serverError)
         }
