@@ -15,6 +15,8 @@ import apiClient from "../../utils/axios.jsx"
 import Select from "react-select";
 import {customStyle, firstStyle, secondStyle} from "../../utils/selectStyles.jsx";
 import {getDateFormat} from "../../utils/DateAndTime.jsx";
+import alarmLogo from "../../../assets/alarm.svg"
+import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx";
 
 const options = [
     {value: 'O1', label: 'First'},
@@ -26,6 +28,8 @@ export default function CatalogModels({isAdminMode}) {
     const [isOpen, setIsOpen] = useState(false);
     const [isDeletingModel, setIsDeletingModel] = useState(false)
     const [tmpModelId, setTmpModelId] = useState([])
+    const [alarm, setAlarm] = useState(null)
+    const [logo, setLogo] = useState(alarmLogo)
 
     const [models, setModels] = useState([])
     useEffect(() => {
@@ -47,6 +51,8 @@ export default function CatalogModels({isAdminMode}) {
     const onConfirmDeletingModel = async () => {
         try {
             await apiClient.delete(`/api/admin/models/${tmpModelId[0]}/versions/${tmpModelId[1]}`);
+            setLogo(acceptLogo)
+            setAlarm("Модель успешно удалена")
         } catch (serverError) {
             console.error(serverError)
         }
@@ -102,13 +108,17 @@ export default function CatalogModels({isAdminMode}) {
                 <CatalogHeader title={"Каталог моделей"}
                                searchFields={["Название модели", "Тип модели"]}></CatalogHeader>
 
-                {isAdminMode && (
-                    <div className="options-buttons_up">
-                        <Button onClick={openAddModal}>Добавить модель</Button>
-                        <Button>Импорт</Button>
-                        <Button>Экспорт</Button>
-                    </div>
-                )}
+                <div className="options-buttons_up">
+                    {isAdminMode && (
+                        <div>
+                            <Button onClick={openAddModal}>Добавить модель</Button>
+                            <Button>Импорт</Button>
+                            <Button>Экспорт</Button>
+                        </div>
+                    )}
+                </div>
+
+                <AlarmMsg logo={logo} alarm={alarm}></AlarmMsg>
 
                 <div className="catalog-models">
                     <table className="table-fill">

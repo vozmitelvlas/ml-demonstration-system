@@ -25,16 +25,18 @@ export default function SignIn({setUserData}) {
     const error = firstErrorKey ? errors[firstErrorKey].message : ''
 
     const sendFormData = async (formData) => {
-        console.log(formData)
         try {
             const res =  await axios.post('http://localhost:8080/api/auth/login', formData)
             setUserData(res.data.user)
             localStorage.setItem("accessToken", res.data.accessToken)
             localStorage.setItem("userId", res.data.user.userId)
             navigate("/models")
-        } catch (serverError) {
-            if (serverError.response.status === 401) {
+        } catch (error) {
+            if (error.response?.status === 401) {
                 setError('form', {type: 'server', message: 'Неверный логин или пароль'})
+            }
+            else{
+                console.log(error)
             }
         }
     }

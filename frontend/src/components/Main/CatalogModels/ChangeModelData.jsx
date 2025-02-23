@@ -13,7 +13,6 @@ import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
 import {changeModelDataSchema, signInSchema} from "../../store/formSchema.jsx";
 import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx"
-import deleteLogo from "../../../assets/delete.svg";
 
 const options = [
     {value: 'O1', label: 'First'},
@@ -53,6 +52,7 @@ export default function ChangeModelData() {
     })
 
     useEffect(() => {
+        console.log("ihyvi")
         apiClient.get(`/api/admin/models/${modelId}/versions/${versionId}`).then((res) => {
             const dataForEdit = {
                 modelName: res.data.modelName,

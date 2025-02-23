@@ -9,12 +9,17 @@ import Filter from "../Filter/Filter.jsx";
 import DeleteModal from "../../utils/DeleteModal.jsx";
 import apiClient from "../../utils/axios.jsx";
 import {getDateFormat} from "../../utils/DateAndTime.jsx";
+import alarmLogo from "../../../assets/alarm.svg";
+import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx";
+import acceptLogo from "../../../assets/accept.svg"
 
 export default function CatalogUsers() {
     const navigate = useNavigate()
     const [isDeletingModel, setIsDeletingModel] = useState(false)
-    const [isOpen, setIsOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState(false)
     const [tmpUserId, setTmpUserId] = useState("")
+    const [alarm, setAlarm] = useState(null)
+    const [logo, setLogo] = useState(alarmLogo)
 
     const [users, setUsers] = useState([])
     useEffect(() => {
@@ -35,7 +40,7 @@ export default function CatalogUsers() {
         setIsDeletingModel(true)
     }
     const toggleSidebar = () => {
-        setIsOpen(!isOpen);
+        setIsOpen(!isOpen)
     };
 
     const closeAddModal = (event) => {
@@ -51,8 +56,10 @@ export default function CatalogUsers() {
     const onConfirmDeletingUser = async () => {
         try {
             await apiClient.delete(`/api/admin/users/${tmpUserId}`);
-        } catch (serverError) {
-            console.error(serverError)
+            setAlarm("Пользователь успешно удален")
+            setLogo(acceptLogo)
+        } catch (error) {
+            console.error(error)
         }
         setIsDeletingModel(false)
     }
@@ -81,6 +88,7 @@ export default function CatalogUsers() {
                 <div className="options-buttons_up">
                     <Button onClick={openAddModal}>Добавить пользователя</Button>
                 </div>
+                <AlarmMsg logo={logo} alarm={alarm}></AlarmMsg>
 
                 <div className="catalog-users">
                     <table className="table-fill">

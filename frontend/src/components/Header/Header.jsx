@@ -30,7 +30,7 @@ export default function Header({login, isAdminMode, setIsAdminMode, isAdmin, isM
                 <a className="a-img"><img src={userLogo} alt={"lk"} className={isAdminMode ? styles.whiteSvg : ""}></img></a>
                 <h3>{login}</h3>
             </div>
-            {isAdminMode && (<h3 style={{marginLeft: "20px", opacity: 0.5}}>Режим Администратора</h3>)}
+            {isAdminMode && (<h3 style={{marginLeft: "20px", opacity: 0.65}}>Режим Администратора</h3>)}
 
             <div className={styles.right}>
                 <b>{getDateFormat(new Date())} &nbsp; {getTimeFormat(new Date())}</b>

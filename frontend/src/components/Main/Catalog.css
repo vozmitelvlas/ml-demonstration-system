@@ -17,6 +17,7 @@ main{
 .catalog-models, .catalog-users, .catalog-orgs{
     flex-grow: 1;
     overflow: auto;
+    margin-bottom: 10px;
 }
 .options-buttons_right-down{
     display: flex;
@@ -28,10 +29,12 @@ main{
     align-items: center;
     margin: 0 50px 20px 20px;
 }
-
 .options-buttons_up{
-    display: flex;
+    height: 80px;
     margin-left: 40px;
+}
+.options-buttons_up > div{
+    display: flex;
 }
 .URL{
     display: flex;

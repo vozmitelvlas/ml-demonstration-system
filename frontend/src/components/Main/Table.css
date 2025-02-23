@@ -34,7 +34,7 @@ div.table-title {
 
 .table-fill {
     overflow: auto;
-    margin: 50px auto;
+    margin: 10px auto;
     background: white;
     border-radius: 3px;
     border-collapse: collapse;

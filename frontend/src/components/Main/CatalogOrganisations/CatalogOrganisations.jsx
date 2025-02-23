@@ -11,12 +11,19 @@ import DeleteModal from "../../utils/DeleteModal.jsx";
 import {customStyle, firstStyle, secondStyle} from "../../utils/selectStyles.jsx";
 import apiClient from "../../utils/axios.jsx";
 import {getDateFormat} from "../../utils/DateAndTime.jsx";
+import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx";
+import alarmLogo from "../../../assets/alarm.svg"
+import acceptLogo from "../../../assets/accept.svg"
 
 export default function CatalogOrganisations() {
-    let navigate = useNavigate()
-    const [isOpen, setIsOpen] = useState(false);
-    let [isDeletingModel, setIsDeletingModel] = useState(false)
-    const [selectedValues, setSelectedValues] = useState([]);
+    const navigate = useNavigate()
+    const [isOpen, setIsOpen] = useState(false)
+    const [isDeletingModel, setIsDeletingModel] = useState(false)
+    const [selectedValues, setSelectedValues] = useState([])
+    const [tmpOrgId, setTmpOrgId] = useState("")
+    const [alarm, setAlarm] = useState(null)
+    const [logo, setLogo] = useState(alarmLogo)
+
 
     const [organisation, setOrganisation] = useState([])
     useEffect(() => {
@@ -25,40 +32,58 @@ export default function CatalogOrganisations() {
         }).catch(error => {
             console.log(error)
         })
-    }, []);
+    }, [isDeletingModel])
 
     const toggleSidebar = () => {
-        setIsOpen(!isOpen);
+        setIsOpen(!isOpen)
     }
-    let onCloseDeleteModal = () => {
+    const onCloseDeleteModal = () => {
         setIsDeletingModel(false)
     }
-    let onDeleteOrgClick = (event) => {
+    const onDeleteOrgClick = (event) => {
         let tr = event.target.closest("tr")
+
+        setTmpOrgId(tr.dataset.id)
         setIsDeletingModel(true)
     }
-    let onCloseAddModal = (event) => {
+    const onCloseAddModal = (event) => {
         event.preventDefault()
         let addModal = event.target.closest(".add-modal-overlay")
         addModal.classList.add("add-modal-overlay_hidden")
     }
-    let onOpenAddModal = () => {
+    const onOpenAddModal = () => {
         let addModal = document.querySelector(".add-modal-overlay")
         addModal.classList.remove("add-modal-overlay_hidden")
     }
-    let onAddNewCatalog = (event) => {
+    const onAddNewCatalog = (event) => {
         event.preventDefault()
     }
     const handleSelectChange = (newValue) => {
         console.log(newValue)
-        setSelectedValues(newValue);
+        setSelectedValues(newValue)
     };
     const [selectStyle, setSelectStyles] = useState(customStyle);
     const setFirstMultiBackColor = () => {
         setSelectStyles((prev) => firstStyle(prev));
-    };
+    }
     const setSecondMultiBackColor = () => {
         setSelectStyles((prev) => secondStyle(prev));
+    }
+    const onConfirmDeletingOrg = async (event) => {
+        event.preventDefault()
+        try {
+            await apiClient.delete(`/api/admin/organizations/${tmpOrgId}`)
+                setLogo(acceptLogo)
+                setAlarm("Организация успешно удалена")
+        } catch (error) {
+            if (error.response?.status === 409) {
+                setLogo(alarmLogo)
+                setAlarm("Организация не пуста")
+            } else {
+                console.log(error)
+            }
+        }
+        setIsDeletingModel(false)
     }
 
 
@@ -75,12 +100,13 @@ export default function CatalogOrganisations() {
                     }}></Filter>
             }
             <main>
-                <CatalogHeader title={"Организации"} searchFields={["Название организации"]}></CatalogHeader>
+                <CatalogHeader title={"Каталог организаций"} searchFields={["Название организации"]}></CatalogHeader>
 
                 <div className="options-buttons_up">
                     <Button onClick={onOpenAddModal}>Добавить организацию</Button>
                 </div>
 
+                <AlarmMsg logo={logo} alarm={alarm}></AlarmMsg>
                 <div className="catalog-orgs">
                     <table className="table-fill table-organisation">
                         <thead>
@@ -100,7 +126,7 @@ export default function CatalogOrganisations() {
                         </thead>
                         <tbody>
                         {organisation.map(org => (
-                            <tr key={org.organizationId}>
+                            <tr key={org.organizationId} data-id={org.organizationId}>
                                 <td className="text-center">{org.organizationId}</td>
                                 <td className="text-center">{org.name}</td>
                                 <td className="text-center">{getDateFormat(new Date(org.createdAt))}</td>
@@ -159,7 +185,7 @@ export default function CatalogOrganisations() {
                     </div>
                 </div>
 
-                <DeleteModal open={isDeletingModel} onNo={onCloseDeleteModal}></DeleteModal>
+                <DeleteModal open={isDeletingModel} onNo={onCloseDeleteModal} onYes={onConfirmDeletingOrg}></DeleteModal>
             </main>
         </>
     )

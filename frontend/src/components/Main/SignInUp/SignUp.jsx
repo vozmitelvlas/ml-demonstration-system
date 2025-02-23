@@ -41,9 +41,12 @@ export default function SignUp({setUserData}) {
                 });
 
             navigate("/models")
-        } catch (serverError) {
-            if (serverError.response.status === 409) {
+        } catch (error) {
+            if (error.response?.status === 409) {
                 setError('form', {type: 'server', message: 'Пользователь уже существует'})
+            }
+            else{
+                console.log(error)
             }
         }
     }
