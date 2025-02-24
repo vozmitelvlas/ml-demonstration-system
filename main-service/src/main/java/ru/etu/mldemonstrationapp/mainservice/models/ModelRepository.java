@@ -14,7 +14,7 @@ public interface ModelRepository extends JpaRepository<Model, Long> {
             DELETE FROM Limit l
             WHERE l.limitId IN (
                 SELECT m.limit.limitId FROM Model m
-                JOIN model.limit
+                JOIN Limit l ON l.limitId = m.limit.limitId
                 WHERE m.modelId = :modelId)
              AND NOT EXISTS (
                 SELECT m from Model m
