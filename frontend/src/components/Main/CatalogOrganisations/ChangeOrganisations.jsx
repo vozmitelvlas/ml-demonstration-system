@@ -1,11 +1,7 @@
 import DataHeader from "../Headers/DataHeader.jsx";
 import React, {useEffect, useState} from "react";
-import Button from "../Button/Button.jsx";
 import {useNavigate, useParams} from "react-router-dom";
-import deleteLogo from "../../../assets/delete.svg";
 import DeleteModal from "../../utils/DeleteModal.jsx";
-import Select from "react-select";
-import {customStyle} from "../../utils/selectStyles.jsx";
 import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx";
 import acceptLogo from "../../../assets/accept.svg"
 import alarmLogo from "../../../assets/alarm.svg"
@@ -14,6 +10,8 @@ import {getDateFormat} from "../../utils/DateAndTime.jsx";
 import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
 import {changeOrganisationsSchema} from "../../store/formSchema.jsx";
+import ChangeOrganisationsInfo from "./ChangeOrganisationsInfo.jsx";
+import ChangeOrganisationModels from "./ChangeOrganisationModels.jsx";
 
 const limitOptions = [
     {value: 'O1', label: 'Лимит организации'},
@@ -38,7 +36,6 @@ const limitDataForSend = {
 }
 
 export default function ChangeOrganisations() {
-    const navigate = useNavigate()
     const {orgId} = useParams()
     const [activeBut, setActiveBut] = useState("first")
     const [isDeletingModel, setIsDeletingModel] = useState(false)
@@ -46,12 +43,10 @@ export default function ChangeOrganisations() {
     const [alarm, setAlarm] = useState(null)
     const [logo, setLogo] = useState(alarmLogo)
 
-    const {
-        register,
-        handleSubmit,
-        formState: {errors},
-        reset,
-    } = useForm({
+    const firstForm = useForm({
+        resolver: yupResolver(changeOrganisationsSchema)
+    })
+    const secondForm = useForm({
         resolver: yupResolver(changeOrganisationsSchema)
     })
 
@@ -60,7 +55,7 @@ export default function ChangeOrganisations() {
             setDisplayData({
                 createdAt: getDateFormat(new Date(res.data.createdAt))
             })
-            reset({
+            firstForm.reset({
                 name: res.data.name,
                 description: res.data.description,
                 // limitsType: "USER_LIMITS",
@@ -69,12 +64,16 @@ export default function ChangeOrganisations() {
         })
     }, [])
     useEffect(() => {
-        const firstErrorKey = Object.keys(errors)[0];
+        const firstErrorKey = Object.keys(firstForm.formState.errors)[0];
         if (firstErrorKey) {
             setLogo(alarmLogo)
-            setAlarm(errors[firstErrorKey].message)
+            setAlarm(firstForm.formState.errors[firstErrorKey].message)
         }
-    }, [errors]);
+    }, [firstForm.formState.errors]);
+    useEffect(() => {
+        setAlarm(null)
+    }, [activeBut]);
+
 
 
     const closeDeleteModal = () => {
@@ -86,12 +85,12 @@ export default function ChangeOrganisations() {
     }
     const onSaveOrgData = async (newValue) => {
         console.log(newValue)
-        try{
+        try {
             await apiClient.put(`/api/admin/organizations/${orgId}`, newValue)
             setAlarm("Изменения сохранены")
             setLogo(acceptLogo)
         } catch (error) {
-            if(error.response?.status === 409){
+            if (error.response?.status === 409) {
                 setAlarm("Организация с таким названием уже существует")
                 setLogo(alarmLogo)
             }
@@ -104,123 +103,30 @@ export default function ChangeOrganisations() {
             <DataHeader
                 activeBut={activeBut}
                 setActiveBut={setActiveBut}
-                firstButton="ИНФОРМАЦИЯ"
-                secondButton="МОДЕЛИ">
+                buttons={["ИНФОРМАЦИЯ", "МОДЕЛИ"]}
+                names={["first", "second"]}>
                 Изменение данных организации
             </DataHeader>
 
             <AlarmMsg logo={logo} alarm={alarm}></AlarmMsg>
 
             {activeBut === "first" && (
-                <form onSubmit={handleSubmit(onSaveOrgData)} className="change-content">
-                    <div>
-                        <table className="change-container__table tableHover naked-input data-input">
-                            <tbody>
-                            <tr>
-                                <td>Дата создания</td>
-                                <td className="text-center">
-                                    <input type="text" value={displayData.createdAt} disabled/>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Название</td>
-                                <td className="text-center">
-                                    <input type="text" {...register("name")}/>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td>Описание</td>
-                                <td>
-                                    <textarea {...register("description")}></textarea>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div className="delete-modal__buttons">
-                        <Button type="button" onClick={() => {
-                            navigate("/organisations")
-                        }}>Назад</Button>
-                        <Button type="submit">Сохранить</Button>
-                    </div>
-
-                </form>
+                <ChangeOrganisationsInfo
+                    register={firstForm.register}
+                    handleSubmit={firstForm.handleSubmit}
+                    submitFunction={onSaveOrgData}
+                    displayData={displayData}>
+                </ChangeOrganisationsInfo>
             )}
 
             {activeBut === "second" && (
-                    <form className="change-content">
-                        <div className="change-orgs-content">
-                            <div className="select-container">
-                                <div>
-                                    <h2>Установка лимитов и моделей</h2>
-                                    <div className="orgs-selects">
-                                        <Select
-                                            className="limits-select naked-input"
-                                            options={limitOptions}
-                                            // onChange={handleSelectChange}
-                                            closeMenuOnSelect={false}
-                                            placeholder="Лимит"
-                                            isSearchable
-                                            styles={customStyle}
-                                        />
-                                        <Select
-                                            className="limits-select naked-input"
-                                            isMulti
-                                            options={options}
-                                            // onChange={handleSelectChange}
-                                            closeMenuOnSelect={false}
-                                            placeholder="Модели"
-                                            isSearchable
-                                            styles={customStyle}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="orgs-models">
-                                <h2>Доступные организации модели</h2>
-                                <table className="table-fill naked-input limits-input">
-                                    <thead>
-                                    <tr>
-                                        <th className="text-center">
-                                            <strong>ID</strong>
-                                        </th>
-                                        <th className="text-center">
-                                            <strong>Название</strong>
-                                        </th>
-                                        <th className="text-center">
-                                            <strong>Лимит RPS</strong>
-                                        </th>
-                                        <th className="text-center">
-                                            <strong>Лимит запросов/нед</strong>
-                                        </th>
-                                        <th></th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr>
-                                        <td className="text-center">1</td>
-                                        <td className="text-center">Graph-based segmentation model1</td>
-                                        <td className="text-center"><input type="text" defaultValue={""}/>
-                                        </td>
-                                        <td className="text-center"><input type="text" defaultValue={""}/></td>
-                                        <td className="text-center">
-                                            <a className="a-img" onClick={onDeleteModelClick}><img
-                                                src={deleteLogo}></img></a>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-
-                        <div className="delete-modal__buttons">
-                            <Button type="button" onClick={() => {navigate("/organisations")}}>Назад</Button>
-                            <Button type="submit">Сохранить</Button>
-                        </div>
-                    </form>
+                <ChangeOrganisationModels
+                    register={secondForm.register}
+                    handleSubmit={secondForm.handleSubmit}
+                    limitOptions={limitOptions}
+                    options={options}
+                    onDeleteModelClick={onDeleteModelClick}>
+                ></ChangeOrganisationModels>
             )}
 
             <DeleteModal open={isDeletingModel} onNo={closeDeleteModal}></DeleteModal>

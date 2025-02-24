@@ -44,9 +44,9 @@
 .change-container__table tr:nth-child(odd):hover td {
     background: var(--accent-color);
 }
-.change-container__table tr:hover td select{
-    background: white;
-}
+/*.change-container__table tr:hover td select{*/
+/*    background: white;*/
+/*}*/
 
 /*.tableHover tr:hover td {*/
 /*    background: var(--accent-color);*/

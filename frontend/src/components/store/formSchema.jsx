@@ -81,5 +81,6 @@ export const changeUserDataSchema = yup.object()
 export const changeOrganisationsSchema = yup.object()
     .shape({
         name: yup.string()
-            .required('Название организации должно быть указано'),
+            .required('Название организации должно быть указано')
+            .min(4, 'Неверное название. Должно быть не меньше 4 символов')
     })

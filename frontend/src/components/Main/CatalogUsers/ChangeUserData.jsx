@@ -84,11 +84,10 @@ export default function ChangeUserData() {
             setUserData(res.data)
             setDisplayData(dataForDisplay)
             reset(dataForEdit)
-            setAlarm(null)
         }).catch(error => {
             console.log(error)
         })
-    }, [activeBut]);
+    }, []);
     useEffect(() => {
         const firstErrorKey = Object.keys(errors)[0];
         if (firstErrorKey) {
@@ -96,6 +95,9 @@ export default function ChangeUserData() {
             setAlarm(errors[firstErrorKey].message)
         }
     }, [errors]);
+    useEffect(() => {
+        setAlarm(null)
+    }, [activeBut]);
 
     let closeDeleteModal = () => {
         setIsDeletingModel(false)
@@ -130,8 +132,8 @@ export default function ChangeUserData() {
 
             <DataHeader activeBut={activeBut}
                         setActiveBut={setActiveBut}
-                        firstButton="ИНФОРМАЦИЯ"
-                        secondButton="МОДЕЛИ">
+                        buttons={["ИНФОРМАЦИЯ", "МОДЕЛИ"]}
+                        names={["first", "second"]}>
                 Изменение данных пользователя
             </DataHeader>
 

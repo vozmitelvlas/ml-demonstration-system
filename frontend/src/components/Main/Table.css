@@ -148,10 +148,16 @@ td.text-right {
 }
 tr:hover input {
     background-color: #ffffff;
+    transition: background-color 0.2s ease;
 }
 tr:hover select {
     background-color: white;
+    transition: background-color 0.2s ease;
 }
 tr:hover textarea {
     background-color: #ffffff;
+    transition: background-color 0.2s ease;
+}
+td {
+    transition: background-color 0.2s ease, color 0.2s ease;
 }

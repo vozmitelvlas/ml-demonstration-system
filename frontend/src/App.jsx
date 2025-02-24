@@ -42,7 +42,8 @@ function App() {
             setLogin(userData?.login)
 
         } else {
-            const userId = localStorage.getItem("userId")
+            setIsAdminMode(sessionStorage.getItem("isAdminMode"))
+            const userId = sessionStorage.getItem("userId")
             if (userId) {
                 apiClient.get(`/api/users/${userId}`)
                     .then((res) => {
@@ -60,8 +61,14 @@ function App() {
         <div className={isAdminMode ? styles.adminMain : styles.main}>
             {
                 !excludedPaths.includes(location.pathname) &&
-                <Header login={login} isMainOrg={isMainOrg} isAdmin={isAdmin} isAdminMode={isAdminMode}
-                        setIsAdminMode={setIsAdminMode}/>
+                <Header
+                    login={login}
+                    isMainOrg={isMainOrg}
+                    isAdmin={isAdmin}
+                    isAdminMode={isAdminMode}
+                    setIsAdminMode={setIsAdminMode}
+                    orgId={userData?.organization?.organizationId}
+                />
             }
             <div className={styles.mainContent}>
                 <Routes>
@@ -78,7 +85,7 @@ function App() {
                     <Route path="/users" element={<CatalogUsers/>}/>
                     <Route path="/users/:userId/edit" element={<ChangeUserData/>}/>
 
-                    <Route path="/user/organisation" element={<MyOrganisations/>}/>
+                    <Route path="/user/organisation/:orgId" element={<MyOrganisations/>}/>
 
                     <Route path="/organisations" element={<CatalogOrganisations/>}/>
                     <Route path="/organisations/:orgId/edit" element={<ChangeOrganisations/>}/>

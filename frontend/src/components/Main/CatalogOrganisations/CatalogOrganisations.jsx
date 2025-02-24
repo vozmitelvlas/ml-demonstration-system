@@ -165,7 +165,7 @@ export default function CatalogOrganisations() {
                             <h3>Новая организация</h3>
                         </div>
                         <div className="add-modal__table">
-                            <table className="change-container__table tableHover naked-input">
+                            <table className="change-container__table naked-input">
                                 <tbody>
                                 <tr>
                                     <td>Название<span> *</span></td>

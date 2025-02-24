@@ -5,11 +5,12 @@ import exit from "../../assets/exit.svg";
 import menu from "../../assets/menu.svg";
 import styles from "./Header.module.css";
 
-export default function Header({login, isAdminMode, setIsAdminMode, isAdmin, isMainOrg}) {
+export default function Header({login, isAdminMode, setIsAdminMode, isAdmin, isMainOrg, orgId}) {
     const navigate = useNavigate();
 
     const toggleAdminMode = (event) => {
         setIsAdminMode(!isAdminMode)
+        sessionStorage.setItem("isAdminMode", !isAdminMode)
         navigate('/models')
 
         let adminButton = event.target
@@ -44,7 +45,7 @@ export default function Header({login, isAdminMode, setIsAdminMode, isAdmin, isM
                             navigate("/models")
                         }}>Каталог моделей</a>
                         {isMainOrg && (
-                            <a onClick={() => {navigate("/user/organisation")}}>Моя организация</a>
+                            <a onClick={() => {navigate(`/user/organisation/${orgId}`)}}>Моя организация</a>
                         )}
                         {isAdmin && (
                             <a name="admin-button" onClick={toggleAdminMode}>Режим администратора</a>

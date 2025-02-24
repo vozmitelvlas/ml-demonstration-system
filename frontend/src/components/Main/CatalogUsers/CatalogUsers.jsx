@@ -164,7 +164,7 @@ export default function CatalogUsers() {
                     <div className="add-modal__title">
                         <h3>Новый пользователь</h3>
                     </div>
-                    <table className="change-container__table tableHover naked-input">
+                    <table className="change-container__table naked-input">
                         <tbody>
                         <tr>
                             <td>Логин<span> *</span></td>

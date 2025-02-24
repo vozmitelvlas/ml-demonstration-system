@@ -1,53 +1,59 @@
-import Filter from "../Filter/Filter.jsx";
-import React, {useState} from "react";
-import CatalogHeader from "../Headers/CatalogHeader.jsx";
-import Button from "../Button/Button.jsx";
-import editLogo from "../../../assets/edit.svg";
-import deleteLogo from "../../../assets/delete.svg";
-import {Link, useNavigate} from "react-router-dom";
-import styles from"./MyOrganisations.module.css"
+import React, {useEffect, useState} from "react";
+import styles from "./MyOrganisations.module.css"
 import Select from "react-select";
 import {customStyle} from "../../utils/selectStyles.jsx";
+import apiClient from "../../utils/axios.jsx";
+import {useNavigate, useParams} from "react-router-dom";
+import alarmLogo from "../../../assets/alarm.svg";
+import acceptLogo from "../../../assets/accept.svg";
+import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx";
+import Button from "../Button/Button.jsx";
 
 const limitOptions = [
-    {value: 'O1', label: 'Лимит организации'},
-    {value: 'O2', label: 'Лимиты модели'},
-    {value: 'O2', label: 'Лимиты пользователя'}
+    {value: 'ORGANIZATION_LIMITS', label: 'Лимит организации'},
+    {value: 'USER_LIMITS', label: 'Лимиты пользователя'},
+    {value: 'MODEL_LIMITS', label: 'Лимиты модели'}
 ];
 
-export default function MyOrganisations(){
+export default function MyOrganisations() {
     const navigate = useNavigate()
-    const [isOpen, setIsOpen] = useState(false);
-    const toggleSidebar = () => {
-        setIsOpen(!isOpen);
-    };
+    const {orgId} = useParams()
+    const [logo, setLogo] = useState(alarmLogo)
+    const [alarm, setAlarm] = useState(null)
+    const [myOrg, setMyOrg] = useState({})
+    const [members, setMembers] = useState([])
+    const [limit, setLimit] = useState({})
 
-    let onEditOrg = () => {
-        navigate("/user/organisations/edit")
+    useEffect(() => {
+        apiClient.get(`/api/organizations/${orgId}`).then(res => {
+            setMyOrg(res.data)
+            setLimit(limitOptions.find(limit => res.data.limitsType === limit.value))
+        })
+        apiClient.get(`/api/organizations/${orgId}/members`).then(res => {
+            setMembers(res.data)
+        })
+    }, []);
+
+    const handleSelectChange = (newValue) => {
+        setLimit(newValue)
     }
-
-    const allUsers = [{
-        id: 3,
-        email: "123123.mail.ru"
-    }, {id: 4, email: "adaqwdawdawd.mail.ru"}, {id: 1, email: "vvvvv.mail.ru"}, {id: 2, email: "qqqqq.mail.ru"}, {id: 3, email: "123123.mail.ru"}, {id: 4, email: "adaqwdawdawd.mail.ru"},
-        {id: 1, email: "vvvvv.mail.ru"}, {id: 2, email: "qqqqq.mail.ru"}, {
-            id: 3,
-            email: "123123.mail.ru"
-        }, {id: 4, email: "adaqwdawdawd.mail.ru"}, {id: 1, email: "vvvvv.mail.ru"}, {id: 2, email: "qqqqq.mail.ru"}, {id: 3, email: "123123.mail.ru"}, {id: 4, email: "adaqwdawdawd.mail.ru"}]
+    const handleSubmit = async () => {
+        event.preventDefault()
+        const sendData = {
+            limitsType: limit.value
+        }
+        console.log(limit, sendData)
+        try {
+            await apiClient.put(`/api/organizations/${orgId}/limits-type`, sendData)
+            setLogo(acceptLogo)
+            setAlarm("Лимит успешно установлен")
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
     return (
         <>
-            {isOpen &&
-                <Filter
-                    setIsOpen={setIsOpen}
-                    sorts={{
-                        "Сортировать": {
-                            options: ["Последние добавленные", "Давно добавленные"],
-                            names: ["latestAdded", "oldestAdded"]
-                        },
-                    }}></Filter>
-            }
-
             <main>
                 <div className={styles.header}>
                     <h1>Моя организация</h1>
@@ -56,38 +62,38 @@ export default function MyOrganisations(){
                 <div className={styles.content}>
                     <div className={styles.info}>
                         <div>
-                            <h2>Название организации - <span>Название</span></h2>
+                            <h2>Название организации - <span>{myOrg.name}</span></h2>
                         </div>
                         <div>
                             <h2>Описание:</h2>
-                            <textarea defaultValue={"ADASAlasdair"} disabled></textarea>
+                            <textarea defaultValue={myOrg.description} disabled></textarea>
                         </div>
-                        <div>
+                        <form onSubmit={handleSubmit}>
                             <h2>Установка лимита для участников организации:</h2>
                             <div className={styles.limits}>
                                 <Select
                                     className={"limits-select naked-input"}
                                     options={limitOptions}
-                                    // onChange={handleSelectChange}
-                                    closeMenuOnSelect={false}
-                                    placeholder={"Пользователи"}
+                                    value={limit}
+                                    onChange={handleSelectChange}
                                     isSearchable
                                     styles={customStyle}
                                 />
-                                <button className={styles.button}>Сохранить</button>
+                                <button type="submit" className={styles.button}>Сохранить</button>
+                                <AlarmMsg logo={logo} alarm={alarm}></AlarmMsg>
                             </div>
-                        </div>
+                        </form>
                     </div>
 
-                    <div  className={styles.users}>
+                    <div className={styles.users}>
                         <h2>Участники организации:</h2>
                         <div className={styles.table}>
-                            <table className="change-container__table tableHover to-center">
+                            <table className="change-container__table">
                                 <tbody>
-                                {allUsers.map((user, ind) => (
+                                {members.map((member, ind) => (
                                     <tr key={ind}>
-                                        <td>{ind + 1}</td>
-                                        <td className="text-center">{user.email}</td>
+                                        <td className={styles.memberId}>{ind + 1}</td>
+                                        <td className={`text-center member ${styles.member}`}>{member.lastName} {member.firstName} ({member.email})</td>
                                     </tr>
                                 ))}
                                 </tbody>
@@ -95,6 +101,10 @@ export default function MyOrganisations(){
                         </div>
                     </div>
 
+                </div>
+
+                <div className={styles.backBut}>
+                    <Button onClick={() => {navigate("/models")}}>Назад</Button>
                 </div>
 
             </main>

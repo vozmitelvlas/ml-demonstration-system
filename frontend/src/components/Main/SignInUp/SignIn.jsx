@@ -28,8 +28,8 @@ export default function SignIn({setUserData}) {
         try {
             const res =  await axios.post('http://localhost:8080/api/auth/login', formData)
             setUserData(res.data.user)
-            localStorage.setItem("accessToken", res.data.accessToken)
-            localStorage.setItem("userId", res.data.user.userId)
+            sessionStorage.setItem("accessToken", res.data.accessToken)
+            sessionStorage.setItem("userId", res.data.user.userId)
             navigate("/models")
         } catch (error) {
             if (error.response?.status === 401) {

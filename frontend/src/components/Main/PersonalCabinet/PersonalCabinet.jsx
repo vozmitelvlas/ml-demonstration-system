@@ -61,7 +61,7 @@ export default function PersonalCabinet({userData}) {
                     <div className="edit-modal__title">
                         <h3>Редактирование данных</h3>
                     </div>
-                    <table className="change-container__table tableHover naked-input">
+                    <table className="change-container__table naked-input">
                         <tbody>
                         <tr>
                             <td>Логин</td>

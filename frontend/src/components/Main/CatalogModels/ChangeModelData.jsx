@@ -51,7 +51,6 @@ export default function ChangeModelData() {
     })
 
     useEffect(() => {
-        console.log("ihyvi")
         apiClient.get(`/api/admin/models/${modelId}/versions/${versionId}`).then((res) => {
             const dataForEdit = {
                 modelName: res.data.modelName,
@@ -75,11 +74,10 @@ export default function ChangeModelData() {
             setDisplayData(dataForDisplay)
             setLimit(limitData)
             reset(dataForEdit)
-            setAlarm(null)
         }).catch(error => {
             console.log(error)
         })
-    }, [activeBut]);
+    }, []);
 
     useEffect(() => {
         const firstErrorKey = Object.keys(errors)[0];
@@ -88,6 +86,9 @@ export default function ChangeModelData() {
             setAlarm(errors[firstErrorKey].message)
         }
     }, [errors]);
+    useEffect(() => {
+        setAlarm(null)
+    }, [activeBut]);
 
 
     const onChangeName = () => {
@@ -118,8 +119,8 @@ export default function ChangeModelData() {
             <DataHeader
                 activeBut={activeBut}
                 setActiveBut={setActiveBut}
-                firstButton="ИНФОРМАЦИЯ"
-                secondButton="ОГРАНИЧЕНИЯ">
+                buttons={["ИНФОРМАЦИЯ", "ОГРАНИЧЕНИЯ"]}
+                names={["first", "second"]}>
                 Изменение данных модели
             </DataHeader>
 
@@ -225,7 +226,7 @@ export default function ChangeModelData() {
                     </div>
                     <div>
                         <h2>Лимиты по умолчанию</h2>
-                        <table className="change-container__table tableHover naked-input">
+                        <table className="change-container__table naked-input">
                             <tbody>
                             <tr>
                                 <td>Лимит RPS</td>

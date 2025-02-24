@@ -27,8 +27,8 @@ export default function ModelData() {
 
             <DataHeader activeBut={activeBut}
                         setActiveBut={setActiveBut}
-                        firstButton="ИНФОРМАЦИЯ"
-                        secondButton="ВИЗУАЛИЗАЦИЯ">
+                        buttons={["ИНФОРМАЦИЯ", "ВИЗУАЛИЗАЦИЯ"]}
+                        names={["first", "second"]}>
                 Модель Graph-based segmentation model
             </DataHeader>
 
