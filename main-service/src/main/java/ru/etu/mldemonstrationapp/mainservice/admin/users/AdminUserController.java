@@ -86,6 +86,13 @@ public class AdminUserController {
     public ResponseEntity<ModelUserLimit> updateUserLimit(@PathVariable Long userId, @PathVariable Long modelId, @RequestBody ModelUserLimit limit) {
         return ResponseEntity.ok(adminUserService.updateUserLimit(userId, modelId, limit));
     }
+
+    @ApiResponse(useReturnTypeSchema = true, responseCode = "204")
+    @DeleteMapping("/{userId}/models/{modelId}")
+    public ResponseEntity<Void> removeAccessToModel(@PathVariable Long userId, @PathVariable Long modelId) {
+        adminUserService.removeAccessToModel(userId, modelId);
+        return ResponseEntity.noContent().build();
+    }
 }
 
 

@@ -9,6 +9,7 @@ import org.springframework.web.server.ResponseStatusException;
 import ru.etu.mldemonstrationapp.mainservice.admin.users.dto.CreateUserRequest;
 import ru.etu.mldemonstrationapp.mainservice.admin.users.dto.UpdateUserRequest;
 import ru.etu.mldemonstrationapp.mainservice.models.Model;
+import ru.etu.mldemonstrationapp.mainservice.models.Limit;
 import ru.etu.mldemonstrationapp.mainservice.models.LimitRepository;
 import ru.etu.mldemonstrationapp.mainservice.models.ModelRepository;
 import ru.etu.mldemonstrationapp.mainservice.organizations.Organization;
@@ -148,5 +149,16 @@ public class AdminUserService {
         existingLimit.setRequestsPerWeek(updatedLimit.getRequestsPerWeek());
         
         return limitRepository.save(existingLimit);
+    }
+
+    @Transactional
+    public void removeAccessToModel(Long userId, Long modelId) {
+        User user = userRepository.findById(userId).orElseThrow();
+        var limitsIds = user.getLimits().stream()
+                .filter(limit -> limit.getModel().getModelId().equals(modelId))
+                .map(Limit::getLimitId)
+                .toList();
+        limitRepository.deleteAllByIdInBatch(limitsIds);
+        userRepository.save(user);
     }
 }
