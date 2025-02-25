@@ -40,10 +40,10 @@ export default function CatalogModels({isAdminMode}) {
         })
     }, [isDeletingModel])
 
-    let closeDeleteModal = () => {
+    const closeDeleteModal = () => {
         setIsDeletingModel(false)
     }
-    let onDeleteModelClick = (event) => {
+    const onDeleteModelClick = (event) => {
         let tr = event.target.closest("tr")
         setTmpModelId(tr.dataset.id.split(" "))
         setIsDeletingModel(true)
@@ -62,15 +62,15 @@ export default function CatalogModels({isAdminMode}) {
     const toggleSidebar = () => {
         setIsOpen(!isOpen);
     };
-    let closeAddModal = (event) => {
+    const closeAddModal = (event) => {
         let addModal = event.target.closest(".add-modal-overlay")
         addModal.classList.add("add-modal-overlay_hidden")
     }
-    let openAddModal = () => {
+    const openAddModal = () => {
         let addModal = document.querySelector(".add-modal-overlay")
         addModal.classList.remove("add-modal-overlay_hidden")
     }
-    let handleNewModelClick = () => {
+    const handleNewModelClick = () => {
         navigate("models/edit")
     }
 

@@ -30,17 +30,17 @@ function App() {
 
     useEffect(() => {
         if (userData !== null) {
-            userData?.roles?.includes("ADMIN") ? setIsAdmin(true) : setIsAdmin(false)
-            setMainOrg(userData?.roles?.includes("ORGANIZATION_HEAD"))
+            setIsAdmin(userData.roles.includes("ADMIN"))
+            setMainOrg(userData.roles.includes("ORGANIZATION_HEAD"))
             setLogin(userData?.login)
 
         } else {
-            setIsAdminMode(sessionStorage.getItem("isAdminMode"))
             const userId = sessionStorage.getItem("userId")
             if (userId) {
                 apiClient.get(`/api/users/${userId}`)
                     .then((res) => {
                         setUserData(res.data)
+                        if(res.data.roles.includes("ADMIN")) setIsAdminMode(sessionStorage.getItem("isAdminMode"))
                     })
                     .catch(error => {
                         console.error(error)

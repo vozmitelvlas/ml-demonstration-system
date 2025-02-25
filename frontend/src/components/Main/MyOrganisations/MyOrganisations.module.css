@@ -1,6 +1,6 @@
 .users{
     text-align: left;
-    margin-right: 120px;
+    margin-right: 50px;
     height: 100%;
 }
 .users h2{
@@ -25,7 +25,6 @@
     gap: 30px;
     text-align: left;
     height: 100%;
-
 }
 .content{
     display: flex;
@@ -34,7 +33,7 @@
 
     flex-grow: 1;
     overflow: auto;
-    margin-left: 120px;
+    margin-left: 70px;
 }
 .content span{
     color: var(--accent-color);

@@ -7,19 +7,21 @@ import {yupResolver} from "@hookform/resolvers/yup";
 import {personalCabinetSchema} from "../../store/formSchema.jsx";
 import apiClient from "../../utils/axios.jsx";
 import SetNewPassword from "./SetNewPassword.jsx";
+import DeleteModal from "../../utils/DeleteModal.jsx";
+import {useNavigate} from "react-router-dom";
+import alarmLogo from "../../../assets/alarm.svg";
+import acceptLogo from "../../../assets/accept.svg"
+import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx";
 
 
 export default function PersonalCabinet({userData, setUserData}) {
+    const navigate = useNavigate()
     const [isEditing, setIsEditing] = useState(false);
     const [passwordChanging, setPasswordChanging] = useState(false)
+    const [isDeletingProfile, setIsDeletingProfile] = useState(false)
+    const [alarm, setAlarm] = useState(null)
+    const [logo, setLogo] = useState(alarmLogo)
 
-    const openClosePasswordModal = () => {
-        setPasswordChanging(!passwordChanging)
-    }
-
-    const openCloseEditModal = () => {
-        setIsEditing(!isEditing)
-    }
     const {
         register,
         handleSubmit,
@@ -37,6 +39,17 @@ export default function PersonalCabinet({userData, setUserData}) {
         }
     })
 
+    const openCloseDeleteModal = () => {
+        setIsDeletingProfile(!isDeletingProfile)
+    }
+
+    const openClosePasswordModal = () => {
+        setPasswordChanging(!passwordChanging)
+    }
+
+    const openCloseEditModal = () => {
+        setIsEditing(!isEditing)
+    }
     useEffect(() => {
         if (!userData) {
             apiClient.get(`/api/users/${sessionStorage.getItem("userId")}`).then((res) => {
@@ -68,6 +81,15 @@ export default function PersonalCabinet({userData, setUserData}) {
             console.log(error)
         }
     }
+    const onConfirmDeleteProfile = async () => {
+        console.log(userData.userId)
+        try {
+            await apiClient.delete(`/api/users/profile`)
+            navigate("/")
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
     return (
         <div className={styles.personalCabinet}>
@@ -75,7 +97,7 @@ export default function PersonalCabinet({userData, setUserData}) {
                 <a className="a-img"><img className={styles.logo} src={user_logo} alt="Пользовательский логотип"></img></a>
                 <Button onClick={openCloseEditModal}>Редактировать профиль</Button>
                 <Button onClick={openClosePasswordModal}>Сменить пароль</Button>
-                <Button>Удалить профиль</Button>
+                <Button onClick={openCloseDeleteModal}>Удалить профиль</Button>
             </div>
 
             <div>
@@ -105,7 +127,7 @@ export default function PersonalCabinet({userData, setUserData}) {
                     <tr>
                         <td>Описание</td>
                         <td>
-                            <textarea disabled value={userData?.description}></textarea>
+                            <textarea disabled value={userData?.description ? userData?.description : ""}></textarea>
                         </td>
                     </tr>
                     </tbody>
@@ -165,6 +187,12 @@ export default function PersonalCabinet({userData, setUserData}) {
             <div className={`edit-modal-overlay ${passwordChanging ? "" : "edit-modal-overlay_hidden"}`}>
                 <SetNewPassword setPasswordChanging={setPasswordChanging}></SetNewPassword>
             </div>
+
+            <DeleteModal
+                open={isDeletingProfile}
+                onNo={openCloseDeleteModal}
+                onYes={onConfirmDeleteProfile}>
+            </DeleteModal>
         </div>
     );
 };
