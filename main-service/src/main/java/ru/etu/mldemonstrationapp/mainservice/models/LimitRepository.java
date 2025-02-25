@@ -22,5 +22,8 @@ public interface LimitRepository extends JpaRepository<Limit, Long> {
            "JOIN l.model m " +
            "WHERE u.userId = :userId AND m.modelId = :modelId")
     Optional<ModelUserLimit> findByUserIdAndModelId(Long userId, Long modelId);
+
+    @Query("SELECT l FROM ModelUserLimit l JOIN l.user u WHERE u.userId = :userId")
+    Optional<ModelUserLimit> findAllByUserId(Long userId);
 }
 

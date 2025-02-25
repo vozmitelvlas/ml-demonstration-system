@@ -101,6 +101,9 @@ public class OrganizationService {
 
     @Transactional
     public ModelOrganizationLimit createModelLimit(Long organizationId, Long modelId, ModelOrganizationLimit limit) {
+        if (limitRepository.findByOrganizationIdAndModelId(organizationId, modelId).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Limit already exists for this organization and model");
+        }
         Organization organization = organizationRepository.findById(organizationId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Organization not found"));
 

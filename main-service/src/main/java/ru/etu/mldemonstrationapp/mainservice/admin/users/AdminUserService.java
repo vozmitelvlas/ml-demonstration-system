@@ -17,7 +17,6 @@ import ru.etu.mldemonstrationapp.mainservice.users.ModelUserLimit;
 import ru.etu.mldemonstrationapp.mainservice.users.Role;
 import ru.etu.mldemonstrationapp.mainservice.users.User;
 import ru.etu.mldemonstrationapp.mainservice.users.UserRepository;
-import ru.etu.mldemonstrationapp.mainservice.users.dto.ModelUserLimitRequest;
 
 import java.time.Instant;
 import java.util.Collections;
@@ -42,8 +41,8 @@ public class AdminUserService {
         );
     }
 
-    public Optional<ModelUserLimit> getUserLimits(Long userId, Long modelId) {
-        return limitRepository.findByUserIdAndModelId(userId, modelId);
+    public Optional<ModelUserLimit> getAllUserLimits(Long userId) {
+        return limitRepository.findAllByUserId(userId);
     }
 
     @Transactional
@@ -125,19 +124,24 @@ public class AdminUserService {
     }
 
     @Transactional
-    public ModelUserLimit createUserLimit(ModelUserLimitRequest request) {
-        Model model = modelRepository.findById(request.modelId())
+    public ModelUserLimit createUserLimit(Long userId, Long modelId, ModelUserLimit limit) {
+        if (limitRepository.findByUserIdAndModelId(userId, modelId).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Limit already exists for this user and model");
+        }
+        Model model = modelRepository.findById(modelId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Model not found"));
-        User user = userRepository.findById(request.userId())
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-        ModelUserLimit modelUserLimit = new ModelUserLimit(model, user);
-        return limitRepository.save(modelUserLimit);
+        limit.setUser(user);
+        limit.setModel(model);
+
+        return limitRepository.save(limit);
     }
 
     @Transactional
-    public ModelUserLimit updateUserLimit(ModelUserLimitRequest request, ModelUserLimit updatedLimit) {
-        ModelUserLimit existingLimit = limitRepository.findByUserIdAndModelId(request.userId(), request.modelId())
+    public ModelUserLimit updateUserLimit(Long userId, Long modelId, ModelUserLimit updatedLimit) {
+        ModelUserLimit existingLimit = limitRepository.findByUserIdAndModelId(userId, modelId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Limit not found"));
 
         existingLimit.setRps(updatedLimit.getRps());

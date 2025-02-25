@@ -69,20 +69,21 @@ public class OrganizationController {
     }
 
     @Secured({"ROLE_ORGANIZATION_HEAD", "ROLE_ADMIN"})
-    @PostMapping("/{organizationId}/models/{modelId}/limits")
-    public ResponseEntity<ModelOrganizationLimit> createModelLimit(
-            @PathVariable Long organizationId,
-            @PathVariable Long modelId,
-            @RequestBody ModelOrganizationLimit limit) {
-        return ResponseEntity.ok(organizationService.createModelLimit(organizationId, modelId, limit));
+    @PostMapping("/{organizationId}/models")
+    public ResponseEntity<ModelOrganizationLimitResponse> createModelLimit(@PathVariable Long organizationId, @PathVariable Long modelId, @RequestBody ModelOrganizationLimit limit) {
+        ModelOrganizationLimit createdLimit = organizationService.createModelLimit(organizationId, modelId, limit);
+        ModelOrganizationLimitResponse response = new ModelOrganizationLimitResponse(
+            createdLimit,
+            createdLimit.getModel().getModelId(),
+            createdLimit.getModel().getName(),
+            "/api/organizations/" + organizationId + "/models/" + createdLimit.getModel().getModelId()
+        );
+        return ResponseEntity.ok(response);
     }
     
     @Secured({"ROLE_ORGANIZATION_HEAD", "ROLE_ADMIN"})
-    @PutMapping("/{organizationId}/models/{modelId}/limits")
-    public ResponseEntity<ModelOrganizationLimit> updateModelLimit(
-            @PathVariable Long organizationId,
-            @PathVariable Long modelId,
-            @RequestBody ModelOrganizationLimit limit) {
+    @PutMapping("/{organizationId}/models/{modelId}/limit")
+    public ResponseEntity<ModelOrganizationLimit> updateModelLimit(@PathVariable Long organizationId, @PathVariable Long modelId, @RequestBody ModelOrganizationLimit limit) {
         return ResponseEntity.ok(organizationService.updateModelLimit(organizationId, modelId, limit));
     }
     

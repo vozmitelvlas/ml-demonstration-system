@@ -11,7 +11,7 @@ import ru.etu.mldemonstrationapp.mainservice.admin.users.dto.CreateUserRequest;
 import ru.etu.mldemonstrationapp.mainservice.admin.users.dto.UpdateUserRequest;
 import ru.etu.mldemonstrationapp.mainservice.users.ModelUserLimit;
 import ru.etu.mldemonstrationapp.mainservice.users.User;
-import ru.etu.mldemonstrationapp.mainservice.users.dto.ModelUserLimitRequest;
+import ru.etu.mldemonstrationapp.mainservice.users.dto.ModelUserLimitResponse;
 
 import java.util.List;
 import java.util.Map;
@@ -62,24 +62,29 @@ public class AdminUserController {
     }
 
     @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
-    @GetMapping("/{userId}/limits/{modelId}")
-    public ResponseEntity<ModelUserLimit> getUserLimits(@PathVariable Long userId, @PathVariable Long modelId) {
-        Optional<ModelUserLimit> limit = adminUserService.getUserLimits(userId, modelId);
-        return limit.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    @GetMapping("/{userId}/limits")
+    public ResponseEntity<Optional<ModelUserLimit>> getAllUserLimits(@PathVariable Long userId) {
+        Optional<ModelUserLimit> limits = adminUserService.getAllUserLimits(userId);
+        return ResponseEntity.ok(limits);
     }
 
     @ApiResponse(useReturnTypeSchema = true, responseCode = "201")
-    @PostMapping("/limits")
-    public ResponseEntity<ModelUserLimit> createUserLimit(@Valid @RequestBody ModelUserLimitRequest request) {
-        ModelUserLimit limit = adminUserService.createUserLimit(request);
-        return ResponseEntity.ok(limit);
+    @PostMapping("/{userId}/limits")
+    public ResponseEntity<ModelUserLimitResponse> createUserLimit(@PathVariable Long userId, @PathVariable Long modelId, @RequestBody ModelUserLimit limit) {
+        ModelUserLimit createdLimit = adminUserService.createUserLimit(userId, modelId, limit);
+        ModelUserLimitResponse response = new ModelUserLimitResponse(
+            createdLimit,
+            createdLimit.getModel().getModelId(),
+            createdLimit.getModel().getName(),
+            "/api/users/" + userId + "/models/" + createdLimit.getModel().getModelId()
+        );
+        return ResponseEntity.ok(response);
     }
 
     @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
-    @PutMapping("/limits")
-    public ResponseEntity<ModelUserLimit> updateUserLimit(@Valid @RequestBody ModelUserLimitRequest request, @RequestBody ModelUserLimit updatedLimit) {
-        ModelUserLimit limit = adminUserService.updateUserLimit(request, updatedLimit);
-        return ResponseEntity.ok(limit);
+    @PutMapping("/{userId}/models/{modelId}/limit")
+    public ResponseEntity<ModelUserLimit> updateUserLimit(@PathVariable Long userId, @PathVariable Long modelId, @RequestBody ModelUserLimit limit) {
+        return ResponseEntity.ok(adminUserService.updateUserLimit(userId, modelId, limit));
     }
 }
 
