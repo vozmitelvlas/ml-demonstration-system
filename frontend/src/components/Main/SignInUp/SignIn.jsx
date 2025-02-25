@@ -26,7 +26,7 @@ export default function SignIn({setUserData}) {
 
     const sendFormData = async (formData) => {
         try {
-            const res =  await axios.post('http://localhost:8080/api/auth/login', formData)
+            const res = await axios.post('http://localhost:8080/api/auth/login', formData)
             setUserData(res.data.user)
             sessionStorage.setItem("accessToken", res.data.accessToken)
             sessionStorage.setItem("userId", res.data.user.userId)
@@ -34,8 +34,7 @@ export default function SignIn({setUserData}) {
         } catch (error) {
             if (error.response?.status === 401) {
                 setError('form', {type: 'server', message: 'Неверный логин или пароль'})
-            }
-            else{
+            } else {
                 console.log(error)
             }
         }
@@ -43,39 +42,41 @@ export default function SignIn({setUserData}) {
 
     return (
         <div className={styles.signInUp}>
-            <form onSubmit={handleSubmit(sendFormData)}>
-                <div className={styles.container}>
-                    <div className={styles.inData}>
-                        <h2>Вход в ML models</h2>
-                        <div className={`${styles.row} naked-input`}>
-                            <div className={styles.inputDiv}>
-                                <div>
-                                    <input type="text" placeholder="Логин" {...register("login")} required/>
-                                </div>
+            <form onSubmit={handleSubmit(sendFormData)} className={styles.container}>
+                <div className={`${styles.inData} naked-input`}>
+                    <h2>Вход в ML models</h2>
+                    <div className={styles.row}>
+                        <div className={styles.inputDiv}>
+                            <div>
+                                <input type="text" placeholder="Логин" {...register("login")} required/>
                             </div>
                         </div>
-                        <div className={`${styles.row} naked-input`}>
-                            <div className={styles.inputDiv}>
-                                <div>
-                                    <input type="password" placeholder="Пароль" {...register("password")} required/>
-                                </div>
+                    </div>
+                    <div className={styles.row}>
+                        <div className={styles.inputDiv}>
+                            <div>
+                                <input type="password" placeholder="Пароль" {...register("password")} required/>
                             </div>
                         </div>
+                    </div>
 
-                        {error && <span>{error}</span>}
+                    {error && <span>{error}</span>}
+                    <div className={styles.row}>
                         <div className={styles.button}>
-                            <button type="submit">Войти</button>
+                            <div>
+                                <button type="submit">Войти</button>
+                            </div>
                         </div>
                     </div>
+                </div>
 
-                    <div>
-                        <span className={styles.password} onClick={() => navigate("/password")}>Забыли пароль?</span>
-                        <p>
-                            Нет аккаунта?
-                            <span className={styles.password}
-                                  onClick={() => navigate("/signup")}> Зарегистрируйтесь</span>
-                        </p>
-                    </div>
+                <div>
+                    <span className={styles.password} onClick={() => navigate("/password")}>Забыли пароль?</span>
+                    <p>
+                        Нет аккаунта?
+                        <span className={styles.password}
+                              onClick={() => navigate("/signup")}> Зарегистрируйтесь</span>
+                    </p>
                 </div>
             </form>
         </div>

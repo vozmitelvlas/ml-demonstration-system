@@ -54,13 +54,18 @@ export const changeModelDataSchema = yup.object()
     .shape({
         modelName: yup.string()
             .required('Поля должны быть заполнены'),
+
         versionName: yup.string()
             .required('Поля должны быть заполнены'),
+
         description: yup.string(),
+
         uri: yup.string()
             .required('Поля должны быть заполнены'),
+
         runtime: yup.string()
             .required('Поля должны быть заполнены'),
+
         problemType: yup.string()
             .required('Поля должны быть заполнены'),
     })
@@ -69,8 +74,10 @@ export const changeUserDataSchema = yup.object()
     .shape({
         lastName: yup.string()
             .required('Фамилия должна быть указана'),
+
         firstName: yup.string()
             .required('Имя должно быть указано'),
+
         selectRoles: yup
             .array(
                 yup.object({value: yup.string(), label: yup.string()}) // Каждый элемент массива должен быть объектом
@@ -89,4 +96,32 @@ export const personalCabinetSchema = yup.object()
     .shape({
         lastName: yup.string()
             .required('Фамилия должна быть указана'),
+    })
+
+export const setNewPasswordSchema = yup.object()
+    .shape({
+        newPassword: yup.string()
+            .min(6, 'Неверный пароль. Должно быть не меньше 6 символов')
+            .matches(/[\d]+/ui, 'Неверный пароль. Пароль должен содержать хотя бы одну цифру')
+            .matches(/[a-zA-Z]/i, 'Неверный пароль. Пароль должен состоять из латинских букв')
+            .max(255, 'Неверный пароль. Должно быть не больше 255 символов'),
+
+        repeatNewPassword: yup.string()
+            .oneOf([yup.ref('newPassword'), null], 'Пароли должны совпадать')
+    })
+
+export const passwordRecoverSchema = yup.object()
+    .shape({
+        email: yup.string()
+            // .required('Email обязателен')
+            .email('Некорректный формат Email'),
+
+        password: yup.string()
+            .min(6, 'Неверный пароль. Должно быть не меньше 6 символов')
+            .matches(/[\d]+/ui, 'Неверный пароль. Пароль должен содержать хотя бы одну цифру')
+            .matches(/[a-zA-Z]/i, 'Неверный пароль. Пароль должен состоять из латинских букв')
+            .max(255, 'Неверный пароль. Должно быть не больше 255 символов'),
+
+        repeatPassword: yup.string()
+            .oneOf([yup.ref('password'), null], 'Пароли должны совпадать')
     })
