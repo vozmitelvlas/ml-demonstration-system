@@ -10,6 +10,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ru.etu.mldemonstrationapp.mainservice.auth.JwtToken;
+import ru.etu.mldemonstrationapp.mainservice.organizations.dto.ModelOrganizationLimitRequest;
 import ru.etu.mldemonstrationapp.mainservice.organizations.dto.ModelOrganizationLimitResponse;
 import ru.etu.mldemonstrationapp.mainservice.organizations.dto.UpdateLimitsTypeRequest;
 import ru.etu.mldemonstrationapp.mainservice.users.User;
@@ -70,8 +71,8 @@ public class OrganizationController {
 
     @Secured({"ROLE_ORGANIZATION_HEAD", "ROLE_ADMIN"})
     @PostMapping("/{organizationId}/models")
-    public ResponseEntity<ModelOrganizationLimitResponse> createModelLimit(@PathVariable Long organizationId, @PathVariable Long modelId, @RequestBody ModelOrganizationLimit limit) {
-        ModelOrganizationLimit createdLimit = organizationService.createModelLimit(organizationId, modelId, limit);
+    public ResponseEntity<ModelOrganizationLimitResponse> createModelLimit(@PathVariable Long organizationId, @RequestBody ModelOrganizationLimitRequest request) {
+        ModelOrganizationLimit createdLimit = organizationService.createModelLimit(organizationId, request.modelId(), request.limit());
         ModelOrganizationLimitResponse response = new ModelOrganizationLimitResponse(
             createdLimit,
             createdLimit.getModel().getModelId(),

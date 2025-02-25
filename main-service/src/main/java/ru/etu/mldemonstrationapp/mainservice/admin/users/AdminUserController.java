@@ -11,6 +11,7 @@ import ru.etu.mldemonstrationapp.mainservice.admin.users.dto.CreateUserRequest;
 import ru.etu.mldemonstrationapp.mainservice.admin.users.dto.UpdateUserRequest;
 import ru.etu.mldemonstrationapp.mainservice.users.ModelUserLimit;
 import ru.etu.mldemonstrationapp.mainservice.users.User;
+import ru.etu.mldemonstrationapp.mainservice.users.dto.ModelUserLimitRequest;
 import ru.etu.mldemonstrationapp.mainservice.users.dto.ModelUserLimitResponse;
 
 import java.util.List;
@@ -68,8 +69,8 @@ public class AdminUserController {
 
     @ApiResponse(useReturnTypeSchema = true, responseCode = "201")
     @PostMapping("/{userId}/limits")
-    public ResponseEntity<ModelUserLimitResponse> createUserLimit(@PathVariable Long userId, @PathVariable Long modelId, @RequestBody ModelUserLimit limit) {
-        ModelUserLimit createdLimit = adminUserService.createUserLimit(userId, modelId, limit);
+    public ResponseEntity<ModelUserLimitResponse> createUserLimit(@PathVariable Long userId, @RequestBody ModelUserLimitRequest request) {
+        ModelUserLimit createdLimit = adminUserService.createUserLimit(userId, request.modelId(), request.limit());
         ModelUserLimitResponse response = new ModelUserLimitResponse(
             createdLimit,
             createdLimit.getModel().getModelId(),
