@@ -27,7 +27,7 @@ export default function Header({login, isAdminMode, setIsAdminMode, isAdmin, isM
 
     return (
         <header className={isAdminMode ? styles.adminMode : styles.header}>
-            <div className={styles.left} onClick={() => navigate("/user")}>
+            <div className={styles.left} onClick={() => navigate("/profile")}>
                 <a className="a-img"><img src={userLogo} alt={"lk"} className={isAdminMode ? styles.whiteSvg : ""}></img></a>
                 <h3>{login}</h3>
             </div>
@@ -39,13 +39,13 @@ export default function Header({login, isAdminMode, setIsAdminMode, isAdmin, isM
                     <a className="a-img"><img src={menu} alt={"menu"} className={isAdminMode ? styles.whiteSvg : ""}></img></a>
                     <div className={styles.content}>
                         <a onClick={() => {
-                            navigate("/user")
+                            navigate("/profile")
                         }}>Личный кабинет</a>
                         <a onClick={() => {
                             navigate("/models")
                         }}>Каталог моделей</a>
                         {isMainOrg && (
-                            <a onClick={() => {navigate(`/user/organisation/${orgId}`)}}>Моя организация</a>
+                            <a onClick={() => {navigate(`/organisation/${orgId}`)}}>Моя организация</a>
                         )}
                         {isAdmin && (
                             <a name="admin-button" onClick={toggleAdminMode}>Режим администратора</a>

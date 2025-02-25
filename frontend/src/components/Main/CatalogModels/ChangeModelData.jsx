@@ -98,9 +98,9 @@ export default function ChangeModelData() {
     const onBlurName = () => {
         setAlarm(null)
     }
-    const onSaveModelData = async (modelData) => {
+    const onSaveModelData = async (newModelData) => {
         try {
-            await apiClient.put(`/api/admin/models/${modelId}/versions/${versionId}`, modelData);
+            await apiClient.put(`/api/admin/models/${modelId}/versions/${versionId}`, newModelData);
             setLogo(acceptLogo)
             setAlarm('Изменения сохранены')
         } catch (error) {

@@ -83,10 +83,10 @@ export default function ChangeOrganisations() {
         let tr = event.target.closest("tr")
         setIsDeletingModel(true)
     }
-    const onSaveOrgData = async (newValue) => {
-        console.log(newValue)
+    const onSaveOrgData = async (newOrgData) => {
+        console.log(newOrgData)
         try {
-            await apiClient.put(`/api/admin/organizations/${orgId}`, newValue)
+            await apiClient.put(`/api/admin/organizations/${orgId}`, newOrgData)
             setAlarm("Изменения сохранены")
             setLogo(acceptLogo)
         } catch (error) {
@@ -126,7 +126,7 @@ export default function ChangeOrganisations() {
                     limitOptions={limitOptions}
                     options={options}
                     onDeleteModelClick={onDeleteModelClick}>
-                ></ChangeOrganisationModels>
+                </ChangeOrganisationModels>
             )}
 
             <DeleteModal open={isDeletingModel} onNo={closeDeleteModal}></DeleteModal>

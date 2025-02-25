@@ -38,6 +38,8 @@ export default function SignUp({setUserData}) {
                 .post('http://localhost:8080/api/auth/register', formData)
                 .then((res) => {
                     setUserData(res.data.user)
+                    sessionStorage.setItem("accessToken", res.data.accessToken)
+                    sessionStorage.setItem("userId", res.data.user.userId)
                 });
 
             navigate("/models")

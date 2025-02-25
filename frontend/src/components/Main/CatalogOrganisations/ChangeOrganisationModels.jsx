@@ -19,7 +19,6 @@ export default function ChangeOrganisationModels({handleSubmit, register, limitO
                                     className="limits-select naked-input"
                                     options={limitOptions}
                                     // onChange={handleSelectChange}
-                                    closeMenuOnSelect={false}
                                     placeholder="Лимит"
                                     isSearchable
                                     styles={customStyle}

@@ -36,15 +36,11 @@ export default function ChangeUserData() {
     const [displayData, setDisplayData] = useState(userDataForDisplay)
     const [logo, setLogo] = useState(alarmLogo)
     const [alarm, setAlarm] = useState(null)
-
     const [orgOptions, setOrgOptions] = useState([])
-    const [orgValue, setOrgValue] = useState({})
-    const [rolesValues, setRolesValues] = useState([]);
 
     const {
         register,
         handleSubmit,
-        watch,
         formState: {errors},
         reset,
         control,
@@ -113,13 +109,13 @@ export default function ChangeUserData() {
     const setSecondMultiBackColor = () => {
         setSelectStyles((prev) => secondStyle(prev));
     }
-    const onSaveUserData = async (userData) => {
-        userData["organizationId"] = userData.organization.value
-        userData["roles"] = userData["selectRoles"].map(role => role.value)
-        console.log(userData)
+    const onSaveUserData = async (newUserData) => {
+        newUserData["organizationId"] = newUserData.organization.value
+        newUserData["roles"] = newUserData["selectRoles"].map(role => role.value)
+        console.log(newUserData)
 
         try {
-            await apiClient.put(`/api/admin/users/${userId}`, userData);
+            await apiClient.put(`/api/admin/users/${userId}`, newUserData);
             setLogo(acceptLogo)
             setAlarm('Изменения сохранены')
         } catch (error) {
@@ -189,7 +185,6 @@ export default function ChangeUserData() {
                                                 options={orgOptions}
                                                 onChange={onChange}
                                                 value={value}
-                                                closeMenuOnSelect={false}
                                                 isSearchable
                                                 styles={selectStyle}
                                             />
@@ -286,7 +281,7 @@ export default function ChangeUserData() {
                     </div>
 
                     <div className="delete-modal__buttons">
-                        <Button onClick={() => {
+                        <Button type="button" onClick={() => {
                             navigate("/users")
                         }}>Назад</Button>
                         <Button>Сохранить</Button>

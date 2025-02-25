@@ -18,13 +18,6 @@ import MyOrganisations from "./components/Main/MyOrganisations/MyOrganisations.j
 import apiClient from "./components/utils/axios.jsx";
 
 
-function ProtectedRoute({isAuthenticated}) {
-    if (!isAuthenticated) {
-        return <Navigate to="/signin"/>;
-    }
-    return <Outlet/>;
-}
-
 function App() {
     const location = useLocation();
     const [isAdminMode, setIsAdminMode] = useState(false);
@@ -76,7 +69,7 @@ function App() {
                     <Route path="/signup" element={<SignUp setUserData={setUserData}/>}/>
                     <Route path="/password" element={<PasswordRecover/>}/>
 
-                    <Route path="/user" element={<PersonalCabinet userData={userData}/>}/>
+                    <Route path="/profile" element={<PersonalCabinet userData={userData} setUserData={setUserData}/>}/>
                     <Route path="/models" element={<CatalogModels isAdminMode={isAdminMode}/>}/>
 
                     <Route path="/models/:modelId/versions/:versionId/edit" element={<ChangeModelData/>}/>
@@ -85,7 +78,7 @@ function App() {
                     <Route path="/users" element={<CatalogUsers/>}/>
                     <Route path="/users/:userId/edit" element={<ChangeUserData/>}/>
 
-                    <Route path="/user/organisation/:orgId" element={<MyOrganisations/>}/>
+                    <Route path="/organisation/:orgId" element={<MyOrganisations/>}/>
 
                     <Route path="/organisations" element={<CatalogOrganisations/>}/>
                     <Route path="/organisations/:orgId/edit" element={<ChangeOrganisations/>}/>

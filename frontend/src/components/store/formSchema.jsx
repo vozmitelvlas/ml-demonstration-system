@@ -84,3 +84,9 @@ export const changeOrganisationsSchema = yup.object()
             .required('Название организации должно быть указано')
             .min(4, 'Неверное название. Должно быть не меньше 4 символов')
     })
+
+export const personalCabinetSchema = yup.object()
+    .shape({
+        lastName: yup.string()
+            .required('Фамилия должна быть указана'),
+    })
