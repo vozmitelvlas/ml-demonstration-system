@@ -64,5 +64,14 @@ main{
 .add-modal__table td{
     width: 300px;
 }
+.new-org__container{
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    background-color: white;
+
+    padding: 15px;
+    border-radius: 15px;
+}
 
 

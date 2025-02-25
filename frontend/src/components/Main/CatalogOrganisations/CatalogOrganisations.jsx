@@ -23,6 +23,11 @@ export default function CatalogOrganisations() {
     const [tmpOrgId, setTmpOrgId] = useState("")
     const [alarm, setAlarm] = useState(null)
     const [logo, setLogo] = useState(alarmLogo)
+    const [isAddingOrg, setIsAddingOrg] = useState(false)
+    const [newOrgValue, setNewOrgValue] = useState({
+        name: "",
+        description: "",
+    })
 
 
     const [organisation, setOrganisation] = useState([])
@@ -32,7 +37,7 @@ export default function CatalogOrganisations() {
         }).catch(error => {
             console.log(error)
         })
-    }, [isDeletingModel])
+    }, [isDeletingModel, isAddingOrg])
 
     const toggleSidebar = () => {
         setIsOpen(!isOpen)
@@ -41,40 +46,35 @@ export default function CatalogOrganisations() {
         setIsDeletingModel(false)
     }
     const onDeleteOrgClick = (event) => {
-        let tr = event.target.closest("tr")
+        const tr = event.target.closest("tr")
 
         setTmpOrgId(tr.dataset.id)
         setIsDeletingModel(true)
     }
-    const onCloseAddModal = (event) => {
+    const onAddNewOrg = async (event) => {
         event.preventDefault()
-        let addModal = event.target.closest(".add-modal-overlay")
-        addModal.classList.add("add-modal-overlay_hidden")
-    }
-    const onOpenAddModal = () => {
-        let addModal = document.querySelector(".add-modal-overlay")
-        addModal.classList.remove("add-modal-overlay_hidden")
-    }
-    const onAddNewCatalog = (event) => {
-        event.preventDefault()
-    }
-    const handleSelectChange = (newValue) => {
-        console.log(newValue)
-        setSelectedValues(newValue)
-    };
-    const [selectStyle, setSelectStyles] = useState(customStyle);
-    const setFirstMultiBackColor = () => {
-        setSelectStyles((prev) => firstStyle(prev));
-    }
-    const setSecondMultiBackColor = () => {
-        setSelectStyles((prev) => secondStyle(prev));
+        if(newOrgValue.name.length > 3){
+            console.log(newOrgValue)
+            try {
+                await apiClient.post("/api/admin/organizations", newOrgValue)
+                setIsAddingOrg(!isAddingOrg)
+                setLogo(acceptLogo)
+                setAlarm("Организация успешно создана")
+            }catch (error) {
+                console.log(error)
+            }
+        } else{
+            setLogo(alarmLogo)
+            setAlarm("Неверное название. Должно быть не меньше 4 символов")
+        }
+
     }
     const onConfirmDeletingOrg = async (event) => {
         event.preventDefault()
         try {
             await apiClient.delete(`/api/admin/organizations/${tmpOrgId}`)
-                setLogo(acceptLogo)
-                setAlarm("Организация успешно удалена")
+            setLogo(acceptLogo)
+            setAlarm("Организация успешно удалена")
         } catch (error) {
             if (error.response?.status === 409) {
                 setLogo(alarmLogo)
@@ -84,6 +84,9 @@ export default function CatalogOrganisations() {
             }
         }
         setIsDeletingModel(false)
+    }
+    const onNewChange = ({target}) => {
+        setNewOrgValue({...newOrgValue, [target.name]: target.value})
     }
 
 
@@ -103,7 +106,10 @@ export default function CatalogOrganisations() {
                 <CatalogHeader title={"Каталог организаций"} searchFields={["Название организации"]}></CatalogHeader>
 
                 <div className="options-buttons_up">
-                    <Button onClick={onOpenAddModal}>Добавить организацию</Button>
+                    <Button onClick={()=> {
+                        setIsAddingOrg(!isAddingOrg)
+                        setAlarm(null)
+                    }}>Добавить организацию</Button>
                 </div>
 
                 <AlarmMsg logo={logo} alarm={alarm}></AlarmMsg>
@@ -159,33 +165,52 @@ export default function CatalogOrganisations() {
                     </div>
                 </div>
 
-                <div className="add-modal-overlay add-modal-overlay_hidden">
-                    <div className="add-user-modal">
+                <div className={`add-modal-overlay ${isAddingOrg ? "" : "add-modal-overlay_hidden"}`}>
+                    <form onSubmit={onAddNewOrg} className="new-org__container">
                         <div className="add-modal__title">
                             <h3>Новая организация</h3>
                         </div>
+                        <AlarmMsg logo={logo} alarm={alarm}></AlarmMsg>
                         <div className="add-modal__table">
                             <table className="change-container__table naked-input">
                                 <tbody>
                                 <tr>
                                     <td>Название<span> *</span></td>
-                                    <td className="text-center"><input type="text" defaultValue={""}/></td>
+                                    <td className="text-center">
+                                        <input
+                                            name="name"
+                                            type="text"
+                                            value={newOrgValue.name}
+                                            onChange={onNewChange}
+                                        />
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td>Описание</td>
-                                    <td><textarea></textarea></td>
+                                    <td>
+                                        <textarea
+                                            name="description"
+                                            value={newOrgValue.description}
+                                            onChange={onNewChange}>
+
+                                        </textarea>
+                                    </td>
                                 </tr>
                                 </tbody>
                             </table>
+                            <div className="delete-modal__buttons">
+                                <Button type="button" onClick={() => setIsAddingOrg(!isAddingOrg)}>Отмена</Button>
+                                <Button type="submit">Добавить</Button>
+                            </div>
                         </div>
-                        <div className="delete-modal__buttons">
-                            <Button type="submit" onClick={onCloseAddModal}>Отмена</Button>
-                            <Button type="submit" onClick={onAddNewCatalog}>Добавить</Button>
-                        </div>
-                    </div>
+                    </form>
                 </div>
 
-                <DeleteModal open={isDeletingModel} onNo={onCloseDeleteModal} onYes={onConfirmDeletingOrg}></DeleteModal>
+                <DeleteModal
+                    open={isDeletingModel}
+                    onNo={onCloseDeleteModal}
+                    onYes={onConfirmDeletingOrg}>
+                </DeleteModal>
             </main>
         </>
     )

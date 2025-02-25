@@ -12,6 +12,8 @@ import {useNavigate} from "react-router-dom";
 import alarmLogo from "../../../assets/alarm.svg";
 import acceptLogo from "../../../assets/accept.svg"
 import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx";
+import EditUserData from "./EditUserData.jsx";
+
 
 
 export default function PersonalCabinet({userData, setUserData}) {
@@ -22,6 +24,15 @@ export default function PersonalCabinet({userData, setUserData}) {
     const [alarm, setAlarm] = useState(null)
     const [logo, setLogo] = useState(alarmLogo)
 
+    const dataForEdit = {
+        login: userData?.login,
+        email: userData?.email,
+        lastName: userData?.lastName,
+        firstName: userData?.firstName,
+        patronymic: userData?.patronymic,
+        description: userData?.description,
+    }
+
     const {
         register,
         handleSubmit,
@@ -29,14 +40,7 @@ export default function PersonalCabinet({userData, setUserData}) {
         reset,
     } = useForm({
         resolver: yupResolver(personalCabinetSchema),
-        defaultValues: {
-            login: userData?.login,
-            email: userData?.email,
-            lastName: userData?.lastName,
-            firstName: userData?.firstName,
-            patronymic: userData?.patronymic,
-            description: userData?.description,
-        }
+        defaultValues: dataForEdit
     })
 
     const openCloseDeleteModal = () => {
@@ -48,6 +52,7 @@ export default function PersonalCabinet({userData, setUserData}) {
     }
 
     const openCloseEditModal = () => {
+        reset(dataForEdit)
         setIsEditing(!isEditing)
     }
     useEffect(() => {
@@ -82,7 +87,6 @@ export default function PersonalCabinet({userData, setUserData}) {
         }
     }
     const onConfirmDeleteProfile = async () => {
-        console.log(userData.userId)
         try {
             await apiClient.delete(`/api/users/profile`)
             navigate("/")
@@ -134,59 +138,19 @@ export default function PersonalCabinet({userData, setUserData}) {
                 </table>
             </div>
 
-            <div className={`edit-modal-overlay ${isEditing ? "" : "edit-modal-overlay_hidden"}`}>
-                <form onSubmit={handleSubmit(onSaveUserData)} className={styles.container}>
-                    <h3>Редактирование данных</h3>
-                    <table className="change-container__table naked-input">
-                        <tbody>
-                        <tr>
-                            <td>Логин</td>
-                            <td className="text-center">
-                                <input type="text" {...register("login")} disabled/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>E-mail</td>
-                            <td className="text-center">
-                                <input type="text" {...register("email")} disabled/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Фамилия</td>
-                            <td className="text-center">
-                                <input type="text" {...register("lastName")}/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Имя</td>
-                            <td className="text-center">
-                                <input type="text" {...register("firstName")}/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Отчество</td>
-                            <td className="text-center">
-                                <input type="text" {...register("patronymic")}/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Описание</td>
-                            <td className="text-center">
-                                <textarea {...register("description")}></textarea>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                    <div className="edit-modal__buttons">
-                        <Button type="button" onClick={openCloseEditModal}>Отмена</Button>
-                        <Button type="submit">Сохранить</Button>
-                    </div>
-                </form>
-            </div>
+            <EditUserData
+                isEditing={isEditing}
+                submitFunction={onSaveUserData}
+                handleSubmit={handleSubmit}
+                onCancel={openCloseEditModal}
+                register={register}
+                >
+            </EditUserData>
 
-            <div className={`edit-modal-overlay ${passwordChanging ? "" : "edit-modal-overlay_hidden"}`}>
-                <SetNewPassword setPasswordChanging={setPasswordChanging}></SetNewPassword>
-            </div>
+            <SetNewPassword
+                passwordChanging={passwordChanging}
+                setPasswordChanging={setPasswordChanging}>
+            </SetNewPassword>
 
             <DeleteModal
                 open={isDeletingProfile}
