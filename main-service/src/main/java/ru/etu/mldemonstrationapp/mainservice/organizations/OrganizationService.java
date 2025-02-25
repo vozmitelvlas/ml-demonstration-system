@@ -11,6 +11,8 @@ import ru.etu.mldemonstrationapp.mainservice.models.Limit;
 import ru.etu.mldemonstrationapp.mainservice.models.LimitRepository;
 import ru.etu.mldemonstrationapp.mainservice.users.User;
 import ru.etu.mldemonstrationapp.mainservice.users.UserRepository;
+import ru.etu.mldemonstrationapp.mainservice.models.Model;
+import ru.etu.mldemonstrationapp.mainservice.models.ModelRepository;
 
 import java.time.Instant;
 import java.util.Collections;
@@ -22,6 +24,7 @@ public class OrganizationService {
     private final OrganizationRepository organizationRepository;
     private final LimitRepository limitRepository;
     private final UserRepository userRepository;
+    private final ModelRepository modelRepository;
 
     public Organization getOrganization(Long id) {
         return organizationRepository.findById(id).orElseThrow();
@@ -95,4 +98,33 @@ public class OrganizationService {
         organizationRepository.deleteAllOrganizationsLimits(organizationId);
         organizationRepository.deleteById(organizationId);
     }
+
+    @Transactional
+    public ModelOrganizationLimit createModelLimit(Long organizationId, Long modelId, ModelOrganizationLimit limit) {
+        if (limitRepository.findByOrganizationIdAndModelId(organizationId, modelId).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Limit already exists for this organization and model");
+        }
+        Organization organization = organizationRepository.findById(organizationId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Organization not found"));
+
+        Model model = modelRepository.findById(modelId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Model not found"));
+
+        limit.setOrganization(organization);
+        limit.setModel(model);
+
+        return limitRepository.save(limit);
+    }
+
+    @Transactional
+    public ModelOrganizationLimit updateModelLimit(Long organizationId, Long modelId, ModelOrganizationLimit updatedLimit) {
+        ModelOrganizationLimit existingLimit = limitRepository.findByOrganizationIdAndModelId(organizationId, modelId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Limit not found"));
+
+        existingLimit.setRps(updatedLimit.getRps());
+        existingLimit.setRequestsPerWeek(updatedLimit.getRequestsPerWeek());
+
+        return limitRepository.save(existingLimit);
+    }
+
 }

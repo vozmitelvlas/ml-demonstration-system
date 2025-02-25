@@ -8,18 +8,28 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import ru.etu.mldemonstrationapp.mainservice.admin.users.dto.CreateUserRequest;
 import ru.etu.mldemonstrationapp.mainservice.admin.users.dto.UpdateUserRequest;
+import ru.etu.mldemonstrationapp.mainservice.models.Model;
+import ru.etu.mldemonstrationapp.mainservice.models.Limit;
+import ru.etu.mldemonstrationapp.mainservice.models.LimitRepository;
+import ru.etu.mldemonstrationapp.mainservice.models.ModelRepository;
 import ru.etu.mldemonstrationapp.mainservice.organizations.Organization;
 import ru.etu.mldemonstrationapp.mainservice.organizations.OrganizationRepository;
+import ru.etu.mldemonstrationapp.mainservice.users.ModelUserLimit;
 import ru.etu.mldemonstrationapp.mainservice.users.Role;
 import ru.etu.mldemonstrationapp.mainservice.users.User;
 import ru.etu.mldemonstrationapp.mainservice.users.UserRepository;
+import ru.etu.mldemonstrationapp.mainservice.users.dto.ModelUserLimitResponse;
+
 
 import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class AdminUserService {
+    private final LimitRepository limitRepository;
+    private final ModelRepository modelRepository;
     private final UserRepository userRepository;
     private final OrganizationRepository organizationRepository;
 
@@ -31,6 +41,11 @@ public class AdminUserService {
         return userRepository.findById(userId).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "User with id %s not found".formatted(userId))
         );
+    }
+
+    public List<ModelUserLimitResponse> getAllUserLimits(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with id %s not found".formatted(userId)));
+        return user.getModelsLimits();
     }
 
     @Transactional
@@ -62,6 +77,7 @@ public class AdminUserService {
                 dto.lastName(),
                 dto.patronymic(),
                 dto.description(),
+                Collections.emptyList(),
                 organization,
                 findRolesOrThrowConflict(dto.roles()), // Получение и проверка ролей
                 Instant.now(),
@@ -108,5 +124,43 @@ public class AdminUserService {
     @Transactional
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
+    }
+
+    @Transactional
+    public ModelUserLimit createUserLimit(Long userId, Long modelId, ModelUserLimit limit) {
+        if (limitRepository.findByUserIdAndModelId(userId, modelId).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Limit already exists for this user and model");
+        }
+        Model model = modelRepository.findById(modelId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Model not found"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        limit.setUser(user);
+        limit.setModel(model);
+
+        return limitRepository.save(limit);
+    }
+
+    @Transactional
+    public ModelUserLimit updateUserLimit(Long userId, Long modelId, ModelUserLimit updatedLimit) {
+        ModelUserLimit existingLimit = limitRepository.findByUserIdAndModelId(userId, modelId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Limit not found"));
+
+        existingLimit.setRps(updatedLimit.getRps());
+        existingLimit.setRequestsPerWeek(updatedLimit.getRequestsPerWeek());
+        
+        return limitRepository.save(existingLimit);
+    }
+
+    @Transactional
+    public void removeAccessToModel(Long userId, Long modelId) {
+        User user = userRepository.findById(userId).orElseThrow();
+        var limitsIds = user.getLimits().stream()
+                .filter(limit -> limit.getModel().getModelId().equals(modelId))
+                .map(Limit::getLimitId)
+                .toList();
+        limitRepository.deleteAllByIdInBatch(limitsIds);
+        userRepository.save(user);
     }
 }
