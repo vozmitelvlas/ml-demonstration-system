@@ -6,12 +6,18 @@ import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
 import {personalCabinetSchema} from "../../store/formSchema.jsx";
 import apiClient from "../../utils/axios.jsx";
+import SetNewPassword from "./SetNewPassword.jsx";
 
 
 export default function PersonalCabinet({userData, setUserData}) {
     const [isEditing, setIsEditing] = useState(false);
+    const [passwordChanging, setPasswordChanging] = useState(false)
 
-    const openCloseModal = () => {
+    const openClosePasswordModal = () => {
+        setPasswordChanging(!passwordChanging)
+    }
+
+    const openCloseEditModal = () => {
         setIsEditing(!isEditing)
     }
     const {
@@ -27,8 +33,7 @@ export default function PersonalCabinet({userData, setUserData}) {
             lastName: userData?.lastName,
             firstName: userData?.firstName,
             patronymic: userData?.patronymic,
-            description: userData?.description
-
+            description: userData?.description,
         }
     })
 
@@ -68,8 +73,8 @@ export default function PersonalCabinet({userData, setUserData}) {
         <div className={styles.personalCabinet}>
             <div className={styles.userOptions}>
                 <a className="a-img"><img className={styles.logo} src={user_logo} alt="Пользовательский логотип"></img></a>
-                <Button onClick={openCloseModal}>Редактировать профиль</Button>
-                <Button>Сменить пароль</Button>
+                <Button onClick={openCloseEditModal}>Редактировать профиль</Button>
+                <Button onClick={openClosePasswordModal}>Сменить пароль</Button>
                 <Button>Удалить профиль</Button>
             </div>
 
@@ -99,17 +104,17 @@ export default function PersonalCabinet({userData, setUserData}) {
 
                     <tr>
                         <td>Описание</td>
-                        <td><textarea disabled defaultValue={userData?.description}></textarea></td>
+                        <td>
+                            <textarea disabled value={userData?.description}></textarea>
+                        </td>
                     </tr>
                     </tbody>
                 </table>
             </div>
 
             <div className={`edit-modal-overlay ${isEditing ? "" : "edit-modal-overlay_hidden"}`}>
-                <form onSubmit={handleSubmit(onSaveUserData)} className="edit-modal">
-                    <div className="edit-modal__title">
-                        <h3>Редактирование данных</h3>
-                    </div>
+                <form onSubmit={handleSubmit(onSaveUserData)} className={styles.container}>
+                    <h3>Редактирование данных</h3>
                     <table className="change-container__table naked-input">
                         <tbody>
                         <tr>
@@ -151,10 +156,14 @@ export default function PersonalCabinet({userData, setUserData}) {
                         </tbody>
                     </table>
                     <div className="edit-modal__buttons">
-                        <Button type="button" onClick={openCloseModal}>Отмена</Button>
+                        <Button type="button" onClick={openCloseEditModal}>Отмена</Button>
                         <Button type="submit">Сохранить</Button>
                     </div>
                 </form>
+            </div>
+
+            <div className={`edit-modal-overlay ${passwordChanging ? "" : "edit-modal-overlay_hidden"}`}>
+                <SetNewPassword setPasswordChanging={setPasswordChanging}></SetNewPassword>
             </div>
         </div>
     );
