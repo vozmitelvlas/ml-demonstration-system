@@ -18,6 +18,8 @@ import ru.etu.mldemonstrationapp.mainservice.users.ModelUserLimit;
 import ru.etu.mldemonstrationapp.mainservice.users.Role;
 import ru.etu.mldemonstrationapp.mainservice.users.User;
 import ru.etu.mldemonstrationapp.mainservice.users.UserRepository;
+import ru.etu.mldemonstrationapp.mainservice.users.dto.ModelUserLimitResponse;
+
 
 import java.time.Instant;
 import java.util.Collections;
@@ -41,9 +43,9 @@ public class AdminUserService {
         );
     }
 
-    public List<ModelUserLimit> getAllUserLimits(Long userId) {
+    public List<ModelUserLimitResponse> getAllUserLimits(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with id %s not found".formatted(userId)));
-        return user.getLimits();
+        return user.getModelsLimits();
     }
 
     @Transactional

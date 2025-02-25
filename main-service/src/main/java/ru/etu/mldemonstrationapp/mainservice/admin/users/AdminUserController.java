@@ -62,9 +62,8 @@ public class AdminUserController {
 
     @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
     @GetMapping("/{userId}/limits")
-    public ResponseEntity<List<ModelUserLimit>> getAllUserLimits(@PathVariable Long userId) {
-        List<ModelUserLimit> limits = adminUserService.getAllUserLimits(userId);
-        return ResponseEntity.ok(limits);
+    public ResponseEntity<List<ModelUserLimitResponse>> getAllUserLimits(@PathVariable Long userId) {
+        return ResponseEntity.ok(adminUserService.getAllUserLimits(userId));
     }
 
     @ApiResponse(useReturnTypeSchema = true, responseCode = "201")
