@@ -10,11 +10,13 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import ru.etu.mldemonstrationapp.mainservice.organizations.Organization;
 import ru.etu.mldemonstrationapp.mainservice.users.dto.OrganizationReferenceResponse;
+import ru.etu.mldemonstrationapp.mainservice.users.dto.LimitReferenceResponse;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Data
@@ -49,6 +51,16 @@ public class User implements Serializable {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<ModelUserLimit> limits = new ArrayList<>();
+
+    @JsonProperty(value = "limits")
+    public List<LimitReferenceResponse> getLimitsReference() {
+        return limits.stream()
+                .map(limit -> new LimitReferenceResponse(
+                        this.getUserId(),
+                        "/api/users/%d/limits/%d".formatted(this.getUserId(), limit.getLimitId())
+                ))
+                .collect(Collectors.toList());
+    }
 
     @ManyToOne
     @JoinColumn(name = "organization_id", nullable = false)

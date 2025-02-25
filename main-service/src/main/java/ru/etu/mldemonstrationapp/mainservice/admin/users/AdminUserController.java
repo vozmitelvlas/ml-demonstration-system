@@ -15,7 +15,6 @@ import ru.etu.mldemonstrationapp.mainservice.users.dto.ModelUserLimitResponse;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @SecurityRequirement(name = "jwt-bearer")
@@ -63,8 +62,8 @@ public class AdminUserController {
 
     @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
     @GetMapping("/{userId}/limits")
-    public ResponseEntity<Optional<ModelUserLimit>> getAllUserLimits(@PathVariable Long userId) {
-        Optional<ModelUserLimit> limits = adminUserService.getAllUserLimits(userId);
+    public ResponseEntity<List<ModelUserLimit>> getAllUserLimits(@PathVariable Long userId) {
+        List<ModelUserLimit> limits = adminUserService.getAllUserLimits(userId);
         return ResponseEntity.ok(limits);
     }
 
