@@ -1,7 +1,9 @@
 package ru.etu.mldemonstrationapp.mainservice.admin.users.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+
 import java.util.List;
 
 public record UpdateUserRequest(
@@ -19,7 +21,11 @@ public record UpdateUserRequest(
         @Size(max = 255, message = "Patronymic should not exceed 255 characters")
         String patronymic,
 
+        @NotNull(message = "Organization id cannot be null")
         Long organizationId,
 
+        @NotNull(message = "Roles must not be null")
+        @Size(min = 1, max = 3)
         List<String> roles
-) {}
+) {
+}

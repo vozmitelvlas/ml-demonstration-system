@@ -17,8 +17,9 @@ public class ModelInfo implements Serializable {
     @Id
     private Long modelId;
 
-    @OneToOne(cascade = CascadeType.ALL, optional = false)
-    @PrimaryKeyJoinColumn(name = "model_id")
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "model_id")
     private Model model;
 
     private String runtime;

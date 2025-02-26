@@ -26,17 +26,15 @@ public class Model implements Serializable {
     @Column(nullable = false)
     private String name;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "model_id")
+    @OneToOne(mappedBy = "model", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private ModelInfo modelInfo;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "model_id")
+    @OneToMany(mappedBy = "model", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<ModelVersion> modelVersions = new ArrayList<>();
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "limit_id")
     private Limit limit;
 

@@ -11,6 +11,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import ru.etu.mldemonstrationapp.mainservice.admin.models.dto.CreateModelRequest;
 import ru.etu.mldemonstrationapp.mainservice.admin.models.dto.CreateModelVersionRequest;
 import ru.etu.mldemonstrationapp.mainservice.admin.models.dto.UpdateModelVersionRequest;
+import ru.etu.mldemonstrationapp.mainservice.models.Limit;
 import ru.etu.mldemonstrationapp.mainservice.models.Model;
 import ru.etu.mldemonstrationapp.mainservice.models.ModelVersion;
 
@@ -91,6 +92,14 @@ public class AdminModelController {
     public ModelVersion updateModel(@PathVariable Long modelId, @PathVariable Long versionId,
                                     @Valid @RequestBody UpdateModelVersionRequest updateModelVersionRequest) {
         return adminModelsService.updateModelVersion(versionId, updateModelVersionRequest);
+    }
+
+
+    @Operation(description = "Update modeL limit")
+    @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
+    @PutMapping("/{id}/limit")
+    public Limit updateModelLimit(@PathVariable Long id, @Valid @RequestBody Limit limit) {
+        return adminModelsService.updateModelLimit(id, limit);
     }
 
     @Operation(description = "Delete model version. If deleted version was last then delete model too")

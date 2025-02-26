@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import ru.etu.mldemonstrationapp.mainservice.organizations.Organization;
-import ru.etu.mldemonstrationapp.mainservice.users.dto.ModelUserLimitResponse;
 import ru.etu.mldemonstrationapp.mainservice.users.dto.OrganizationReferenceResponse;
 
 import java.io.Serializable;
@@ -47,20 +46,9 @@ public class User implements Serializable {
 
     private String description;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<ModelUserLimit> limits = new ArrayList<>();
-
-    @JsonIgnore
-    public List<ModelUserLimitResponse> getModelsLimits() {
-        return limits.stream().map(modelUserLimit ->
-                new ModelUserLimitResponse(
-                        modelUserLimit,
-                        modelUserLimit.getModel().getModelId(),
-                        modelUserLimit.getModel().getName(),
-                        "/api/models/%d".formatted(modelUserLimit.getModel().getModelId())
-                )).toList();
-    }
 
     @ManyToOne
     @JoinColumn(name = "organization_id", nullable = false)

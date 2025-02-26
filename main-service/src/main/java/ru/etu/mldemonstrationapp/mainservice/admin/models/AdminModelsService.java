@@ -43,15 +43,21 @@ public class AdminModelsService {
         }
         Model model = new Model();
         model.setName(dto.name());
-        model = modelRepository.save(model);
+
+        // Default limit
+        Limit limit = new Limit(null, 100, 100);
+        model.setLimit(limit);
 
         ModelInfo modelInfo = new ModelInfo();
         modelInfo.setRuntime(dto.runtime());
         modelInfo.setProblemType(dto.problemType());
-        modelInfo.setModelId(model.getModelId());
+        modelInfo.setModel(model);
 
         model.setModelInfo(modelInfo);
 
+        modelRepository.save(model);
+
+        // Add default version of the model
         ModelVersion modelVersion = new ModelVersion();
         modelVersion.setVersionName("1.0");
         modelVersion.setUri(dto.uri());
@@ -75,9 +81,8 @@ public class AdminModelsService {
                 dto.uri(),
                 model,
                 Instant.now(),
-                Instant.now())
-        );
-
+                Instant.now()
+        ));
     }
 
     @Transactional
@@ -106,6 +111,14 @@ public class AdminModelsService {
         modelRepository.save(model);
 
         return modelVersion;
+    }
+
+    @Transactional
+    Limit updateModelLimit(Long modelId, Limit limit) {
+        Model model = modelRepository.findById(modelId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Model not found"));
+        model.getLimit().setRps(limit.getRps());
+        model.getLimit().setRequestsPerWeek(limit.getRequestsPerWeek());
+        return modelRepository.save(model).getLimit();
     }
 
     @Transactional

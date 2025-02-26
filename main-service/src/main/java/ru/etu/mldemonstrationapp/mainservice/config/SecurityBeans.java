@@ -56,7 +56,9 @@ public class SecurityBeans {
                 .authorizeHttpRequests(config -> config
                         .requestMatchers("/swagger-ui/*", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/organizations/*/limits-type").hasAnyRole("ORGANIZATION_HEAD", "ADMIN")
+                        .requestMatchers("/api/organizations/*/models").hasRole("ORGANIZATION_HEAD")
+                        .requestMatchers("/api/organizations/*/members").hasRole("ORGANIZATION_HEAD")
+                        .requestMatchers("/api/organizations/*/limits-type").hasRole("ORGANIZATION_HEAD")
                         .requestMatchers(HttpMethod.POST, "/api/users/profile/password/reset").hasAuthority("PASSWORD_RESET")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/**").hasAnyRole("USER", "ADMIN")
