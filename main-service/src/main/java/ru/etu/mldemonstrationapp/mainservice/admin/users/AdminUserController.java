@@ -1,5 +1,6 @@
 package ru.etu.mldemonstrationapp.mainservice.admin.users;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -8,11 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.etu.mldemonstrationapp.mainservice.admin.users.dto.CreateUserRequest;
+import ru.etu.mldemonstrationapp.mainservice.admin.users.dto.ModelUserLimitResponse;
 import ru.etu.mldemonstrationapp.mainservice.admin.users.dto.UpdateUserRequest;
 import ru.etu.mldemonstrationapp.mainservice.users.ModelUserLimit;
 import ru.etu.mldemonstrationapp.mainservice.users.User;
-import ru.etu.mldemonstrationapp.mainservice.users.dto.ModelUserLimitRequest;
-import ru.etu.mldemonstrationapp.mainservice.users.dto.ModelUserLimitResponse;
 
 import java.util.List;
 import java.util.Map;
@@ -61,36 +61,25 @@ public class AdminUserController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(description = "Get all user limits for model")
     @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
     @GetMapping("/{userId}/limits")
     public ResponseEntity<List<ModelUserLimitResponse>> getAllUserLimits(@PathVariable Long userId) {
         return ResponseEntity.ok(adminUserService.getAllUserLimits(userId));
     }
 
-    @ApiResponse(useReturnTypeSchema = true, responseCode = "201")
-    @PostMapping("/{userId}/limits")
-    public ResponseEntity<ModelUserLimitResponse> createUserLimit(@PathVariable Long userId, @RequestBody ModelUserLimitRequest request) {
-        ModelUserLimit createdLimit = adminUserService.createUserLimit(userId, request.modelId(), request.limit());
-        ModelUserLimitResponse response = new ModelUserLimitResponse(
-            createdLimit,
-            createdLimit.getModel().getModelId(),
-            createdLimit.getModel().getName(),
-            "/api/users/" + userId + "/models/" + createdLimit.getModel().getModelId()
-        );
-        return ResponseEntity.ok(response);
-    }
-
+    @Operation(description = "Create or update user limit")
     @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
     @PutMapping("/{userId}/models/{modelId}/limit")
-    public ResponseEntity<ModelUserLimit> updateUserLimit(@PathVariable Long userId, @PathVariable Long modelId, @RequestBody ModelUserLimit limit) {
-        return ResponseEntity.ok(adminUserService.updateUserLimit(userId, modelId, limit));
-    }
+    public ModelUserLimitResponse updateUserLimit(@PathVariable Long userId, @PathVariable Long modelId, @RequestBody ModelUserLimit limit) {
+        ModelUserLimit modelUserLimit = adminUserService.updateUserLimit(userId, modelId, limit);
 
-    @ApiResponse(useReturnTypeSchema = true, responseCode = "204")
-    @DeleteMapping("/{userId}/models/{modelId}")
-    public ResponseEntity<Void> removeAccessToModel(@PathVariable Long userId, @PathVariable Long modelId) {
-        adminUserService.removeAccessToModel(userId, modelId);
-        return ResponseEntity.noContent().build();
+        return new ModelUserLimitResponse(
+                modelUserLimit,
+                modelUserLimit.getModel().getModelId(),
+                modelUserLimit.getModel().getName(),
+                "/api/models/%d".formatted(modelUserLimit.getModel().getModelId())
+        );
     }
 }
 

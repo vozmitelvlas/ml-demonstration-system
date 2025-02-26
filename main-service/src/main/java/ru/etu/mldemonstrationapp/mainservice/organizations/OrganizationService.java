@@ -101,7 +101,7 @@ public class OrganizationService {
     @Transactional
     public ModelOrganizationLimit createModelLimit(Long organizationId, Long modelId, ModelOrganizationLimit limit) {
         if (limitRepository.findByOrganizationIdAndModelId(organizationId, modelId).isPresent()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Limit already exists for this organization and model");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Organization already has access to this model");
         }
         Organization organization = organizationRepository.findById(organizationId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Organization not found"));
@@ -118,7 +118,7 @@ public class OrganizationService {
     @Transactional
     public ModelOrganizationLimit updateModelLimit(Long organizationId, Long modelId, ModelOrganizationLimit updatedLimit) {
         ModelOrganizationLimit existingLimit = limitRepository.findByOrganizationIdAndModelId(organizationId, modelId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Limit not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Organization has not access to this model"));
 
         existingLimit.setRps(updatedLimit.getRps());
         existingLimit.setRequestsPerWeek(updatedLimit.getRequestsPerWeek());

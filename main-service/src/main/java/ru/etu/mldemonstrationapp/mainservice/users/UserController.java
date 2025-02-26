@@ -8,14 +8,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ru.etu.mldemonstrationapp.mainservice.auth.JwtToken;
 import ru.etu.mldemonstrationapp.mainservice.users.dto.NewPasswordRequest;
 import ru.etu.mldemonstrationapp.mainservice.users.dto.UpdatePasswordRequest;
-
-import java.util.List;
+import ru.etu.mldemonstrationapp.mainservice.users.dto.UpdateUserRequest;
 
 @RestController
 @RequestMapping("/api/users")
@@ -25,25 +23,18 @@ public class UserController {
     private final UserService userService;
 
     @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
-    @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
-        return ResponseEntity.ok(userService.getAllUsers());
-    }
-
-    @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
-    @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.getUserById(id));
-    }
-
-    @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
     @GetMapping("/profile")
     public ResponseEntity<User> getProfile(@AuthenticationPrincipal JwtToken token) {
         return ResponseEntity.ok(userService.getUserById(token.userId()));
     }
 
+    @Operation(description = "Update your own user profile")
+    @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
+    @PutMapping("/profile")
+    public ResponseEntity<User> updateProfile(@AuthenticationPrincipal JwtToken token, @Valid @RequestBody UpdateUserRequest request) {
+        return ResponseEntity.ok(userService.updateUser(token.userId(), request));
+    }
 
-    @Secured({"PASSWORD_RESET"})
     @Operation(description = "Set a new password using a password reset token")
     @ApiResponse(useReturnTypeSchema = true, responseCode = "204")
     @PostMapping("/profile/password/reset")
@@ -59,7 +50,6 @@ public class UserController {
         userService.updateUserPassword(jwtToken.userId(), updatePasswordRequest);
         return ResponseEntity.noContent().build();
     }
-
 
     @Operation(description = "Delete your own user")
     @ApiResponse(useReturnTypeSchema = true, responseCode = "204")
