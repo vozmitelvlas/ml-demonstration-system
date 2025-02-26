@@ -125,3 +125,18 @@ export const passwordRecoverSchema = yup.object()
         repeatPassword: yup.string()
             .oneOf([yup.ref('password'), null], 'Пароли должны совпадать')
     })
+
+export const ChangeOrganisationModelsSchema = yup.object().strict().test(
+    'all-integers',
+    'Все значения обязательны и должны быть целыми числами',
+    (obj) => {
+        return Object.entries(obj).every(([key, value]) => {
+            if (value === undefined || value === null || value === "") {
+                return false; // Значение должно быть обязательным
+            }
+            const val = Number(value);
+
+            return !(isNaN(val) || !Number.isInteger(val));
+        });
+    }
+);

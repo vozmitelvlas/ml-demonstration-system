@@ -5,11 +5,19 @@ import Button from "../Button/Button.jsx";
 import React from "react";
 import {useNavigate} from "react-router-dom";
 
-export default function ChangeOrganisationModels({handleSubmit, register, limitOptions, options, onDeleteModelClick}) {
+export default function ChangeOrganisationModels({
+                                                     handleSubmit,
+                                                     register,
+                                                     limitOptions,
+                                                     options,
+                                                     onDeleteModelClick,
+                                                     orgModels,
+                                                     submitFunction
+                                                 }) {
     const navigate = useNavigate()
     return (
         <>
-            <form className="change-content">
+            <form onSubmit={handleSubmit(submitFunction)} className="change-content">
                 <div className="change-orgs-content">
                     <div className="select-container">
                         <div>
@@ -36,7 +44,6 @@ export default function ChangeOrganisationModels({handleSubmit, register, limitO
                             </div>
                         </div>
                     </div>
-
                     <div className="orgs-models">
                         <h2>Доступные организации модели</h2>
                         <table className="table-fill naked-input limits-input">
@@ -58,17 +65,23 @@ export default function ChangeOrganisationModels({handleSubmit, register, limitO
                             </tr>
                             </thead>
                             <tbody>
-                            <tr>
-                                <td className="text-center">1</td>
-                                <td className="text-center">Graph-based segmentation model1</td>
-                                <td className="text-center"><input type="text" defaultValue={""}/>
-                                </td>
-                                <td className="text-center"><input type="text" defaultValue={""}/></td>
-                                <td className="text-center">
-                                    <a className="a-img" onClick={onDeleteModelClick}><img
-                                        src={deleteLogo}></img></a>
-                                </td>
-                            </tr>
+                            {orgModels.map(model => (
+                                <tr key={model.modelId}>
+                                    <td className="text-center">{model.modelId}</td>
+                                    <td className="text-center">{model.modelName}</td>
+                                    <td className="text-center">
+                                        <input type="text" {...register(`rps${model.modelId}`)} />
+                                    </td>
+                                    <td className="text-center">
+                                        <input type="text" {...register(`requestsPerWeek${model.modelId}`)}/>
+                                    </td>
+                                    <td className="text-center">
+                                        <a className="a-img" onClick={onDeleteModelClick}>
+                                            <img src={deleteLogo}></img>
+                                        </a>
+                                    </td>
+                                </tr>
+                            ))}
                             </tbody>
                         </table>
                     </div>
