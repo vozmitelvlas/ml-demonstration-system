@@ -95,7 +95,6 @@ public class OrganizationService {
         if (organizationRepository.containsUsers(organizationId)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Organization contains users");
         }
-        organizationRepository.deleteAllOrganizationsLimits(organizationId);
         organizationRepository.deleteById(organizationId);
     }
 
