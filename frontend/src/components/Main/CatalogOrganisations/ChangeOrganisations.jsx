@@ -42,7 +42,7 @@ export default function ChangeOrganisations() {
     const [displayData, setDisplayData] = useState(orgDataForDisplay)
     const [alarm, setAlarm] = useState(null)
     const [logo, setLogo] = useState(alarmLogo)
-
+    const [idModelForDelete, setIdModelForDelete] = useState("")
     const [orgModels, setOrgModels] = useState([])
 
     const firstForm = useForm({
@@ -68,7 +68,6 @@ export default function ChangeOrganisations() {
 
         apiClient.get(`/api/admin/organizations/${orgId}/models`).then(res => {
             const formatModels = {}
-            console.log(res.data)
             res.data.forEach(model => {
                 formatModels[`rps${model.modelId}`] = model.limit.rps.toString()
                 formatModels[`requestsPerWeek${model.modelId}`] = model.limit.requestsPerWeek.toString()
@@ -79,7 +78,7 @@ export default function ChangeOrganisations() {
             console.log(error)
         })
         setAlarm(null)
-    }, [activeBut])
+    }, [activeBut, isDeletingModel])
 
     useEffect(() => {
         if (activeBut === "first") {
@@ -97,13 +96,23 @@ export default function ChangeOrganisations() {
         }
     }, [firstForm.formState.errors, secondForm.formState.errors]);
 
-
     const closeDeleteModal = () => {
         setIsDeletingModel(false)
     }
     const onDeleteModelClick = (event) => {
-        let tr = event.target.closest("tr")
+        const tr = event.target.closest("tr")
+        setIdModelForDelete(tr.dataset.id)
         setIsDeletingModel(true)
+    }
+    const onConfirmDeletingModel = async () => {
+        try {
+            await apiClient.delete(`/api/admin/organizations/${orgId}/models/${idModelForDelete}`)
+            setAlarm("Модель успешно удалена из организации")
+            setLogo(acceptLogo)
+            setIsDeletingModel(false)
+        } catch (error){
+            console.log(error)
+        }
     }
     const onSaveOrgData = async (newOrgData) => {
         console.log(newOrgData)
@@ -180,7 +189,11 @@ export default function ChangeOrganisations() {
                 </ChangeOrganisationModels>
             )}
 
-            <DeleteModal open={isDeletingModel} onNo={closeDeleteModal}></DeleteModal>
+            <DeleteModal
+                open={isDeletingModel}
+                onNo={closeDeleteModal}
+                onYes={onConfirmDeletingModel}
+            ></DeleteModal>
         </div>
     )
 }

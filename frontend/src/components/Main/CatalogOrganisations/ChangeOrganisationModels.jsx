@@ -66,7 +66,7 @@ export default function ChangeOrganisationModels({
                             </thead>
                             <tbody>
                             {orgModels.map(model => (
-                                <tr key={model.modelId}>
+                                <tr key={model.modelId} data-id={model.modelId}>
                                     <td className="text-center">{model.modelId}</td>
                                     <td className="text-center">{model.modelName}</td>
                                     <td className="text-center">
