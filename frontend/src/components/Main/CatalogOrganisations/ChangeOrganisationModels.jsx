@@ -4,6 +4,7 @@ import deleteLogo from "../../../assets/delete.svg";
 import Button from "../Button/Button.jsx";
 import React from "react";
 import {useNavigate} from "react-router-dom";
+import {Controller} from "react-hook-form";
 
 export default function ChangeOrganisationModels({
                                                      handleSubmit,
@@ -12,7 +13,8 @@ export default function ChangeOrganisationModels({
                                                      options,
                                                      onDeleteModelClick,
                                                      orgModels,
-                                                     submitFunction
+                                                     submitFunction,
+                                                     control
                                                  }) {
     const navigate = useNavigate()
     return (
@@ -23,14 +25,23 @@ export default function ChangeOrganisationModels({
                         <div>
                             <h2>Установка лимитов и моделей</h2>
                             <div className="orgs-selects">
-                                <Select
-                                    className="limits-select naked-input"
-                                    options={limitOptions}
-                                    // onChange={handleSelectChange}
-                                    placeholder="Лимит"
-                                    isSearchable
-                                    styles={customStyle}
-                                />
+                                <Controller
+                                    control={control}
+                                    name="limitsType"
+                                    render={({
+                                                 field: {onChange, value},
+                                             }) => (
+                                        <Select
+                                            className="limits-select naked-input"
+                                            options={limitOptions}
+                                            onChange={onChange}
+                                            value={value}
+                                            isSearchable
+                                            styles={customStyle}
+                                        />
+                                    )}/>
+
+
                                 <Select
                                     className="limits-select naked-input"
                                     isMulti

@@ -128,15 +128,16 @@ export const passwordRecoverSchema = yup.object()
 
 export const ChangeOrganisationModelsSchema = yup.object().strict().test(
     'all-integers',
-    'Все значения обязательны и должны быть целыми числами',
+    'Значения полей обязательны и должны быть целыми числами',
     (obj) => {
-        return Object.entries(obj).every(([key, value]) => {
-            if (value === undefined || value === null || value === "") {
-                return false; // Значение должно быть обязательным
-            }
-            const val = Number(value);
-
-            return !(isNaN(val) || !Number.isInteger(val));
-        });
+        return Object.entries(obj)
+            .filter(([key]) => key.startsWith('rps') || key.startsWith('requestsPerWeek'))
+            .every(([key, value]) => {
+                if (value === undefined || value === null || value === "") return false; // Обязательность
+                const val = Number(value);
+                if (isNaN(val)) return false; // Число
+                if (!Number.isInteger(val)) return false; // Целое число
+                return true;
+            });
     }
 );

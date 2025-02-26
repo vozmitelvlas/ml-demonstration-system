@@ -1,6 +1,6 @@
 import DataHeader from "../Headers/DataHeader.jsx";
 import React, {useEffect, useState} from "react";
-import {useNavigate, useParams} from "react-router-dom";
+import {useParams} from "react-router-dom";
 import DeleteModal from "../../utils/DeleteModal.jsx";
 import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx";
 import acceptLogo from "../../../assets/accept.svg"
@@ -14,9 +14,9 @@ import ChangeOrganisationsInfo from "./ChangeOrganisationsInfo.jsx";
 import ChangeOrganisationModels from "./ChangeOrganisationModels.jsx";
 
 const limitOptions = [
-    {value: 'O1', label: 'Лимит организации'},
-    {value: 'O2', label: 'Лимиты модели'},
-    {value: 'O2', label: 'Лимиты пользователя'}
+    {value: 'ORGANIZATION_LIMITS', label: 'Лимит организации'},
+    {value: 'MODEL_LIMITS', label: 'Лимиты модели'},
+    {value: 'USER_LIMITS', label: 'Лимиты пользователя'}
 ];
 
 const options = [
@@ -30,10 +30,6 @@ const options = [
 const orgDataForDisplay = {
     createdAt: "",
 }
-const limitDataForSend = {
-    rps: 0,
-    requestsPerWeek: 0,
-}
 
 export default function ChangeOrganisations() {
     const {orgId} = useParams()
@@ -44,6 +40,7 @@ export default function ChangeOrganisations() {
     const [logo, setLogo] = useState(alarmLogo)
     const [idModelForDelete, setIdModelForDelete] = useState("")
     const [orgModels, setOrgModels] = useState([])
+    const [limitsType, setLimitsType] = useState("")
 
     const firstForm = useForm({
         resolver: yupResolver(changeOrganisationsSchema)
@@ -60,23 +57,32 @@ export default function ChangeOrganisations() {
             firstForm.reset({
                 name: res.data.name,
                 description: res.data.description,
-                // limitsType: "USER_LIMITS",
             })
+            setLimitsType(limitOptions.find(limit => limit.value === res.data.limitsType))
         }).catch(error => {
             console.log(error)
         })
 
         apiClient.get(`/api/admin/organizations/${orgId}/models`).then(res => {
             const formatModels = {}
+            console.log(res.data)
             res.data.forEach(model => {
                 formatModels[`rps${model.modelId}`] = model.limit.rps.toString()
                 formatModels[`requestsPerWeek${model.modelId}`] = model.limit.requestsPerWeek.toString()
             })
+
             setOrgModels(res.data)
-            secondForm.reset(formatModels)
+            secondForm.reset({
+                limitsType: limitsType,
+                ...formatModels
+            })
         }).catch(error => {
             console.log(error)
         })
+
+        apiClient.get(`/api/admin/models`).then(res => {
+        })
+
         setAlarm(null)
     }, [activeBut, isDeletingModel])
 
@@ -110,7 +116,7 @@ export default function ChangeOrganisations() {
             setAlarm("Модель успешно удалена из организации")
             setLogo(acceptLogo)
             setIsDeletingModel(false)
-        } catch (error){
+        } catch (error) {
             console.log(error)
         }
     }
@@ -128,8 +134,14 @@ export default function ChangeOrganisations() {
         }
     }
     const onSaveModelLimits = async (newValue) => {
+        console.log(newValue)
         try {
-            const entries = Object.entries(newValue);
+            await apiClient.put(`/api/admin/organizations/${orgId}/limits-type`, {limitsType: newValue.limitsType.value})
+
+            const tmpValue = {...newValue}
+            delete tmpValue["limitsType"]
+
+            const entries = Object.entries(tmpValue);
             for (let i = 0; i < entries.length; i += 2) {
                 const chunk = entries.slice(i, i + 2);
                 let modelId;
@@ -140,15 +152,10 @@ export default function ChangeOrganisations() {
                 });
 
                 const chunkAsObject = Object.fromEntries(trueChunk);
-                console.log(modelId, chunkAsObject)
 
-                const res = await apiClient.put(`/api/admin/organizations/${Number(orgId)}/models/${Number(modelId)}/limit`, chunkAsObject)
-                // secondForm.reset(prev => ({
-                //     ...prev,
-                //     [`rps${modelId}`]: res.data.rps?.toString(),
-                //     [`requestsPerWeek${modelId}`]: res.data.requestsPerWeek?.toString()
-                // }))
+                await apiClient.put(`/api/admin/organizations/${Number(orgId)}/models/${Number(modelId)}/limit`, chunkAsObject)
             }
+
             setLogo(acceptLogo)
             setAlarm("Изменения сохранены")
         } catch (error) {
@@ -185,7 +192,8 @@ export default function ChangeOrganisations() {
                     submitFunction={onSaveModelLimits}
                     limitOptions={limitOptions}
                     options={options}
-                    onDeleteModelClick={onDeleteModelClick}>
+                    onDeleteModelClick={onDeleteModelClick}
+                    control={secondForm.control}>
                 </ChangeOrganisationModels>
             )}
 
