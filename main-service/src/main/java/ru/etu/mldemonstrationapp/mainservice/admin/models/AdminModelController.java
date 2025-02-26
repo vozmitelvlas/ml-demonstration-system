@@ -95,7 +95,7 @@ public class AdminModelController {
     }
 
 
-    @Operation(description = "Update mode limit")
+    @Operation(description = "Update modeL limit")
     @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
     @PutMapping("/{id}/limit")
     public Limit updateModelLimit(@PathVariable Long id, @Valid @RequestBody Limit limit) {

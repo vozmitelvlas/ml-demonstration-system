@@ -52,7 +52,6 @@ public class AdminModelsService {
         modelInfo.setRuntime(dto.runtime());
         modelInfo.setProblemType(dto.problemType());
         modelInfo.setModel(model);
-//        modelInfo.setModelId(model.getModelId());
 
         model.setModelInfo(modelInfo);
 
