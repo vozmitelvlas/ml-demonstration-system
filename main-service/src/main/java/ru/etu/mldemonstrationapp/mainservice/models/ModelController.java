@@ -1,12 +1,16 @@
 package ru.etu.mldemonstrationapp.mainservice.models;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.etu.mldemonstrationapp.mainservice.auth.JwtToken;
 
 import java.util.List;
 
@@ -17,23 +21,29 @@ import java.util.List;
 public class ModelController {
     private final ModelService modelService;
 
+    @Operation(description = "Get available models")
+    @ApiResponse(responseCode = "200", useReturnTypeSchema = true)
     @GetMapping
-    public ResponseEntity<List<Model>> getAllModels() {
-        return ResponseEntity.ok(modelService.getAllModels());
+    public ResponseEntity<List<Model>> getAvailableModels(@AuthenticationPrincipal JwtToken jwtToken) {
+        return ResponseEntity.ok(modelService.getAvailableModels(jwtToken.userId()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Model> getModelById(@PathVariable Long id) {
-        return ResponseEntity.ok(modelService.getModelById(id));
+    @ApiResponse(responseCode = "200", useReturnTypeSchema = true)
+    public ResponseEntity<Model> getModelById(@PathVariable Long id, @AuthenticationPrincipal JwtToken jwtToken) {
+        return ResponseEntity.ok(modelService.getModelById(id, jwtToken.userId()));
     }
 
+    @ApiResponse(responseCode = "200", useReturnTypeSchema = true)
     @GetMapping("/versions/{id}")
-    public ResponseEntity<ModelVersion> getModelVersionById(@PathVariable Long id) {
-        return ResponseEntity.ok(modelService.getModelVersionById(id));
+    public ResponseEntity<ModelVersion> getModelVersionById(@PathVariable Long id, @AuthenticationPrincipal JwtToken jwtToken) {
+        return ResponseEntity.ok(modelService.getModelVersionById(id, jwtToken.userId()));
     }
 
+    @Operation(description = "Get all versions of available models")
+    @ApiResponse(responseCode = "200", useReturnTypeSchema = true)
     @GetMapping("/versions")
-    public ResponseEntity<List<ModelVersion>> getAllModelVersions() {
-        return ResponseEntity.ok(modelService.getAllModelVersions());
+    public ResponseEntity<List<ModelVersion>> getAvailableModelsVersions(@AuthenticationPrincipal JwtToken jwtToken) {
+        return ResponseEntity.ok(modelService.getAvailableModelsVersions(jwtToken.userId()));
     }
 }

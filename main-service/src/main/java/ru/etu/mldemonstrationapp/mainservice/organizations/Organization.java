@@ -30,17 +30,15 @@ public class Organization implements Serializable {
 
     private String description;
 
-    @OneToMany
-    @JoinColumn(name = "organization_id")
+    @OneToMany(mappedBy = "organization", cascade = CascadeType.ALL)
     @JsonIgnore
-    private List<User> members;
+    private List<User> members = new ArrayList<>();
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private OrganizationLimitsType limitsType;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "organization_id")
+    @OneToMany(mappedBy = "organization", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<ModelOrganizationLimit> limits = new ArrayList<>();
 

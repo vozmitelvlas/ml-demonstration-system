@@ -3,6 +3,10 @@ package ru.etu.mldemonstrationapp.mainservice.models;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import ru.etu.mldemonstrationapp.mainservice.organizations.Organization;
+
+import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ModelVersionRepository extends JpaRepository<ModelVersion, Long> {
@@ -13,4 +17,20 @@ public interface ModelVersionRepository extends JpaRepository<ModelVersion, Long
             """)
     boolean versionNameUnique(Long modelId, String name);
 
+    @Query("""
+            SELECT mv FROM ModelOrganizationLimit mol
+                JOIN mol.model m
+                JOIN m.modelVersions mv
+            WHERE mol.organization = :organization
+            """)
+    List<ModelVersion> findAllByOrganization(Organization organization);
+
+
+    @Query("""
+            SELECT mv FROM ModelOrganizationLimit mol
+                JOIN mol.model m
+                JOIN m.modelVersions mv
+            WHERE mol.organization = :organization AND mv.modelVersionId = :id
+            """)
+    Optional<ModelVersion> findByIdAndOrganization(Long id, Organization organization);
 }

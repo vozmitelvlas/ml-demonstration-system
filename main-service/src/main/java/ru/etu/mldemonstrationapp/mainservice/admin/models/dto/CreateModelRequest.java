@@ -2,7 +2,7 @@ package ru.etu.mldemonstrationapp.mainservice.admin.models.dto;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import jakarta.validation.constraints.Pattern;
+import org.hibernate.validator.constraints.URL;
 
 public record CreateModelRequest(
         @NotNull(message = "Model name cannot be null")
@@ -10,7 +10,7 @@ public record CreateModelRequest(
         String name,
 
         @NotNull(message = "URI cannot be null")
-        @Pattern(regexp = "^(https?|ftp)://[\\w-]+(\\.[\\w-]+)+([\\w.,@?^=%&:/~+#-]*[\\w@?^=%&/~+#-])?$", message = "Invalid URI format")
+        @URL(message = "Invalid URI format")
         @Size(min = 1, max = 255, message = "URI must be between 1 and 255 characters")
         String uri,
 
