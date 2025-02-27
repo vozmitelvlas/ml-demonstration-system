@@ -14,7 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 import ru.etu.mldemonstrationapp.mainservice.auth.dto.LoginRequest;
 import ru.etu.mldemonstrationapp.mainservice.auth.dto.LoginResponse;
 import ru.etu.mldemonstrationapp.mainservice.auth.dto.ResetPasswordRequest;
-import ru.etu.mldemonstrationapp.mainservice.users.dto.CreateUserRequest;
+import ru.etu.mldemonstrationapp.mainservice.users.dto.UserRegistrationRequest;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -31,7 +31,7 @@ public class AuthController {
 
     @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
     @PostMapping("/register")
-    ResponseEntity<LoginResponse> register(@Valid @RequestBody CreateUserRequest createUserRequest) {
+    ResponseEntity<LoginResponse> register(@Valid @RequestBody UserRegistrationRequest createUserRequest) {
         return authService.register(createUserRequest);
     }
 

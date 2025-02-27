@@ -15,7 +15,7 @@ import ru.etu.mldemonstrationapp.mainservice.config.CustomUserDetails;
 import ru.etu.mldemonstrationapp.mainservice.email.EmailService;
 import ru.etu.mldemonstrationapp.mainservice.users.User;
 import ru.etu.mldemonstrationapp.mainservice.users.UserService;
-import ru.etu.mldemonstrationapp.mainservice.users.dto.CreateUserRequest;
+import ru.etu.mldemonstrationapp.mainservice.users.dto.UserRegistrationRequest;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +36,7 @@ public class AuthService {
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(new LoginResponse(userDetails.user(), token));
     }
 
-    public ResponseEntity<LoginResponse> register(CreateUserRequest createUserRequest) {
+    public ResponseEntity<LoginResponse> register(UserRegistrationRequest createUserRequest) {
         User user = userService.registerUser(createUserRequest);
         String token = jwtService.generateAccessToken(new CustomUserDetails(user));
         ResponseCookie cookie = jwtService.generateAccessTokenCookie(token);

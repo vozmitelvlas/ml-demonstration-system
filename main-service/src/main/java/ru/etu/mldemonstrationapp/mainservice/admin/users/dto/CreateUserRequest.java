@@ -2,6 +2,7 @@ package ru.etu.mldemonstrationapp.mainservice.admin.users.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.util.List;
@@ -33,7 +34,10 @@ public record CreateUserRequest(
         @Size(max = 500, message = "Description should not exceed 500 characters")
         String description,
 
+        @NotNull(message = "OrganizationId must not be null")
         Long organizationId,
 
+        @NotNull(message = "Roles must not be null")
+        @Size(min = 1, max = 3)
         List<String> roles
 ) {}

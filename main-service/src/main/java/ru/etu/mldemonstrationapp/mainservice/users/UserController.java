@@ -12,7 +12,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ru.etu.mldemonstrationapp.mainservice.auth.JwtToken;
 import ru.etu.mldemonstrationapp.mainservice.users.dto.NewPasswordRequest;
-import ru.etu.mldemonstrationapp.mainservice.users.dto.UpdatePasswordRequest;
+import ru.etu.mldemonstrationapp.mainservice.users.dto.UpdateProfileRequest;
 import ru.etu.mldemonstrationapp.mainservice.users.dto.UpdateUserRequest;
 
 @RestController
@@ -46,7 +46,7 @@ public class UserController {
     @Operation(description = "Update password with confirmation of the old one")
     @ApiResponse(useReturnTypeSchema = true, responseCode = "204")
     @PutMapping("/profile/password")
-    public ResponseEntity<Void> updatePassword(@AuthenticationPrincipal JwtToken jwtToken, @Valid @RequestBody UpdatePasswordRequest updatePasswordRequest) {
+    public ResponseEntity<Void> updatePassword(@AuthenticationPrincipal JwtToken jwtToken, @Valid @RequestBody UpdateProfileRequest updatePasswordRequest) {
         userService.updateUserPassword(jwtToken.userId(), updatePasswordRequest);
         return ResponseEntity.noContent().build();
     }

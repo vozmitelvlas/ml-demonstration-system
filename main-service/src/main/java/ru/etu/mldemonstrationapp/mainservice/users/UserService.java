@@ -11,8 +11,8 @@ import org.springframework.web.server.ResponseStatusException;
 import ru.etu.mldemonstrationapp.mainservice.auth.JwtService;
 import ru.etu.mldemonstrationapp.mainservice.organizations.Organization;
 import ru.etu.mldemonstrationapp.mainservice.organizations.OrganizationRepository;
-import ru.etu.mldemonstrationapp.mainservice.users.dto.CreateUserRequest;
-import ru.etu.mldemonstrationapp.mainservice.users.dto.UpdatePasswordRequest;
+import ru.etu.mldemonstrationapp.mainservice.users.dto.UserRegistrationRequest;
+import ru.etu.mldemonstrationapp.mainservice.users.dto.UpdateProfileRequest;
 import ru.etu.mldemonstrationapp.mainservice.users.dto.UpdateUserRequest;
 
 import java.util.Collections;
@@ -37,7 +37,7 @@ public class UserService {
     }
 
     @Transactional
-    public User registerUser(CreateUserRequest request) {
+    public User registerUser(UserRegistrationRequest request) {
         if (userRepository.existsByLogin(request.login())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Login already exists");
         }
@@ -79,7 +79,7 @@ public class UserService {
     }
 
     @Transactional
-    public void updateUserPassword(Long id, UpdatePasswordRequest request) {
+    public void updateUserPassword(Long id, UpdateProfileRequest request) {
         User user = userRepository.findById(id).orElseThrow();
         if (passwordEncoder.matches(request.oldPassword(), user.getPassword())) {
             user.setPassword(passwordEncoder.encode(request.newPassword()));
