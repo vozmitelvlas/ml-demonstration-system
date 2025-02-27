@@ -99,7 +99,7 @@ th.text-center {
 }
 .limits-select{
     margin: unset;
-    width: 250px;
+    min-width: 250px;
 }
 .to-center{
     display: flex;

@@ -10,11 +10,13 @@ export default function ChangeOrganisationModels({
                                                      handleSubmit,
                                                      register,
                                                      limitOptions,
-                                                     options,
                                                      onDeleteModelClick,
                                                      orgModels,
                                                      submitFunction,
-                                                     control
+                                                     control,
+                                                     allModels,
+                                                     onSelectModels,
+                                                     onSelectLimit
                                                  }) {
     const navigate = useNavigate()
     return (
@@ -34,24 +36,47 @@ export default function ChangeOrganisationModels({
                                         <Select
                                             className="limits-select naked-input"
                                             options={limitOptions}
-                                            onChange={onChange}
+                                            onChange={(newValue) => {
+                                                onChange(newValue)
+                                                onSelectLimit(newValue)
+                                            }}
                                             value={value}
                                             isSearchable
                                             styles={customStyle}
                                         />
                                     )}/>
 
+                                <Controller
+                                    control={control}
+                                    name="selectModels"
+                                    render={({
+                                                 field: {onChange, value},
+                                             }) => (
+                                        <Select
+                                            isMulti
+                                            className="limits-select naked-input"
+                                            options={allModels}
+                                            onChange={(newValue) => {
+                                                onChange(newValue)
+                                                onSelectModels(newValue)
+                                            }}
+                                            closeMenuOnSelect={false}
+                                            value={value}
+                                            isSearchable
+                                            styles={customStyle}
+                                        />
+                                    )}/>
 
-                                <Select
-                                    className="limits-select naked-input"
-                                    isMulti
-                                    options={options}
-                                    // onChange={handleSelectChange}
-                                    closeMenuOnSelect={false}
-                                    placeholder="Модели"
-                                    isSearchable
-                                    styles={customStyle}
-                                />
+                                {/*<Select*/}
+                                {/*    className="limits-select naked-input"*/}
+                                {/*    isMulti*/}
+                                {/*    options={options}*/}
+                                {/*    // onChange={handleSelectChange}*/}
+                                {/*    closeMenuOnSelect={false}*/}
+                                {/*    placeholder="Модели"*/}
+                                {/*    isSearchable*/}
+                                {/*    styles={customStyle}*/}
+                                {/*/>*/}
                             </div>
                         </div>
                     </div>
