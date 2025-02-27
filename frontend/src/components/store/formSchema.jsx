@@ -126,7 +126,7 @@ export const passwordRecoverSchema = yup.object()
             .oneOf([yup.ref('password'), null], 'Пароли должны совпадать')
     })
 
-export const ChangeOrganisationModelsSchema = yup.object().strict().test(
+export const limitsSchema = yup.object().strict().test(
     'all-integers',
     'Значения полей обязательны и должны быть целыми числами',
     (obj) => {

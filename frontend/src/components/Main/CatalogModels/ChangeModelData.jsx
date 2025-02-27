@@ -119,7 +119,7 @@ export default function ChangeModelData() {
             <DataHeader
                 activeBut={activeBut}
                 setActiveBut={setActiveBut}
-                buttons={["ИНФОРМАЦИЯ", "ОГРАНИЧЕНИЯ"]}
+                buttons={["ИНФОРМАЦИЯ", "ЛИМИТ"]}
                 names={["first", "second"]}>
                 Изменение данных модели
             </DataHeader>
@@ -208,22 +208,6 @@ export default function ChangeModelData() {
 
             {activeBut === "second" && (
                 <form className="change-content">
-                    <div className="select-container">
-                        <h2>Видимость</h2>
-                        <div>
-                            <p className="text-class">Организации с доступом к модели</p>
-                            <Select
-                                className="limits-select naked-input"
-                                isMulti
-                                options={options}
-                                onChange={handleSelectChange}
-                                closeMenuOnSelect={false}
-                                placeholder={"Выбрать"}
-                                isSearchable
-                                styles={customStyle}
-                            />
-                        </div>
-                    </div>
                     <div>
                         <h2>Лимиты по умолчанию</h2>
                         <table className="change-container__table naked-input">

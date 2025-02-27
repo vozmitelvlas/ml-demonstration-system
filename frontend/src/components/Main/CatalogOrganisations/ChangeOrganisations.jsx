@@ -9,7 +9,7 @@ import apiClient from "../../utils/axios.jsx";
 import {getDateFormat} from "../../utils/DateAndTime.jsx";
 import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
-import {ChangeOrganisationModelsSchema, changeOrganisationsSchema} from "../../store/formSchema.jsx";
+import {changeOrganisationsSchema, limitsSchema} from "../../store/formSchema.jsx";
 import ChangeOrganisationsInfo from "./ChangeOrganisationsInfo.jsx";
 import ChangeOrganisationModels from "./ChangeOrganisationModels.jsx";
 
@@ -41,7 +41,7 @@ export default function ChangeOrganisations() {
         resolver: yupResolver(changeOrganisationsSchema)
     })
     const secondForm = useForm({
-        resolver: yupResolver(ChangeOrganisationModelsSchema)
+        resolver: yupResolver(limitsSchema)
     })
 
     useEffect(() => {
@@ -203,7 +203,7 @@ export default function ChangeOrganisations() {
             <DataHeader
                 activeBut={activeBut}
                 setActiveBut={setActiveBut}
-                buttons={["ИНФОРМАЦИЯ", "МОДЕЛИ"]}
+                buttons={["ИНФОРМАЦИЯ", "ЛИМИТ И МОДЕЛИ"]}
                 names={["first", "second"]}>
                 Изменение данных организации
             </DataHeader>
@@ -230,8 +230,7 @@ export default function ChangeOrganisations() {
                     control={secondForm.control}
                     allModels={modelOptions}
                     onSelectModels={onSelectModels}
-                    onSelectLimit={onSelectLimit}
-                >
+                    onSelectLimit={onSelectLimit}>
                 </ChangeOrganisationModels>
             )}
 

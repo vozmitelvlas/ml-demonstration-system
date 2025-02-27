@@ -4,7 +4,7 @@ import CatalogModels from "./components/Main/CatalogModels/CatalogModels.jsx";
 import {Routes, Route, Outlet, Navigate} from "react-router-dom";
 import CatalogUsers from "./components/Main/CatalogUsers/CatalogUsers.jsx";
 import ChangeModelData from "./components/Main/CatalogModels/ChangeModelData.jsx";
-import ChangeUserData from "./components/Main/CatalogUsers/ChangeUserData.jsx";
+import ChangeUser from "./components/Main/CatalogUsers/ChangeUser.jsx";
 import CatalogOrganisations from "./components/Main/CatalogOrganisations/CatalogOrganisations.jsx";
 import ChangeOrganisations from "./components/Main/CatalogOrganisations/ChangeOrganisations.jsx";
 import PersonalCabinet from "./components/Main/PersonalCabinet/PersonalCabinet.jsx";
@@ -69,7 +69,7 @@ function App() {
                     <Route path="/models/:modelId/versions/:versionId/data" element={<ModelData isAdmin={isAdmin}/>}/>
 
                     <Route path="/users" element={<CatalogUsers/>}/>
-                    <Route path="/users/:userId/edit" element={<ChangeUserData/>}/>
+                    <Route path="/users/:userId/edit" element={<ChangeUser/>}/>
 
                     <Route path="/organisation/:orgId" element={<MyOrganisations/>}/>
 

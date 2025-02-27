@@ -66,17 +66,6 @@ export default function ChangeOrganisationModels({
                                             styles={customStyle}
                                         />
                                     )}/>
-
-                                {/*<Select*/}
-                                {/*    className="limits-select naked-input"*/}
-                                {/*    isMulti*/}
-                                {/*    options={options}*/}
-                                {/*    // onChange={handleSelectChange}*/}
-                                {/*    closeMenuOnSelect={false}*/}
-                                {/*    placeholder="Модели"*/}
-                                {/*    isSearchable*/}
-                                {/*    styles={customStyle}*/}
-                                {/*/>*/}
                             </div>
                         </div>
                     </div>
