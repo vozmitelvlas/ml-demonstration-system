@@ -27,10 +27,6 @@ public class UserService {
     private final OrganizationRepository organizationRepository;
     private final JwtService jwtService;
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
-    }
-
     public User getUserById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
@@ -41,7 +37,7 @@ public class UserService {
     }
 
     @Transactional
-    public User createUser(CreateUserRequest request) {
+    public User registerUser(CreateUserRequest request) {
         if (userRepository.existsByLogin(request.login())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Login already exists");
         }
@@ -49,12 +45,12 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
         }
 
-
         List<Role> userRoles = userRepository.findRolesByName(Collections.singletonList("USER"));
         if (userRoles.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Default role USER not found");
         }
 
+        // Default organization
         Organization organization = organizationRepository.findById(4L)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT, "Organization with id 4 does not exist"));
 

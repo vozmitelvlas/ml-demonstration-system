@@ -37,7 +37,7 @@ public class AuthService {
     }
 
     public ResponseEntity<LoginResponse> register(CreateUserRequest createUserRequest) {
-        User user = userService.createUser(createUserRequest);
+        User user = userService.registerUser(createUserRequest);
         String token = jwtService.generateAccessToken(new CustomUserDetails(user));
         ResponseCookie cookie = jwtService.generateAccessTokenCookie(token);
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(new LoginResponse(user, token));

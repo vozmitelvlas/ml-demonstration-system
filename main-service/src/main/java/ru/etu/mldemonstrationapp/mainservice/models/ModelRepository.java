@@ -4,6 +4,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import ru.etu.mldemonstrationapp.mainservice.organizations.Organization;
+
+import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ModelRepository extends JpaRepository<Model, Long> {
@@ -23,4 +27,19 @@ public interface ModelRepository extends JpaRepository<Model, Long> {
             )
             """)
     void deleteModelIfVersionsListEmpty(Long modelId);
+
+
+    @Query("""
+            SELECT m FROM ModelOrganizationLimit mol
+                JOIN mol.model m
+            WHERE mol.organization = :organization
+            """)
+    List<Model> findAllByOrganization(Organization organization);
+
+    @Query("""
+            SELECT m FROM ModelOrganizationLimit mol
+                JOIN mol.model m
+            WHERE mol.organization = :organization AND m.modelId = :id
+            """)
+    Optional<Model> findByIdAndOrganization(Long id, Organization organization);
 }

@@ -6,11 +6,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ru.etu.mldemonstrationapp.mainservice.auth.JwtToken;
-import ru.etu.mldemonstrationapp.mainservice.organizations.dto.ModelOrganizationLimitRequest;
 import ru.etu.mldemonstrationapp.mainservice.organizations.dto.ModelOrganizationLimitResponse;
 import ru.etu.mldemonstrationapp.mainservice.organizations.dto.UpdateLimitsTypeRequest;
 import ru.etu.mldemonstrationapp.mainservice.users.User;
@@ -60,32 +58,12 @@ public class OrganizationController {
 
     @Operation(description = "Change a type of limits for organization members")
     @ApiResponse(useReturnTypeSchema = true, responseCode = "204")
-    @Secured({"ROLE_ORGANIZATION_HEAD", "ROLE_ADMIN"})
     @PutMapping("{id}/limits-type")
     public ResponseEntity<Void> changeLimitType(@PathVariable Long id,
                                                 @AuthenticationPrincipal JwtToken jwtToken,
                                                 @Valid @RequestBody UpdateLimitsTypeRequest updateLimitsTypeRequest) {
         organizationService.updateOrganizationLimitsType(jwtToken.userId(), id, updateLimitsTypeRequest.limitsType());
         return ResponseEntity.noContent().build();
-    }
-
-    @Secured({"ROLE_ORGANIZATION_HEAD", "ROLE_ADMIN"})
-    @PostMapping("/{organizationId}/models")
-    public ResponseEntity<ModelOrganizationLimitResponse> createModelLimit(@PathVariable Long organizationId, @RequestBody ModelOrganizationLimitRequest request) {
-        ModelOrganizationLimit createdLimit = organizationService.createModelLimit(organizationId, request.modelId(), request.limit());
-        ModelOrganizationLimitResponse response = new ModelOrganizationLimitResponse(
-            createdLimit,
-            createdLimit.getModel().getModelId(),
-            createdLimit.getModel().getName(),
-            "/api/organizations/" + organizationId + "/models/" + createdLimit.getModel().getModelId()
-        );
-        return ResponseEntity.ok(response);
-    }
-    
-    @Secured({"ROLE_ORGANIZATION_HEAD", "ROLE_ADMIN"})
-    @PutMapping("/{organizationId}/models/{modelId}/limit")
-    public ResponseEntity<ModelOrganizationLimit> updateModelLimit(@PathVariable Long organizationId, @PathVariable Long modelId, @RequestBody ModelOrganizationLimit limit) {
-        return ResponseEntity.ok(organizationService.updateModelLimit(organizationId, modelId, limit));
     }
     
 }
