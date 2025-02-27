@@ -12,6 +12,9 @@ import {getDateFormat} from "../../utils/DateAndTime.jsx";
 import alarmLogo from "../../../assets/alarm.svg";
 import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx";
 import acceptLogo from "../../../assets/accept.svg"
+import {useForm} from "react-hook-form";
+import {yupResolver} from "@hookform/resolvers/yup";
+import {signUpSchema} from "../../store/formSchema.jsx";
 
 export default function CatalogUsers() {
     const navigate = useNavigate()
@@ -20,8 +23,12 @@ export default function CatalogUsers() {
     const [tmpUserId, setTmpUserId] = useState("")
     const [alarm, setAlarm] = useState(null)
     const [logo, setLogo] = useState(alarmLogo)
-
+    const [isAddingUser, setIsAddingUser] = useState(false)
     const [users, setUsers] = useState([])
+    const {handleSubmit, register, formState: {errors}, reset} = useForm({
+        resolver: yupResolver(signUpSchema)
+    })
+
     useEffect(() => {
         apiClient.get('/api/admin/users').then((res) => {
             setUsers(res.data)
@@ -29,28 +36,22 @@ export default function CatalogUsers() {
             console.error(error)
         })
     }, [isDeletingModel])
+    useEffect(() => {
+        const firstErrorKey = Object.keys(errors)[0];
+        if (firstErrorKey) {
+            setLogo(alarmLogo)
+            setAlarm(errors[firstErrorKey].message)
+        }
+    }, [errors]);
 
-    const closeDeleteModal = () => {
-        setIsDeletingModel(false)
-    }
     const onDeleteUserClick = (event) => {
-        let tr = event.target.closest("tr")
+        const tr = event.target.closest("tr")
 
         setTmpUserId(tr.dataset.id)
         setIsDeletingModel(true)
     }
     const toggleSidebar = () => {
         setIsOpen(!isOpen)
-    };
-
-    const closeAddModal = (event) => {
-        let editModal = event.target.closest(".add-modal-overlay")
-        editModal.classList.add("add-modal-overlay_hidden")
-    }
-    const openAddModal = () => {
-        let editModal = document.querySelector(".add-modal-overlay")
-        editModal.classList.remove("add-modal-overlay_hidden")
-
     };
 
     const onConfirmDeletingUser = async () => {
@@ -62,6 +63,21 @@ export default function CatalogUsers() {
             console.error(error)
         }
         setIsDeletingModel(false)
+    }
+    const onSaveUserData = async (newValue) => {
+        console.log(newValue)
+        newValue["roles"] = ["USER"]
+        newValue["organization"] = ""
+        try {
+            // const res = await apiClient.post(`/api/admin/users`, newValue)
+            // setUsers({...users, res})
+            setAlarm("Пользователь успешно создан")
+            setLogo(acceptLogo)
+            reset({})
+            setIsAddingUser(!isAddingUser)
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     return (
@@ -86,7 +102,10 @@ export default function CatalogUsers() {
                 <CatalogHeader title={"Каталог пользователей"} searchFields={["Почта", "Фамилия"]}></CatalogHeader>
 
                 <div className="options-buttons_up">
-                    <Button onClick={openAddModal}>Добавить пользователя</Button>
+                    <Button onClick={() => {
+                        setIsAddingUser(!isAddingUser)
+                        setAlarm(null)
+                    }}>Добавить пользователя</Button>
                 </div>
                 <AlarmMsg logo={logo} alarm={alarm}></AlarmMsg>
 
@@ -159,51 +178,68 @@ export default function CatalogUsers() {
                 </div>
             </main>
 
-            <div className="add-modal-overlay add-modal-overlay_hidden">
-                <div className="add-user-modal">
+            <div className={`add-modal-overlay ${isAddingUser ? "" : "add-modal-overlay_hidden"}`}>
+                <form onSubmit={handleSubmit(onSaveUserData)} className="add-container">
                     <div className="add-modal__title">
                         <h3>Новый пользователь</h3>
                     </div>
+                    <AlarmMsg logo={logo} alarm={alarm}></AlarmMsg>
                     <table className="change-container__table naked-input">
                         <tbody>
                         <tr>
                             <td>Логин<span> *</span></td>
-                            <td className="text-center"><input type="text" defaultValue={""} required/></td>
+                            <td className="text-center">
+                                <input type="text" {...register("login")} required/>
+                            </td>
                         </tr>
                         <tr>
                             <td>Фамилия<span> *</span></td>
-                            <td className="text-center"><input type="text" defaultValue={""} required/></td>
+                            <td className="text-center">
+                                <input type="text" {...register("lastName")} required/>
+                            </td>
                         </tr>
                         <tr>
                             <td>Имя<span> *</span></td>
-                            <td className="text-center"><input type="text" defaultValue={""} required/></td>
+                            <td className="text-center">
+                                <input type="text" {...register("firstName")} required/>
+                            </td>
                         </tr>
                         <tr>
                             <td>Отчество</td>
-                            <td className="text-center"><input type="text" defaultValue={""}/></td>
+                            <td className="text-center">
+                                <input type="text" {...register("patronymic")}/>
+                            </td>
                         </tr>
                         <tr>
                             <td>E-mail<span> *</span></td>
-                            <td className="text-center"><input type="text" defaultValue={""} required/></td>
+                            <td className="text-center">
+                                <input type="text" {...register("email")} required/>
+                            </td>
                         </tr>
                         <tr>
                             <td>Пароль<span> *</span></td>
-                            <td className="text-center"><input type="text" defaultValue={""} required/></td>
+                            <td className="text-center">
+                                <input type="password" {...register("password")} required/>
+                            </td>
                         </tr>
 
                         <tr>
                             <td>Описание</td>
-                            <td className="text-center"><textarea></textarea></td>
+                            <td className="text-center">
+                                <textarea {...register("description")}></textarea>
+                            </td>
                         </tr>
                         </tbody>
                     </table>
                     <div className="add-user__buttons">
-                        <Button onClick={closeAddModal}>Отмена</Button>
-                        <Button>Сохранить</Button>
+                        <Button type="button" onClick={() => setIsAddingUser(!isAddingUser)}>Отмена</Button>
+                        <Button type="submit">Сохранить</Button>
                     </div>
-                </div>
+                </form>
             </div>
-            <DeleteModal open={isDeletingModel} onNo={closeDeleteModal} onYes={onConfirmDeletingUser}></DeleteModal>
+            <DeleteModal open={isDeletingModel} onNo={() => {
+                setIsDeletingModel(false)
+            }} onYes={onConfirmDeletingUser}></DeleteModal>
         </>
 
     )

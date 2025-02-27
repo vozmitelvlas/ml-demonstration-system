@@ -47,7 +47,6 @@ export default function CatalogOrganisations() {
     }
     const onDeleteOrgClick = (event) => {
         const tr = event.target.closest("tr")
-
         setTmpOrgId(tr.dataset.id)
         setIsDeletingModel(true)
     }
@@ -88,7 +87,6 @@ export default function CatalogOrganisations() {
     const onNewChange = ({target}) => {
         setNewOrgValue({...newOrgValue, [target.name]: target.value})
     }
-
 
     return (
         <>
@@ -166,7 +164,7 @@ export default function CatalogOrganisations() {
                 </div>
 
                 <div className={`add-modal-overlay ${isAddingOrg ? "" : "add-modal-overlay_hidden"}`}>
-                    <form onSubmit={onAddNewOrg} className="new-org__container">
+                    <form onSubmit={onAddNewOrg} className="add-container">
                         <div className="add-modal__title">
                             <h3>Новая организация</h3>
                         </div>
