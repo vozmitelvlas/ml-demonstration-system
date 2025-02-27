@@ -7,7 +7,6 @@ import styles from "./Header.module.css";
 
 export default function Header({login, isAdminMode, setIsAdminMode, isAdmin, isMainOrg, orgId}) {
     const navigate = useNavigate();
-
     const toggleAdminMode = (event) => {
         setIsAdminMode(!isAdminMode)
         sessionStorage.setItem("isAdminMode", !isAdminMode)

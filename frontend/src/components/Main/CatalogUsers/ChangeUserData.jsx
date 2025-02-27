@@ -83,7 +83,8 @@ export default function ChangeUserData() {
         }).catch(error => {
             console.log(error)
         })
-    }, []);
+        setAlarm(null)
+    }, [activeBut]);
     useEffect(() => {
         const firstErrorKey = Object.keys(errors)[0];
         if (firstErrorKey) {
@@ -91,15 +92,12 @@ export default function ChangeUserData() {
             setAlarm(errors[firstErrorKey].message)
         }
     }, [errors]);
-    useEffect(() => {
-        setAlarm(null)
-    }, [activeBut]);
 
-    let closeDeleteModal = () => {
+    const closeDeleteModal = () => {
         setIsDeletingModel(false)
     }
-    let onDeleteModelClick = (event) => {
-        let tr = event.target.closest("tr")
+    const onDeleteModelClick = (event) => {
+        const tr = event.target.closest("tr")
         setIsDeletingModel(true)
     }
     const [selectStyle, setSelectStyles] = useState(customStyle);

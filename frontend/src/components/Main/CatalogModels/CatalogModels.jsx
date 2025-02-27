@@ -23,7 +23,7 @@ const options = [
     {value: 'O2', label: 'Second'}
 ];
 
-export default function CatalogModels({isAdminMode}) {
+export default function CatalogModels({isAdminMode, isAdmin}) {
     const navigate = useNavigate()
     const [isOpen, setIsOpen] = useState(false);
     const [isDeletingModel, setIsDeletingModel] = useState(false)
@@ -33,12 +33,13 @@ export default function CatalogModels({isAdminMode}) {
 
     const [models, setModels] = useState([])
     useEffect(() => {
-        apiClient.get('/api/models/versions').then((res) => {
+        console.log(isAdmin)
+        apiClient.get(isAdmin ? '/api/admin/models/versions' : '/api/models/versions').then((res) => {
             setModels(res.data)
         }).catch(error => {
             console.error(error)
         })
-    }, [isDeletingModel])
+    }, [isDeletingModel, isAdmin])
 
     const closeDeleteModal = () => {
         setIsDeletingModel(false)

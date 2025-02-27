@@ -77,7 +77,7 @@ export default function ChangeModelData() {
         }).catch(error => {
             console.log(error)
         })
-    }, []);
+    }, [activeBut]);
 
     useEffect(() => {
         const firstErrorKey = Object.keys(errors)[0];

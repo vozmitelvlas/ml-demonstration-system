@@ -6,7 +6,7 @@ import styles from "./ModelData.module.css"
 import apiClient from "../../utils/axios.jsx";
 
 
-export default function ModelData() {
+export default function ModelData({isAdmin}) {
     const navigate = useNavigate()
     const {modelId, versionId} = useParams()
     const [activeBut, setActiveBut] = useState("first");
@@ -14,7 +14,7 @@ export default function ModelData() {
     const [modelData, setModelData] = useState({});
     useEffect(() => {
         try {
-            apiClient.get(`/api/models/versions/${versionId}`).then((res) => { // modelId?
+            apiClient.get(isAdmin ? `/api/admin/models/${modelId}/versions/${versionId}` : `/api/models/versions/${versionId}`).then((res) => { // modelId?
                 setModelData(res.data)
             })
         } catch (error) {

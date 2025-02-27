@@ -25,27 +25,20 @@ function App() {
 
     const [isAdmin, setIsAdmin] = useState(false)
     const [isMainOrg, setMainOrg] = useState(false)
-    const [login, setLogin] = useState("")
+    // const [login, setLogin] = useState("")
     const [userData, setUserData] = useState(null)
 
     useEffect(() => {
-        if (userData !== null) {
-            setIsAdmin(userData.roles.includes("ADMIN"))
-            setMainOrg(userData.roles.includes("ORGANIZATION_HEAD"))
-            setLogin(userData?.login)
-
-        } else {
-            const userId = sessionStorage.getItem("userId")
-            if (userId) {
-                apiClient.get(`/api/users/${userId}`)
-                    .then((res) => {
-                        setUserData(res.data)
-                        if(res.data.roles.includes("ADMIN")) setIsAdminMode(sessionStorage.getItem("isAdminMode"))
-                    })
-                    .catch(error => {
-                        console.error(error)
-                    })
-            }
+        if (userData === null && !excludedPaths.includes(location.pathname)) {
+            apiClient.get(`/api/users/profile`)
+                .then((res) => {
+                    setUserData(res.data)
+                    setIsAdmin(res.data.roles.includes("ADMIN"))
+                    setMainOrg(res.data.roles.includes("ORGANIZATION_HEAD"))
+                })
+                .catch(error => {
+                    console.error(error)
+                })
         }
     }, [userData]);
 
@@ -55,7 +48,7 @@ function App() {
             {
                 !excludedPaths.includes(location.pathname) &&
                 <Header
-                    login={login}
+                    login={userData?.login}
                     isMainOrg={isMainOrg}
                     isAdmin={isAdmin}
                     isAdminMode={isAdminMode}
@@ -65,15 +58,15 @@ function App() {
             }
             <div className={styles.mainContent}>
                 <Routes>
-                    <Route path="/" element={<SignIn setUserData={setUserData}/>}/>
+                    <Route path="/" element={<SignIn setUserData={setUserData} setIsAdmin={setIsAdmin} setMainOrg={setMainOrg} />}/>
                     <Route path="/signup" element={<SignUp setUserData={setUserData}/>}/>
                     <Route path="/password" element={<PasswordRecover/>}/>
 
                     <Route path="/profile" element={<PersonalCabinet userData={userData} setUserData={setUserData}/>}/>
-                    <Route path="/models" element={<CatalogModels isAdminMode={isAdminMode}/>}/>
+                    <Route path="/models" element={<CatalogModels isAdminMode={isAdminMode} isAdmin={isAdmin}/>}/>
 
                     <Route path="/models/:modelId/versions/:versionId/edit" element={<ChangeModelData/>}/>
-                    <Route path="/models/:modelId/versions/:versionId/data" element={<ModelData/>}/>
+                    <Route path="/models/:modelId/versions/:versionId/data" element={<ModelData isAdmin={isAdmin}/>}/>
 
                     <Route path="/users" element={<CatalogUsers/>}/>
                     <Route path="/users/:userId/edit" element={<ChangeUserData/>}/>

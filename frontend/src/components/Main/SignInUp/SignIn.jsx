@@ -6,7 +6,7 @@ import {useForm} from 'react-hook-form';
 import {yupResolver} from '@hookform/resolvers/yup';
 import {signInSchema} from "../../store/formSchema.jsx";
 
-export default function SignIn({setUserData}) {
+export default function SignIn({setUserData, setIsAdmin, setMainOrg}) {
     const navigate = useNavigate()
     const {
         register,
@@ -28,8 +28,11 @@ export default function SignIn({setUserData}) {
         try {
             const res = await axios.post('http://localhost:8080/api/auth/login', formData)
             setUserData(res.data.user)
+            setIsAdmin(res.data.user.roles.includes("ADMIN"))
+            setMainOrg(res.data.user.roles.includes("ORGANIZATION_HEAD"))
+
             sessionStorage.setItem("accessToken", res.data.accessToken)
-            sessionStorage.setItem("userId", res.data.user.userId)
+
             navigate("/models")
         } catch (error) {
             if (error.response?.status === 401) {

@@ -57,7 +57,7 @@ export default function PersonalCabinet({userData, setUserData}) {
     }
     useEffect(() => {
         if (!userData) {
-            apiClient.get(`/api/users/${sessionStorage.getItem("userId")}`).then((res) => {
+            apiClient.get(`/api/users/profile`).then((res) => {
                 setUserData(res.data)
                 reset({
                     login: res.data?.login,
@@ -76,7 +76,7 @@ export default function PersonalCabinet({userData, setUserData}) {
 
     const onSaveUserData = async (newUserData) => {
         try {
-            const res = await apiClient.put(`/api/admin/users/${userData.userId}`, {
+            const res = await apiClient.put(`/api/users/profile`, {
                 ...newUserData,
                 roles: userData.roles
             })
