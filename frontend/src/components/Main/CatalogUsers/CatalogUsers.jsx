@@ -25,7 +25,12 @@ export default function CatalogUsers() {
     const [logo, setLogo] = useState(alarmLogo)
     const [isAddingUser, setIsAddingUser] = useState(false)
     const [users, setUsers] = useState([])
-    const {handleSubmit, register, formState: {errors}, reset} = useForm({
+    const {
+        register,
+        handleSubmit,
+        formState: {errors},
+        reset
+    } = useForm({
         resolver: yupResolver(signUpSchema)
     })
 
@@ -36,6 +41,7 @@ export default function CatalogUsers() {
             console.error(error)
         })
     }, [isDeletingModel])
+
     useEffect(() => {
         const firstErrorKey = Object.keys(errors)[0];
         if (firstErrorKey) {
@@ -65,18 +71,25 @@ export default function CatalogUsers() {
         setIsDeletingModel(false)
     }
     const onSaveUserData = async (newValue) => {
-        console.log(newValue)
         newValue["roles"] = ["USER"]
-        newValue["organization"] = ""
+        newValue["organizationId"] = 4
         try {
-            // const res = await apiClient.post(`/api/admin/users`, newValue)
-            // setUsers({...users, res})
+            const res = await apiClient.post(`/api/admin/users`, newValue)
+            const tmpUsers = [...users]
+            tmpUsers.push(res.data)
+
+            setUsers(tmpUsers)
             setAlarm("Пользователь успешно создан")
             setLogo(acceptLogo)
             reset({})
             setIsAddingUser(!isAddingUser)
         } catch (error) {
-            console.log(error)
+            if (error.response?.status === 409) {
+                setLogo(alarmLogo)
+                setAlarm("Пользователь уже существует")
+            } else {
+                console.log(error)
+            }
         }
     }
 
