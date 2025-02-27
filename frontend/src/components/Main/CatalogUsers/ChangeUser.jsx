@@ -90,6 +90,7 @@ export default function ChangeUser() {
 
         setAlarm(null)
     }, [activeBut]);
+
     useEffect(() => {
         if (activeBut === "first") {
             const firstErrorKey1 = Object.keys(firstForm.formState.errors)[0];
@@ -116,11 +117,14 @@ export default function ChangeUser() {
         setSelectStyles((prev) => secondStyle(prev));
     }
     const onSaveUserData = async (newUserData) => {
+        console.log(newUserData)
         newUserData["organizationId"] = newUserData.organization.value
         newUserData["roles"] = newUserData["selectRoles"].map(role => role.value)
 
         try {
-            await apiClient.put(`/api/admin/users/${userId}`, newUserData);
+            const res = await apiClient.put(`/api/admin/users/${userId}`, newUserData);
+
+            setUserData(res.data)
             setLogo(acceptLogo)
             setAlarm('Изменения сохранены')
         } catch (error) {

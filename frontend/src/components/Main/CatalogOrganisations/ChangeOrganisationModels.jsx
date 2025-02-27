@@ -86,7 +86,7 @@ export default function ChangeOrganisationModels({
                                 <th className="text-center">
                                     <strong>Лимит запросов/нед</strong>
                                 </th>
-                                <th></th>
+                                {/*<th></th>*/}
                             </tr>
                             </thead>
                             <tbody>
@@ -100,11 +100,11 @@ export default function ChangeOrganisationModels({
                                     <td className="text-center">
                                         <input type="text" {...register(`requestsPerWeek${model.modelId}`)}/>
                                     </td>
-                                    <td className="text-center">
-                                        <a className="a-img" onClick={onDeleteModelClick}>
-                                            <img src={deleteLogo}></img>
-                                        </a>
-                                    </td>
+                                    {/*<td className="text-center">*/}
+                                    {/*    <a className="a-img" onClick={onDeleteModelClick}>*/}
+                                    {/*        <img src={deleteLogo}></img>*/}
+                                    {/*    </a>*/}
+                                    {/*</td>*/}
                                 </tr>
                             ))}
                             </tbody>

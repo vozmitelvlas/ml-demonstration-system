@@ -45,6 +45,7 @@ export default function ChangeOrganisations() {
     })
 
     useEffect(() => {
+        console.log("hihihi")
         apiClient.get(`/api/admin/organizations/${orgId}`).then(res => {
             setDisplayData({
                 createdAt: getDateFormat(new Date(res.data.createdAt))
@@ -53,9 +54,7 @@ export default function ChangeOrganisations() {
                 name: res.data.name,
                 description: res.data.description,
             })
-
-            if (limitsType === null)
-                setLimitsType(limitOptions.find(limit => limit.value === res.data.limitsType))
+            setLimitsType(limitOptions.find(limit => limit.value === res.data.limitsType))
         }).catch(error => {
             console.log(error)
         })
@@ -72,12 +71,10 @@ export default function ChangeOrganisations() {
 
         apiClient.get(`/api/admin/organizations/${orgId}/models`).then(res => {
             const formatOrgModels = {}
-            res.data.forEach(model =>
-                ['rps', 'requestsPerWeek'].forEach(prop =>
-                    formatOrgModels[`${prop}${model.modelId}`] =
-                        secondForm.getValues()[`${prop}${model.modelId}`] ??
-                        model.limit[prop].toString()
-                )
+            res.data.forEach(model => {
+                    formatOrgModels[`rps${model.modelId}`] = model.limit.rps.toString()
+                    formatOrgModels[`requestsPerWeek${model.modelId}`] = model.limit.requestsPerWeek.toString()
+                }
             );
             setOrgModels(res.data.sort((a, b) => a.modelId - b.modelId))
             secondForm.reset({
@@ -89,7 +86,9 @@ export default function ChangeOrganisations() {
             console.log(error)
         })
         setIsDataSave(false)
-    }, [activeBut, isDeletingModel, isDataSave])
+        setAlarm(null)
+    }, [activeBut])
+
     useEffect(() => {
         if (activeBut === "first") {
             const firstErrorKey1 = Object.keys(firstForm.formState.errors)[0];
@@ -105,28 +104,7 @@ export default function ChangeOrganisations() {
             }
         }
     }, [firstForm.formState.errors, secondForm.formState.errors]);
-    useEffect(() => {
-        setAlarm(null)
-    }, [activeBut]);
 
-    const closeDeleteModal = () => {
-        setIsDeletingModel(false)
-    }
-    const onDeleteModelClick = (event) => {
-        const tr = event.target.closest("tr")
-        setIdModelForDelete(tr.dataset.id)
-        setIsDeletingModel(true)
-    }
-    const onConfirmDeletingModel = async () => {
-        try {
-            await apiClient.delete(`/api/admin/organizations/${orgId}/models/${idModelForDelete}`)
-            setAlarm("Модель успешно удалена из организации")
-            setLogo(acceptLogo)
-            setIsDeletingModel(false)
-        } catch (error) {
-            console.log(error)
-        }
-    }
     const onSelectLimit = (newValue) => {
         setLimitsType(newValue)
         setAlarm(null)
@@ -138,6 +116,9 @@ export default function ChangeOrganisations() {
                     !newValue.some(firstItem => firstItem.value === secondItem.modelId))
                 for (let i = 0; i < selectModelsForDelete.length; i++) {
                     await apiClient.delete(`/api/admin/organizations/${orgId}/models/${selectModelsForDelete[i].modelId}`)
+
+                    setOrgModels(orgModels.filter(secondItem =>
+                        newValue.some(firstItem => firstItem.value === secondItem.modelId)))
                 }
             } else if (newValue.length > orgModels.length) {
                 const selectModelsForAdd = newValue.filter(firstItem =>
@@ -145,10 +126,20 @@ export default function ChangeOrganisations() {
                 )
                 for (let i = 0; i < selectModelsForAdd.length; i++) {
                     const fulModel = allModels.find(item => item.modelId === selectModelsForAdd[i].value)
-                    await apiClient.post(`/api/admin/organizations/${orgId}/models`, fulModel)
+                    const res = await apiClient.post(`/api/admin/organizations/${orgId}/models`, fulModel)
+
+                    setOrgModels(prevState => ([
+                        ...prevState,
+                        res.data
+                    ]))
+                    secondForm.reset(prev => ({
+                        ...prev,
+                        [`rps${res.data.modelId}`]: res.data.limit.rps.toString(),
+                        [`requestsPerWeek${res.data.modelId}`]: res.data.limit.requestsPerWeek.toString()
+                    }))
                 }
             }
-            setIsDataSave(true)
+            // setIsDataSave(true)
             setAlarm(null)
         } catch (error) {
             console.log(error)
@@ -156,7 +147,6 @@ export default function ChangeOrganisations() {
     }
 
     const onSaveOrgData = async (newOrgData) => {
-        console.log(newOrgData)
         try {
             await apiClient.put(`/api/admin/organizations/${orgId}`, newOrgData)
             setAlarm("Изменения сохранены")
@@ -169,7 +159,7 @@ export default function ChangeOrganisations() {
         }
     }
     const onSaveModelLimits = async (newValue) => {
-        console.log(orgModels)
+        console.log("newValue", newValue)
         try {
             await apiClient.put(`/api/admin/organizations/${orgId}/limits-type`, {limitsType: newValue.limitsType.value})
 
@@ -187,9 +177,11 @@ export default function ChangeOrganisations() {
                     return [newKey, value];
                 });
 
-                const chunkAsObject = Object.fromEntries(trueChunk);
-
-                await apiClient.put(`/api/admin/organizations/${Number(orgId)}/models/${Number(modelId)}/limit`, chunkAsObject)
+                if (orgModels.find(model => model.modelId === Number(modelId))) {
+                    const chunkAsObject = Object.fromEntries(trueChunk);
+                    console.log("chunkAsObject", chunkAsObject)
+                    await apiClient.put(`/api/admin/organizations/${Number(orgId)}/models/${Number(modelId)}/limit`, chunkAsObject)
+                }
             }
             setLogo(acceptLogo)
             setAlarm("Изменения сохранены")
@@ -226,19 +218,12 @@ export default function ChangeOrganisations() {
                     handleSubmit={secondForm.handleSubmit}
                     submitFunction={onSaveModelLimits}
                     limitOptions={limitOptions}
-                    onDeleteModelClick={onDeleteModelClick}
                     control={secondForm.control}
                     allModels={modelOptions}
                     onSelectModels={onSelectModels}
                     onSelectLimit={onSelectLimit}>
                 </ChangeOrganisationModels>
             )}
-
-            <DeleteModal
-                open={isDeletingModel}
-                onNo={closeDeleteModal}
-                onYes={onConfirmDeletingModel}
-            ></DeleteModal>
         </div>
     )
 }
