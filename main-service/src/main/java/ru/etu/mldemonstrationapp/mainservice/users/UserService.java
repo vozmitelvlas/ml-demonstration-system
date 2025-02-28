@@ -11,9 +11,9 @@ import org.springframework.web.server.ResponseStatusException;
 import ru.etu.mldemonstrationapp.mainservice.auth.JwtService;
 import ru.etu.mldemonstrationapp.mainservice.organizations.Organization;
 import ru.etu.mldemonstrationapp.mainservice.organizations.OrganizationRepository;
-import ru.etu.mldemonstrationapp.mainservice.users.dto.UserRegistrationRequest;
+import ru.etu.mldemonstrationapp.mainservice.users.dto.UpdatePasswordRequest;
 import ru.etu.mldemonstrationapp.mainservice.users.dto.UpdateProfileRequest;
-import ru.etu.mldemonstrationapp.mainservice.users.dto.UpdateUserRequest;
+import ru.etu.mldemonstrationapp.mainservice.users.dto.UserRegistrationRequest;
 
 import java.util.Collections;
 import java.util.List;
@@ -69,7 +69,7 @@ public class UserService {
     }
 
     @Transactional
-    public User updateUser(Long id, UpdateUserRequest request) {
+    public User updateUser(Long id, UpdateProfileRequest request) {
         User user = getUserById(id);
         user.setFirstName(request.firstName());
         user.setLastName(request.lastName());
@@ -79,7 +79,7 @@ public class UserService {
     }
 
     @Transactional
-    public void updateUserPassword(Long id, UpdateProfileRequest request) {
+    public void updateUserPassword(Long id, UpdatePasswordRequest request) {
         User user = userRepository.findById(id).orElseThrow();
         if (passwordEncoder.matches(request.oldPassword(), user.getPassword())) {
             user.setPassword(passwordEncoder.encode(request.newPassword()));
