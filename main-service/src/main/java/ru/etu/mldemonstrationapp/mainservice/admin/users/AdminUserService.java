@@ -9,6 +9,7 @@ import org.springframework.web.server.ResponseStatusException;
 import ru.etu.mldemonstrationapp.mainservice.admin.users.dto.CreateUserRequest;
 import ru.etu.mldemonstrationapp.mainservice.admin.users.dto.ModelUserLimitResponse;
 import ru.etu.mldemonstrationapp.mainservice.admin.users.dto.UpdateUserRequest;
+import ru.etu.mldemonstrationapp.mainservice.models.Limit;
 import ru.etu.mldemonstrationapp.mainservice.models.LimitRepository;
 import ru.etu.mldemonstrationapp.mainservice.models.Model;
 import ru.etu.mldemonstrationapp.mainservice.models.ModelRepository;
@@ -23,7 +24,6 @@ import ru.etu.mldemonstrationapp.mainservice.users.UserRepository;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -46,19 +46,16 @@ public class AdminUserService {
     public List<ModelUserLimitResponse> getAllUserLimits(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with id %s not found".formatted(userId)));
 
-        // Get organization limits for those models that do not have user limits
-        List<ModelOrganizationLimit> modelOrganizationLimits = limitRepository.findAllByOrganizationWhereModelNotInList(
-                user.getOrganization(), user.getLimits().stream().map(ModelUserLimit::getModel).toList()
-        );
+        var limits = limitRepository.findLimitsForUser(user);
+        return limits.stream().map(result -> {
+            var organizationLimit = (ModelOrganizationLimit) result[0];
+            var userLimit = (ModelUserLimit) result[1];
+            return ModelUserLimitResponse.fromLimitAndModel(
+                    userLimit == null ? organizationLimit : userLimit,
+                    organizationLimit.getModel()
+            );
 
-        var organizationLimitsResponses = modelOrganizationLimits.stream().map(limit -> ModelUserLimitResponse.fromLimitAndModel(limit, limit.getModel()));
-        var userLimits = user.getLimits().stream().map(limit -> ModelUserLimitResponse.fromLimitAndModel(limit, limit.getModel()));
-
-        /*
-            Return a list of limits that containing all ModelUserLimits for the user
-            and ModelOrganizationLimits for all models available to the user's organization
-         */
-        return Stream.concat(organizationLimitsResponses, userLimits).toList();
+        }).toList();
     }
 
     @Transactional
@@ -105,7 +102,7 @@ public class AdminUserService {
         user.setPatronymic(dto.patronymic());
         user.setDescription(dto.description());
 
-        if (dto.organizationId() != null) {
+        if (!user.getOrganization().getOrganizationId().equals(dto.organizationId())) {
             // Проверка на существование организации при обновлении
             Organization organization = organizationRepository.findById(dto.organizationId())
                     .orElseThrow(() -> new ResponseStatusException(
@@ -113,6 +110,9 @@ public class AdminUserService {
                             "Organization with id %s does not exist".formatted(dto.organizationId())
                     ));
             user.setOrganization(organization);
+
+            // Delete all user limits due to changing of available models list
+            limitRepository.deleteAllByIdInBatch(user.getLimits().stream().map(Limit::getLimitId).toList());
         }
 
         // Обновление ролей
