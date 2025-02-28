@@ -3,10 +3,10 @@ import Header from "./components/Header/Header.jsx";
 import CatalogModels from "./components/Main/CatalogModels/CatalogModels.jsx";
 import {Routes, Route, Outlet, Navigate} from "react-router-dom";
 import CatalogUsers from "./components/Main/CatalogUsers/CatalogUsers.jsx";
-import ChangeModelData from "./components/Main/CatalogModels/ChangeModelData.jsx";
+import ChangeModel from "./components/Main/CatalogModels/ChangeModel.jsx";
 import ChangeUser from "./components/Main/CatalogUsers/ChangeUser.jsx";
 import CatalogOrganisations from "./components/Main/CatalogOrganisations/CatalogOrganisations.jsx";
-import ChangeOrganisations from "./components/Main/CatalogOrganisations/ChangeOrganisations.jsx";
+import ChangeOrganisation from "./components/Main/CatalogOrganisations/ChangeOrganisation.jsx";
 import PersonalCabinet from "./components/Main/PersonalCabinet/PersonalCabinet.jsx";
 import SignIn from "./components/Main/SignInUp/SignIn.jsx";
 import {useLocation} from 'react-router-dom';
@@ -65,7 +65,7 @@ function App() {
                     <Route path="/profile" element={<PersonalCabinet userData={userData} setUserData={setUserData}/>}/>
                     <Route path="/models" element={<CatalogModels isAdminMode={isAdminMode} isAdmin={isAdmin}/>}/>
 
-                    <Route path="/models/:modelId/versions/:versionId/edit" element={<ChangeModelData/>}/>
+                    <Route path="/models/:modelId/versions/:versionId/edit" element={<ChangeModel/>}/>
                     <Route path="/models/:modelId/versions/:versionId/data" element={<ModelData isAdmin={isAdmin}/>}/>
 
                     <Route path="/users" element={<CatalogUsers/>}/>
@@ -74,7 +74,7 @@ function App() {
                     <Route path="/organisation/:orgId" element={<MyOrganisations/>}/>
 
                     <Route path="/organisations" element={<CatalogOrganisations/>}/>
-                    <Route path="/organisations/:orgId/edit" element={<ChangeOrganisations/>}/>
+                    <Route path="/organisations/:orgId/edit" element={<ChangeOrganisation/>}/>
                 </Routes>
             </div>
         </div>

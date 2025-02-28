@@ -9,7 +9,7 @@ import {getDateFormat} from "../../utils/DateAndTime.jsx";
 import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
 import {changeOrganisationsSchema, limitsSchema} from "../../store/formSchema.jsx";
-import ChangeOrganisationsInfo from "./ChangeOrganisationsInfo.jsx";
+import ChangeOrganisationInfo from "./ChangeOrganisationInfo.jsx";
 import ChangeOrganisationModels from "./ChangeOrganisationModels.jsx";
 
 const limitOptions = [
@@ -21,7 +21,7 @@ const orgDataForDisplay = {
     createdAt: "",
 }
 
-export default function ChangeOrganisations() {
+export default function ChangeOrganisation() {
     const {orgId} = useParams()
     const [activeBut, setActiveBut] = useState("first")
     const [displayData, setDisplayData] = useState(orgDataForDisplay)
@@ -40,7 +40,6 @@ export default function ChangeOrganisations() {
     })
 
     useEffect(() => {
-        console.log("hihihi")
         apiClient.get(`/api/admin/organizations/${orgId}`).then(res => {
             setDisplayData({
                 createdAt: getDateFormat(new Date(res.data.createdAt))
@@ -168,10 +167,8 @@ export default function ChangeOrganisations() {
                     modelId = lastChar
                     return [newKey, value];
                 });
-
                 if (orgModels.find(model => model.modelId === Number(modelId))) {
                     const chunkAsObject = Object.fromEntries(trueChunk);
-                    console.log("chunkAsObject", chunkAsObject)
                     await apiClient.put(`/api/admin/organizations/${Number(orgId)}/models/${Number(modelId)}/limit`, chunkAsObject)
                 }
             }
@@ -195,12 +192,12 @@ export default function ChangeOrganisations() {
             <AlarmMsg logo={logo}>{alarm}</AlarmMsg>
 
             {activeBut === "first" && (
-                <ChangeOrganisationsInfo
+                <ChangeOrganisationInfo
                     register={firstForm.register}
                     handleSubmit={firstForm.handleSubmit}
                     submitFunction={onSaveOrgData}
                     displayData={displayData}>
-                </ChangeOrganisationsInfo>
+                </ChangeOrganisationInfo>
             )}
 
             {activeBut === "second" && (

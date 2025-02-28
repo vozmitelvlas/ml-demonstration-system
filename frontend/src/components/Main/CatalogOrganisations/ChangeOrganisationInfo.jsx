@@ -3,7 +3,7 @@ import React from "react";
 import {useNavigate} from "react-router-dom";
 
 
-export default function ChangeOrganisationsInfo({submitFunction, handleSubmit, displayData, register}) {
+export default function ChangeOrganisationInfo({submitFunction, handleSubmit, displayData, register}) {
     const navigate = useNavigate()
     return (
         <>

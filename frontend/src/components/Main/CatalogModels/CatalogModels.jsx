@@ -34,7 +34,6 @@ export default function CatalogModels({isAdminMode, isAdmin}) {
 
     const [models, setModels] = useState([])
     useEffect(() => {
-        console.log(isAdmin)
         apiClient.get(isAdmin ? '/api/admin/models/versions' : '/api/models/versions').then((res) => {
             setModels(res.data)
         }).catch(error => {
@@ -61,17 +60,6 @@ export default function CatalogModels({isAdminMode, isAdmin}) {
         setIsDeletingModel(false)
     }
 
-    const toggleSidebar = () => {
-        setIsOpen(!isOpen);
-    };
-    const closeAddModal = (event) => {
-        let addModal = event.target.closest(".add-modal-overlay")
-        addModal.classList.add("add-modal-overlay_hidden")
-    }
-    const openAddModal = () => {
-        let addModal = document.querySelector(".add-modal-overlay")
-        addModal.classList.remove("add-modal-overlay_hidden")
-    }
     const handleNewModelClick = () => {
         navigate("models/edit")
     }
@@ -113,7 +101,7 @@ export default function CatalogModels({isAdminMode, isAdmin}) {
                 <div className="options-buttons_up">
                     {isAdminMode && (
                         <div>
-                            <Button onClick={openAddModal}>Добавить модель</Button>
+                            <Button onClick={() => {setIsAddingModel(!isAddingModel)}}>Добавить модель</Button>
                             <Button>Импорт</Button>
                             <Button>Экспорт</Button>
                         </div>
@@ -183,7 +171,7 @@ export default function CatalogModels({isAdminMode, isAdmin}) {
                 </div>
 
                 <div className="options-buttons">
-                    <Button classNames="filter-button" onClick={toggleSidebar}>Фильтр</Button>
+                    <Button classNames="filter-button" onClick={() => {setIsOpen(!isOpen)}}>Фильтр</Button>
                     {isAdminMode && (
                         <div className="options-buttons_right-down">
                             <Button onClick={() => {
@@ -212,8 +200,6 @@ export default function CatalogModels({isAdminMode, isAdmin}) {
                                     <td>Название<span> *</span></td>
                                     <td className="text-center"><input type="text" defaultValue={""} required/></td>
                                 </tr>
-
-
                                 <tr onMouseEnter={setFirstMultiBackColor} onMouseLeave={setSecondMultiBackColor}>
                                     <td>Тип задачи<span> *</span></td>
                                     <td>
@@ -236,7 +222,7 @@ export default function CatalogModels({isAdminMode, isAdmin}) {
                             </table>
                         </div>
                         <div className="delete-modal__buttons">
-                            <Button onClick={closeAddModal}>Отмена</Button>
+                            <Button onClick={() => {setIsAddingModel(!isAddingModel)}}>Отмена</Button>
                             <Button onClick={handleNewModelClick}>Добавить</Button>
                         </div>
                     </form>
