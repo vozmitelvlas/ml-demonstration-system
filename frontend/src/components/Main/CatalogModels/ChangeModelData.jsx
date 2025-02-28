@@ -124,7 +124,7 @@ export default function ChangeModelData() {
                 Изменение данных модели
             </DataHeader>
 
-            <AlarmMsg logo={logo} alarm={alarm}></AlarmMsg>
+            <AlarmMsg logo={logo}>{alarm}</AlarmMsg>
 
             {activeBut === "first" && (
                 <form onSubmit={handleSubmit(onSaveModelData)} className="change-content">

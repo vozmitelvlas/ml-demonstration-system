@@ -1,7 +1,6 @@
 import DataHeader from "../Headers/DataHeader.jsx";
 import React, {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
-import DeleteModal from "../../utils/DeleteModal.jsx";
 import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx";
 import acceptLogo from "../../../assets/accept.svg"
 import alarmLogo from "../../../assets/alarm.svg"
@@ -25,17 +24,13 @@ const orgDataForDisplay = {
 export default function ChangeOrganisations() {
     const {orgId} = useParams()
     const [activeBut, setActiveBut] = useState("first")
-    const [isDeletingModel, setIsDeletingModel] = useState(false)
     const [displayData, setDisplayData] = useState(orgDataForDisplay)
     const [alarm, setAlarm] = useState(null)
     const [logo, setLogo] = useState(alarmLogo)
-    const [idModelForDelete, setIdModelForDelete] = useState("")
     const [orgModels, setOrgModels] = useState([])
     const [limitsType, setLimitsType] = useState(null)
-
     const [modelOptions, setModelOptions] = useState([])
     const [allModels, setAllModels] = useState([])
-    const [isDataSave, setIsDataSave] = useState(false)
 
     const firstForm = useForm({
         resolver: yupResolver(changeOrganisationsSchema)
@@ -85,7 +80,6 @@ export default function ChangeOrganisations() {
         }).catch(error => {
             console.log(error)
         })
-        setIsDataSave(false)
         setAlarm(null)
     }, [activeBut])
 
@@ -139,7 +133,6 @@ export default function ChangeOrganisations() {
                     }))
                 }
             }
-            // setIsDataSave(true)
             setAlarm(null)
         } catch (error) {
             console.log(error)
@@ -159,7 +152,6 @@ export default function ChangeOrganisations() {
         }
     }
     const onSaveModelLimits = async (newValue) => {
-        console.log("newValue", newValue)
         try {
             await apiClient.put(`/api/admin/organizations/${orgId}/limits-type`, {limitsType: newValue.limitsType.value})
 
@@ -200,7 +192,7 @@ export default function ChangeOrganisations() {
                 Изменение данных организации
             </DataHeader>
 
-            <AlarmMsg logo={logo} alarm={alarm}></AlarmMsg>
+            <AlarmMsg logo={logo}>{alarm}</AlarmMsg>
 
             {activeBut === "first" && (
                 <ChangeOrganisationsInfo

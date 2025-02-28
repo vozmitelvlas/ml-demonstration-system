@@ -80,7 +80,7 @@ export default function MyOrganisations() {
                                     styles={customStyle}
                                 />
                                 <button type="submit" className={styles.button}>Сохранить</button>
-                                <AlarmMsg logo={logo} alarm={alarm}></AlarmMsg>
+                                <AlarmMsg logo={logo}>{alarm}</AlarmMsg>
                             </div>
                         </form>
                     </div>

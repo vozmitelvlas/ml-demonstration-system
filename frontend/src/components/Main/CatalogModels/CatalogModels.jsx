@@ -30,6 +30,7 @@ export default function CatalogModels({isAdminMode, isAdmin}) {
     const [tmpModelId, setTmpModelId] = useState([])
     const [alarm, setAlarm] = useState(null)
     const [logo, setLogo] = useState(alarmLogo)
+    const [isAddingModel, setIsAddingModel] = useState(false)
 
     const [models, setModels] = useState([])
     useEffect(() => {
@@ -119,7 +120,7 @@ export default function CatalogModels({isAdminMode, isAdmin}) {
                     )}
                 </div>
 
-                <AlarmMsg logo={logo} alarm={alarm}></AlarmMsg>
+                <AlarmMsg logo={logo}>{alarm}</AlarmMsg>
 
                 <div className="catalog-models">
                     <table className="table-fill">
@@ -198,11 +199,12 @@ export default function CatalogModels({isAdminMode, isAdmin}) {
                     )}
                 </div>
 
-                <div className="add-modal-overlay add-modal-overlay_hidden">
-                    <div className="add-user-modal">
+                <div className={`add-modal-overlay ${isAddingModel ? "" : "add-modal-overlay_hidden"}`}>
+                    <form className="add-container">
                         <div className="add-modal__title">
                             <h3>Новая модель</h3>
                         </div>
+                        <AlarmMsg logo={logo}>{alarm}</AlarmMsg>
                         <div className="add-modal__table">
                             <table className="change-container__table naked-input">
                                 <tbody>
@@ -237,10 +239,13 @@ export default function CatalogModels({isAdminMode, isAdmin}) {
                             <Button onClick={closeAddModal}>Отмена</Button>
                             <Button onClick={handleNewModelClick}>Добавить</Button>
                         </div>
-                    </div>
+                    </form>
                 </div>
-                <DeleteModal open={isDeletingModel} onNo={closeDeleteModal}
-                             onYes={onConfirmDeletingModel}></DeleteModal>
+                <DeleteModal
+                    open={isDeletingModel}
+                    onNo={closeDeleteModal}
+                    onYes={onConfirmDeletingModel}>
+                </DeleteModal>
             </main>
         </>
     )

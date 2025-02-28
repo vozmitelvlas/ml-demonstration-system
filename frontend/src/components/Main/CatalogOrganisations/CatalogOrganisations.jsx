@@ -53,7 +53,6 @@ export default function CatalogOrganisations() {
     const onAddNewOrg = async (event) => {
         event.preventDefault()
         if(newOrgValue.name.length > 3){
-            console.log(newOrgValue)
             try {
                 await apiClient.post("/api/admin/organizations", newOrgValue)
                 setIsAddingOrg(!isAddingOrg)
@@ -110,7 +109,7 @@ export default function CatalogOrganisations() {
                     }}>Добавить организацию</Button>
                 </div>
 
-                <AlarmMsg logo={logo} alarm={alarm}></AlarmMsg>
+                <AlarmMsg logo={logo}>{alarm}</AlarmMsg>
                 <div className="catalog-orgs">
                     <table className="table-fill table-organisation">
                         <thead>
@@ -168,7 +167,7 @@ export default function CatalogOrganisations() {
                         <div className="add-modal__title">
                             <h3>Новая организация</h3>
                         </div>
-                        <AlarmMsg logo={logo} alarm={alarm}></AlarmMsg>
+                        <AlarmMsg logo={logo}>{alarm}</AlarmMsg>
                         <div className="add-modal__table">
                             <table className="change-container__table naked-input">
                                 <tbody>

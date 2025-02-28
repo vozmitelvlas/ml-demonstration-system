@@ -1,12 +1,12 @@
 import styles from "./AlarmMsg.module.css";
 import React from "react";
 
-export const AlarmMsg = ({logo, alarm}) => (
+export const AlarmMsg = ({logo, children}) => (
     <div className={styles.alarmContainer}>
-        {alarm &&
+        {children &&
             <b className={styles.alarm}>
                 <a className="a-img"><img src={logo}/></a>
-                {alarm}
+                {children}
             </b>
         }
     </div>

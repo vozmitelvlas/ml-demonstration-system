@@ -166,7 +166,7 @@ export default function ChangeUser() {
                 Изменение данных пользователя
             </DataHeader>
 
-            <AlarmMsg logo={logo} alarm={alarm}></AlarmMsg>
+            <AlarmMsg logo={logo}>{alarm}</AlarmMsg>
 
             {activeBut === "first" && (
                 <ChangeUserInfo

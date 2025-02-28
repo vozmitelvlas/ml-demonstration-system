@@ -66,13 +66,12 @@ export default function PersonalCabinet({userData, setUserData}) {
                     firstName: res.data?.firstName,
                     patronymic: res.data?.patronymic,
                     description: res.data?.description
-
                 })
             }).catch(error => {
                 console.error(error)
             })
         }
-    }, [userData]);
+    }, []);
 
     const onSaveUserData = async (newUserData) => {
         try {

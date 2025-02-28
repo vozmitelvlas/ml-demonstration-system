@@ -4,6 +4,7 @@ import {useNavigate} from "react-router-dom";
 import exit from "../../assets/exit.svg";
 import menu from "../../assets/menu.svg";
 import styles from "./Header.module.css";
+import icon from "../../assets/icon.svg"
 
 export default function Header({login, isAdminMode, setIsAdminMode, isAdmin, isMainOrg, orgId}) {
     const navigate = useNavigate();
@@ -26,10 +27,20 @@ export default function Header({login, isAdminMode, setIsAdminMode, isAdmin, isM
 
     return (
         <header className={isAdminMode ? styles.adminMode : styles.header}>
-            <div className={styles.left} onClick={() => navigate("/profile")}>
-                <a className="a-img"><img src={userLogo} alt={"lk"} className={isAdminMode ? styles.whiteSvg : ""}></img></a>
-                <h3>{login}</h3>
-            </div>
+            {!isAdminMode && (
+                <div className={styles.left} onClick={() => navigate("/models")}>
+                    <a className="a-img"><img src={icon} alt={"km"}></img></a>
+                    <h3>ML MODELS</h3>
+                </div>
+            )}
+
+            {isAdminMode && (
+                <div className={styles.left} onClick={() => navigate("/profile")}>
+                    <a className="a-img"><img src={userLogo} alt={"lk"} className={isAdminMode ? styles.whiteSvg : ""}></img></a>
+                    <h3>{login}</h3>
+                </div>
+            )}
+
             {isAdminMode && (<h3 style={{marginLeft: "20px", opacity: 0.65}}>Режим Администратора</h3>)}
 
             <div className={styles.right}>

@@ -120,7 +120,7 @@ export default function CatalogUsers() {
                         setAlarm(null)
                     }}>Добавить пользователя</Button>
                 </div>
-                <AlarmMsg logo={logo} alarm={alarm}></AlarmMsg>
+                <AlarmMsg logo={logo}>{alarm}</AlarmMsg>
 
                 <div className="catalog-users">
                     <table className="table-fill">
@@ -196,7 +196,7 @@ export default function CatalogUsers() {
                     <div className="add-modal__title">
                         <h3>Новый пользователь</h3>
                     </div>
-                    <AlarmMsg logo={logo} alarm={alarm}></AlarmMsg>
+                    <AlarmMsg logo={logo}>{alarm}</AlarmMsg>
                     <table className="change-container__table naked-input">
                         <tbody>
                         <tr>

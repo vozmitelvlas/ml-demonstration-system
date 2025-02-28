@@ -9,19 +9,15 @@
     align-items: center;
     margin-left: auto;
 }
+.right a:hover{
+    background: #d0d0d5;
+}
 .left{
     display: flex;
     align-items: center;
     padding-right: 15px;
     cursor: pointer;
 }
-.header a:hover{
-    background: #d0d0d5;
-}
-.header > .left:hover{
-    background: #d0d0d5;
-}
-
 .adminMode{
     width: 100%;
     display: flex;
@@ -30,9 +26,6 @@
     background: var(--accent-color);
 }
 .adminMode > .right a:hover{
-    background: var(--accent-color);
-}
-.adminMode > .left:hover{
     background: var(--accent-color);
 }
 .whiteSvg{
