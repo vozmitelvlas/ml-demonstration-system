@@ -74,4 +74,12 @@ public class AdminOrganizationController extends OrganizationController {
         return organizationService.updateModelLimit(organizationId, modelId, limit);
     }
 
+    @Operation(description = "Close access to model for organization")
+    @ApiResponse(useReturnTypeSchema = true, responseCode = "204")
+    @DeleteMapping("/{organizationId}/models/{modelId}")
+    public ResponseEntity<Void> closeAccessToModel(@PathVariable Long organizationId,
+                                                    @PathVariable Long modelId) {
+        organizationService.removeAccessToModel(organizationId, modelId);
+        return ResponseEntity.noContent().build();
+    }
 }
