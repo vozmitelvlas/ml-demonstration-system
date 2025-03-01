@@ -1,13 +1,10 @@
 import React, {useEffect, useState} from "react";
 import "../ChangeData.css"
-import Button from "../Button/Button.jsx";
 import DataHeader from "../Headers/DataHeader.jsx";
-import {useNavigate, useParams} from "react-router-dom";
-import Select from "react-select";
-import {customStyle} from "../../utils/selectStyles.jsx";
+import {useParams} from "react-router-dom";
 import acceptLogo from "../../../assets/accept.svg"
 import alarmLogo from "../../../assets/alarm.svg"
-import apiClient from "../../utils/axios.jsx";
+import apiClient from "../../utils/apiClient.jsx";
 import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
 import {changeModelDataSchema, limitsSchema} from "../../store/formSchema.jsx";
@@ -41,26 +38,26 @@ export default function ChangeModel() {
     })
 
     useEffect(() => {
-        apiClient.get(`/api/admin/models/${modelId}/versions/${versionId}`).then((res) => {
+        apiClient(`/api/admin/models/${modelId}/versions/${versionId}`).then(res => {
             const dataForEdit = {
-                modelName: res.data.modelName,
-                versionName: res.data.versionName,
-                description: res.data.description,
-                uri: res.data.uri,
-                runtime: res.data.runtime,
-                problemType: res.data.problemType,
+                modelName: res.modelName,
+                versionName: res.versionName,
+                description: res.description,
+                uri: res.uri,
+                runtime: res.runtime,
+                problemType: res.problemType,
             }
             const dataForDisplay = {
-                modelId: res.data.modelId,
+                modelId: res.modelId,
                 status: "ok",
-                createdAt: res.data.createdAt,
+                createdAt: res.createdAt,
             }
             const limitData = {
-                rps: res.data.limit.rps,
-                requestsPerWeek: res.data.limit.requestsPerWeek
+                rps: res.limit.rps,
+                requestsPerWeek: res.limit.requestsPerWeek
             }
 
-            setModelData(res.data)
+            setModelData(res)
             setDisplayData(dataForDisplay)
 
             firstForm.reset(dataForEdit)
@@ -68,6 +65,7 @@ export default function ChangeModel() {
         }).catch(error => {
             console.log(error)
         })
+
         setAlarm(null)
     }, [activeBut]);
 
@@ -96,7 +94,7 @@ export default function ChangeModel() {
     }
     const onSaveModelData = async (newModelData) => {
         try {
-            await apiClient.put(`/api/admin/models/${modelId}/versions/${versionId}`, newModelData);
+            await apiClient(`/api/admin/models/${modelId}/versions/${versionId}`, 'PUT', newModelData);
             setLogo(acceptLogo)
             setAlarm('Изменения сохранены')
         } catch (error) {
@@ -105,7 +103,7 @@ export default function ChangeModel() {
     }
     const onSaveModelLimit = async (newValue) => {
         try{
-            await apiClient.put(`/api/admin/models/${modelId}/limit`, newValue)
+            await apiClient(`/api/admin/models/${modelId}/limit`, 'PUT', newValue)
             setLogo(acceptLogo)
             setAlarm("Лимиты успешно сохранены")
         } catch (error){

@@ -3,7 +3,7 @@ import Button from "../Button/Button.jsx";
 import React, {useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import styles from "./ModelData.module.css"
-import apiClient from "../../utils/axios.jsx";
+import apiClient from "../../utils/apiClient.jsx";
 
 
 export default function ModelData({isAdmin}) {
@@ -13,14 +13,13 @@ export default function ModelData({isAdmin}) {
 
     const [modelData, setModelData] = useState({});
     useEffect(() => {
-        try {
-            apiClient.get(isAdmin ? `/api/admin/models/${modelId}/versions/${versionId}` : `/api/models/versions/${versionId}`).then((res) => { // modelId?
-                setModelData(res.data)
-            })
-        } catch (error) {
+        apiClient(isAdmin ? `/api/admin/models/${modelId}/versions/${versionId}` : `/api/models/versions/${versionId}`).then(res => {
+            setModelData(res)
+        }).catch(error => {
             console.log(error)
-        }
-    }, [activeBut]);
+        })
+
+    }, [activeBut, isAdmin]);
 
     return (
         <div className="change-container">
@@ -67,7 +66,9 @@ export default function ModelData({isAdmin}) {
                             </tr>
                             <tr>
                                 <td>Описание</td>
-                                <td><textarea defaultValue={"ADASAlasdair"} disabled></textarea></td>
+                                <td>
+                                    <textarea value={modelData.description} disabled></textarea>
+                                </td>
                             </tr>
                             </tbody>
                         </table>

@@ -11,7 +11,7 @@ import "../select.css"
 import React, {useEffect, useState} from "react";
 import Filter from "../Filter/Filter.jsx";
 import DeleteModal from "../../utils/DeleteModal.jsx";
-import apiClient from "../../utils/axios.jsx"
+import apiClient from "../../utils/apiClient.jsx"
 import Select from "react-select";
 import {customStyle, firstStyle, secondStyle} from "../../utils/selectStyles.jsx";
 import {getDateFormat} from "../../utils/DateAndTime.jsx";
@@ -34,11 +34,11 @@ export default function CatalogModels({isAdminMode, isAdmin}) {
 
     const [models, setModels] = useState([])
     useEffect(() => {
-        apiClient.get(isAdmin ? '/api/admin/models/versions' : '/api/models/versions').then((res) => {
-            setModels(res.data)
-        }).catch(error => {
-            console.error(error)
-        })
+        apiClient(isAdmin ? '/api/admin/models/versions' : '/api/models/versions').then((res => {
+            setModels(res)
+        })).catch((error) => {
+            console.log(error);
+        });
     }, [isDeletingModel, isAdmin])
 
     const closeDeleteModal = () => {
@@ -51,7 +51,7 @@ export default function CatalogModels({isAdminMode, isAdmin}) {
     }
     const onConfirmDeletingModel = async () => {
         try {
-            await apiClient.delete(`/api/admin/models/${tmpModelId[0]}/versions/${tmpModelId[1]}`);
+            await apiClient(`/api/admin/models/${tmpModelId[0]}/versions/${tmpModelId[1]}`, 'DELETE');
             setLogo(acceptLogo)
             setAlarm("Модель успешно удалена")
         } catch (serverError) {
@@ -101,9 +101,11 @@ export default function CatalogModels({isAdminMode, isAdmin}) {
                 <div className="options-buttons_up">
                     {isAdminMode && (
                         <div>
-                            <Button onClick={() => {setIsAddingModel(!isAddingModel)}}>Добавить модель</Button>
-                            <Button>Импорт</Button>
-                            <Button>Экспорт</Button>
+                            <Button onClick={() => {
+                                setIsAddingModel(!isAddingModel)
+                                setAlarm(null)
+                            }}>Добавить модель</Button>
+                            <Button>Добавить версию</Button>
                         </div>
                     )}
                 </div>
@@ -134,7 +136,7 @@ export default function CatalogModels({isAdminMode, isAdmin}) {
                             <tr key={`${model.modelId}${model.modelVersionId}`}
                                 data-id={`${model.modelId} ${model.modelVersionId}`}>
 
-                                <td className="text-center">{model.modelId}</td>
+                                <td className="text-center">{model.modelVersionId}</td>
                                 <td className="text-center">
                                     <a><img src={acceptLogo}></img></a>
                                 </td>
@@ -171,7 +173,9 @@ export default function CatalogModels({isAdminMode, isAdmin}) {
                 </div>
 
                 <div className="options-buttons">
-                    <Button classNames="filter-button" onClick={() => {setIsOpen(!isOpen)}}>Фильтр</Button>
+                    <Button classNames="filter-button" onClick={() => {
+                        setIsOpen(!isOpen)
+                    }}>Фильтр</Button>
                     {isAdminMode && (
                         <div className="options-buttons_right-down">
                             <Button onClick={() => {
@@ -222,7 +226,9 @@ export default function CatalogModels({isAdminMode, isAdmin}) {
                             </table>
                         </div>
                         <div className="delete-modal__buttons">
-                            <Button onClick={() => {setIsAddingModel(!isAddingModel)}}>Отмена</Button>
+                            <Button onClick={() => {
+                                setIsAddingModel(!isAddingModel)
+                            }}>Отмена</Button>
                             <Button onClick={handleNewModelClick}>Добавить</Button>
                         </div>
                     </form>

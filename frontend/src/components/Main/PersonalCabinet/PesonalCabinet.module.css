@@ -59,3 +59,9 @@
     vertical-align: middle;
 }
 
+.userData{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+

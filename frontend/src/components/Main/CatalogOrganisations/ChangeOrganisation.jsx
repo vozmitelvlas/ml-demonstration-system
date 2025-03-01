@@ -4,7 +4,7 @@ import {useParams} from "react-router-dom";
 import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx";
 import acceptLogo from "../../../assets/accept.svg"
 import alarmLogo from "../../../assets/alarm.svg"
-import apiClient from "../../utils/axios.jsx";
+import apiClient from "../../utils/apiClient.jsx";
 import {getDateFormat} from "../../utils/DateAndTime.jsx";
 import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
@@ -40,40 +40,40 @@ export default function ChangeOrganisation() {
     })
 
     useEffect(() => {
-        apiClient.get(`/api/admin/organizations/${orgId}`).then(res => {
+        apiClient(`/api/admin/organizations/${orgId}`).then(res => {
             setDisplayData({
-                createdAt: getDateFormat(new Date(res.data.createdAt))
+                createdAt: getDateFormat(new Date(res.createdAt))
             })
             firstForm.reset({
-                name: res.data.name,
-                description: res.data.description,
+                name: res.name,
+                description: res.description,
             })
-            setLimitsType(limitOptions.find(limit => limit.value === res.data.limitsType))
+            setLimitsType(limitOptions.find(limit => limit.value === res.limitsType))
         }).catch(error => {
             console.log(error)
         })
 
-        apiClient.get(`/api/admin/models`).then(res => {
+        apiClient(`/api/admin/models`).then(res => {
             const formatAllModels = []
-            res.data.map(model => {
+            res.map(model => {
                 formatAllModels.push({value: model.modelId, label: model.name})
             })
 
-            setAllModels(res.data)
+            setAllModels(res)
             setModelOptions(formatAllModels)
         })
 
-        apiClient.get(`/api/admin/organizations/${orgId}/models`).then(res => {
+        apiClient(`/api/admin/organizations/${orgId}/models`).then(res => {
             const formatOrgModels = {}
-            res.data.forEach(model => {
+            res.forEach(model => {
                     formatOrgModels[`rps${model.modelId}`] = model.limit.rps.toString()
                     formatOrgModels[`requestsPerWeek${model.modelId}`] = model.limit.requestsPerWeek.toString()
                 }
             );
-            setOrgModels(res.data.sort((a, b) => a.modelId - b.modelId))
+            setOrgModels(res.sort((a, b) => a.modelId - b.modelId))
             secondForm.reset({
                 limitsType: limitsType,
-                selectModels: modelOptions.filter(model => res.data.some(item => item.modelId === model.value)),
+                selectModels: modelOptions.filter(model => res.some(item => item.modelId === model.value)),
                 ...formatOrgModels,
             })
         }).catch(error => {
@@ -108,7 +108,7 @@ export default function ChangeOrganisation() {
                 const selectModelsForDelete = orgModels.filter(secondItem =>
                     !newValue.some(firstItem => firstItem.value === secondItem.modelId))
                 for (let i = 0; i < selectModelsForDelete.length; i++) {
-                    await apiClient.delete(`/api/admin/organizations/${orgId}/models/${selectModelsForDelete[i].modelId}`)
+                    await apiClient(`/api/admin/organizations/${orgId}/models/${selectModelsForDelete[i].modelId}`, 'DELETE')
 
                     setOrgModels(orgModels.filter(secondItem =>
                         newValue.some(firstItem => firstItem.value === secondItem.modelId)))
@@ -119,16 +119,16 @@ export default function ChangeOrganisation() {
                 )
                 for (let i = 0; i < selectModelsForAdd.length; i++) {
                     const fulModel = allModels.find(item => item.modelId === selectModelsForAdd[i].value)
-                    const res = await apiClient.post(`/api/admin/organizations/${orgId}/models`, fulModel)
+                    const res = await apiClient(`/api/admin/organizations/${orgId}/models`, 'POST', fulModel)
 
                     setOrgModels(prevState => ([
                         ...prevState,
-                        res.data
+                        res
                     ]))
                     secondForm.reset(prev => ({
                         ...prev,
-                        [`rps${res.data.modelId}`]: res.data.limit.rps.toString(),
-                        [`requestsPerWeek${res.data.modelId}`]: res.data.limit.requestsPerWeek.toString()
+                        [`rps${res.modelId}`]: res.limit.rps.toString(),
+                        [`requestsPerWeek${res.modelId}`]: res.limit.requestsPerWeek.toString()
                     }))
                 }
             }
@@ -137,14 +137,13 @@ export default function ChangeOrganisation() {
             console.log(error)
         }
     }
-
     const onSaveOrgData = async (newOrgData) => {
         try {
-            await apiClient.put(`/api/admin/organizations/${orgId}`, newOrgData)
+            await apiClient(`/api/admin/organizations/${orgId}`, 'PUT', newOrgData)
             setAlarm("Изменения сохранены")
             setLogo(acceptLogo)
         } catch (error) {
-            if (error.response?.status === 409) {
+            if (error.status === 409) {
                 setAlarm("Организация с таким названием уже существует")
                 setLogo(alarmLogo)
             }
@@ -152,7 +151,7 @@ export default function ChangeOrganisation() {
     }
     const onSaveModelLimits = async (newValue) => {
         try {
-            await apiClient.put(`/api/admin/organizations/${orgId}/limits-type`, {limitsType: newValue.limitsType.value})
+            await apiClient(`/api/admin/organizations/${orgId}/limits-type`, 'PUT', {limitsType: newValue.limitsType.value})
 
             const tmpValue = {...newValue}
             delete tmpValue["limitsType"]
@@ -169,7 +168,7 @@ export default function ChangeOrganisation() {
                 });
                 if (orgModels.find(model => model.modelId === Number(modelId))) {
                     const chunkAsObject = Object.fromEntries(trueChunk);
-                    await apiClient.put(`/api/admin/organizations/${Number(orgId)}/models/${Number(modelId)}/limit`, chunkAsObject)
+                    await apiClient(`/api/admin/organizations/${Number(orgId)}/models/${Number(modelId)}/limit`, 'PUT', chunkAsObject)
                 }
             }
             setLogo(acceptLogo)

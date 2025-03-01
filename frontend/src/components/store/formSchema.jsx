@@ -96,6 +96,8 @@ export const personalCabinetSchema = yup.object()
     .shape({
         lastName: yup.string()
             .required('Фамилия должна быть указана'),
+        firstName: yup.string()
+            .required('Имя должно быть указано'),
     })
 
 export const setNewPasswordSchema = yup.object()
@@ -141,3 +143,9 @@ export const limitsSchema = yup.object().strict().test(
             });
     }
 );
+
+export const newOrgSchema = yup.object()
+    .shape({
+        name: yup.string()
+            .min(4, 'Неверное название организации. Должно быть не меньше 4 символов')
+    })

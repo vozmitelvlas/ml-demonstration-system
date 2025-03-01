@@ -1,7 +1,7 @@
 import styles from "./SignIn.module.css"
 import React from "react";
 import {useNavigate} from "react-router-dom";
-import axios from "axios";
+import apiClient from "../../utils/apiClient.jsx";
 import {useForm} from 'react-hook-form';
 import {yupResolver} from '@hookform/resolvers/yup';
 import {signInSchema} from "../../store/formSchema.jsx";
@@ -26,20 +26,20 @@ export default function SignIn({setUserData, setIsAdmin, setMainOrg}) {
 
     const sendFormData = async (formData) => {
         try {
-            const res = await axios.post('http://localhost:8080/api/auth/login', formData)
-            setUserData(res.data.user)
-            setIsAdmin(res.data.user.roles.includes("ADMIN"))
-            setMainOrg(res.data.user.roles.includes("ORGANIZATION_HEAD"))
+            console.log(formData)
+            const {user} = await apiClient('/api/auth/login', 'POST', formData)
 
-            sessionStorage.setItem("accessToken", res.data.accessToken)
+            console.log("USER_in ", user)
 
+            setUserData(user)
+            setIsAdmin(user.roles.includes("ADMIN"))
+            setMainOrg(user.roles.includes("ORGANIZATION_HEAD"))
             navigate("/models")
         } catch (error) {
-            if (error.response?.status === 401) {
-                setError('form', {type: 'server', message: 'Неверный логин или пароль'})
-            } else {
+            if(error.status === 401)
+                setError('form', {type: 'server', message: error.detail})
+            else
                 console.log(error)
-            }
         }
     }
 

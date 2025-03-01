@@ -7,7 +7,7 @@ import React, {useEffect, useState} from "react";
 import Filter from "../Filter/Filter.jsx";
 
 import DeleteModal from "../../utils/DeleteModal.jsx";
-import apiClient from "../../utils/axios.jsx";
+import apiClient from "../../utils/apiClient.jsx";
 import {getDateFormat} from "../../utils/DateAndTime.jsx";
 import alarmLogo from "../../../assets/alarm.svg";
 import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx";
@@ -18,75 +18,87 @@ import {signUpSchema} from "../../store/formSchema.jsx";
 
 export default function CatalogUsers() {
     const navigate = useNavigate()
-    const [isDeletingModel, setIsDeletingModel] = useState(false)
     const [isOpen, setIsOpen] = useState(false)
     const [tmpUserId, setTmpUserId] = useState("")
     const [alarm, setAlarm] = useState(null)
     const [logo, setLogo] = useState(alarmLogo)
-    const [isAddingUser, setIsAddingUser] = useState(false)
     const [users, setUsers] = useState([])
+
+    const [isAddingUser, setIsAddingUser] = useState(false)
+    const [isDeletingUser, setIsDeletingUser] = useState(false)
+
+    const [isAddedUser, setIsAddedUser] = useState(false)
+    const [isDeletedUser, setIsDeletedUser] = useState(false)
+
     const {
         register,
         handleSubmit,
         formState: {errors},
-        reset
+        reset,
+        setError
     } = useForm({
         resolver: yupResolver(signUpSchema)
     })
 
     useEffect(() => {
-        apiClient.get('/api/admin/users').then((res) => {
-            setUsers(res.data)
+        apiClient('/api/admin/users').then((res) => {
+            setUsers(res)
         }).catch(error => {
             console.error(error)
         })
-    }, [isDeletingModel])
+    }, [isDeletedUser, isAddedUser])
 
+    const firstErrorKey = Object.keys(errors)[0];
     useEffect(() => {
-        const firstErrorKey = Object.keys(errors)[0];
         if (firstErrorKey) {
             setLogo(alarmLogo)
             setAlarm(errors[firstErrorKey].message)
         }
-    }, [errors]);
+    }, [firstErrorKey])
 
     const onDeleteUserClick = (event) => {
         const tr = event.target.closest("tr")
-
         setTmpUserId(tr.dataset.id)
-        setIsDeletingModel(true)
+        setIsDeletingUser(!isDeletedUser)
+        setAlarm(null)
     }
     const toggleSidebar = () => {
         setIsOpen(!isOpen)
-    };
+    }
 
     const onConfirmDeletingUser = async () => {
         try {
-            await apiClient.delete(`/api/admin/users/${tmpUserId}`);
+            await apiClient(`/api/admin/users/${tmpUserId}`, "DELETE");
             setAlarm("Пользователь успешно удален")
             setLogo(acceptLogo)
+            setIsDeletingUser(!isDeletingUser)
+            setIsDeletedUser(true)
         } catch (error) {
             console.error(error)
         }
-        setIsDeletingModel(false)
     }
     const onSaveUserData = async (newValue) => {
         newValue["roles"] = ["USER"]
         newValue["organizationId"] = 4
-        try {
-            const res = await apiClient.post(`/api/admin/users`, newValue)
-            const tmpUsers = [...users]
-            tmpUsers.push(res.data)
 
-            setUsers(tmpUsers)
+        const sendData = {
+            ...newValue,
+            roles: ["USER"],
+            organisationId: 4,
+        }
+
+        console.log(sendData)
+        try {
+            await apiClient(`/api/admin/users`, "POST", sendData)
+
             setAlarm("Пользователь успешно создан")
             setLogo(acceptLogo)
             reset({})
             setIsAddingUser(!isAddingUser)
+            setIsAddedUser(true)
         } catch (error) {
-            if (error.response?.status === 409) {
-                setLogo(alarmLogo)
-                setAlarm("Пользователь уже существует")
+            if (error.status === 409) {
+                setError('form', {type: 'server', message: error.detail})
             } else {
                 console.log(error)
             }
@@ -245,13 +257,16 @@ export default function CatalogUsers() {
                         </tbody>
                     </table>
                     <div className="add-user__buttons">
-                        <Button type="button" onClick={() => setIsAddingUser(!isAddingUser)}>Отмена</Button>
+                        <Button type="button" onClick={() => {
+                            setIsAddingUser(!isAddingUser)
+                            setAlarm(null)
+                        }}>Отмена</Button>
                         <Button type="submit">Сохранить</Button>
                     </div>
                 </form>
             </div>
-            <DeleteModal open={isDeletingModel} onNo={() => {
-                setIsDeletingModel(false)
+            <DeleteModal open={isDeletingUser} onNo={() => {
+                setIsDeletingUser(false)
             }} onYes={onConfirmDeletingUser}></DeleteModal>
         </>
 

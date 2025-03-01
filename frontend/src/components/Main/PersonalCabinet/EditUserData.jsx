@@ -1,13 +1,15 @@
 import styles from "./PesonalCabinet.module.css";
 import Button from "../Button/Button.jsx";
 import React from "react";
+import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx";
 
-export default function EditUserData({isEditing, handleSubmit, submitFunction, register, onCancel}){
+export default function EditUserData({isEditing, handleSubmit, submitFunction, register, onCancel, logo, alarm}){
     return (
         <>
             <div className={`edit-modal-overlay ${isEditing ? "" : "edit-modal-overlay_hidden"}`}>
                 <form onSubmit={handleSubmit(submitFunction)} className={styles.container}>
                     <h3>Редактирование данных</h3>
+                    <AlarmMsg logo={logo}>{alarm}</AlarmMsg>
                     <table className="change-container__table naked-input">
                         <tbody>
                         <tr>
@@ -23,13 +25,13 @@ export default function EditUserData({isEditing, handleSubmit, submitFunction, r
                             </td>
                         </tr>
                         <tr>
-                            <td>Фамилия</td>
+                            <td>Фамилия<span> *</span></td>
                             <td className="text-center">
                                 <input type="text" {...register("lastName")}/>
                             </td>
                         </tr>
                         <tr>
-                            <td>Имя</td>
+                            <td>Имя<span> *</span></td>
                             <td className="text-center">
                                 <input type="text" {...register("firstName")}/>
                             </td>

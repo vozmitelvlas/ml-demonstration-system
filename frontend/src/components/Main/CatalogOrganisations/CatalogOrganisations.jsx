@@ -8,36 +8,53 @@ import "../Table.css"
 import React, {useEffect, useState} from "react";
 import Filter from "../Filter/Filter.jsx";
 import DeleteModal from "../../utils/DeleteModal.jsx";
-import {customStyle, firstStyle, secondStyle} from "../../utils/selectStyles.jsx";
-import apiClient from "../../utils/axios.jsx";
+import apiClient from "../../utils/apiClient.jsx";
 import {getDateFormat} from "../../utils/DateAndTime.jsx";
 import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx";
 import alarmLogo from "../../../assets/alarm.svg"
 import acceptLogo from "../../../assets/accept.svg"
+import {useForm} from "react-hook-form";
+import {yupResolver} from "@hookform/resolvers/yup";
+import {newOrgSchema} from "../../store/formSchema.jsx";
 
 export default function CatalogOrganisations() {
     const navigate = useNavigate()
     const [isOpen, setIsOpen] = useState(false)
     const [isDeletingModel, setIsDeletingModel] = useState(false)
-    const [selectedValues, setSelectedValues] = useState([])
     const [tmpOrgId, setTmpOrgId] = useState("")
     const [alarm, setAlarm] = useState(null)
     const [logo, setLogo] = useState(alarmLogo)
     const [isAddingOrg, setIsAddingOrg] = useState(false)
-    const [newOrgValue, setNewOrgValue] = useState({
-        name: "",
-        description: "",
+    const {
+        handleSubmit,
+        register,
+        setError,
+        formState: {errors}
+    } = useForm({
+        resolver: yupResolver(newOrgSchema),
+        defaultValues: {
+            name: "",
+            description: "",
+        }
     })
 
 
-    const [organisation, setOrganisation] = useState([])
+    const [orgs, setOrgs] = useState([])
     useEffect(() => {
-        apiClient.get("/api/admin/organizations").then(res => {
-            setOrganisation(res.data)
+        apiClient("/api/admin/organizations").then(res => {
+            setOrgs(res)
         }).catch(error => {
             console.log(error)
         })
-    }, [isDeletingModel, isAddingOrg])
+    }, [])
+
+    const firstErrorKey = Object.keys(errors)[0];
+    useEffect(() => {
+        if (firstErrorKey) {
+            setLogo(alarmLogo)
+            setAlarm(errors[firstErrorKey].message)
+        }
+    }, [firstErrorKey])
 
     const toggleSidebar = () => {
         setIsOpen(!isOpen)
@@ -49,32 +66,34 @@ export default function CatalogOrganisations() {
         const tr = event.target.closest("tr")
         setTmpOrgId(tr.dataset.id)
         setIsDeletingModel(true)
+        setAlarm(null)
     }
-    const onAddNewOrg = async (event) => {
-        event.preventDefault()
-        if(newOrgValue.name.length > 3){
-            try {
-                await apiClient.post("/api/admin/organizations", newOrgValue)
-                setIsAddingOrg(!isAddingOrg)
-                setLogo(acceptLogo)
-                setAlarm("Организация успешно создана")
-            }catch (error) {
+
+    const onAddNewOrg = async (newValue) => {
+        try {
+            const res = await apiClient("/api/admin/organizations", 'POST', newValue)
+            setOrgs([...orgs, res])
+
+            setIsAddingOrg(!isAddingOrg)
+            setLogo(acceptLogo)
+            setAlarm("Организация успешно создана")
+        } catch (error) {
+            if (error.status === 409) {
+                setError('form', {type: 'server', message: error.detail})
+            } else {
                 console.log(error)
             }
-        } else{
-            setLogo(alarmLogo)
-            setAlarm("Неверное название. Должно быть не меньше 4 символов")
         }
-
     }
-    const onConfirmDeletingOrg = async (event) => {
-        event.preventDefault()
+
+    const onConfirmDeletingOrg = async () => {
         try {
-            await apiClient.delete(`/api/admin/organizations/${tmpOrgId}`)
+            await apiClient(`/api/admin/organizations/${tmpOrgId}`, 'DELETE')
+            setOrgs(orgs.filter(org => org.organizationId !== Number(tmpOrgId)))
             setLogo(acceptLogo)
             setAlarm("Организация успешно удалена")
         } catch (error) {
-            if (error.response?.status === 409) {
+            if (error.status === 409) {
                 setLogo(alarmLogo)
                 setAlarm("Организация не пуста")
             } else {
@@ -82,9 +101,6 @@ export default function CatalogOrganisations() {
             }
         }
         setIsDeletingModel(false)
-    }
-    const onNewChange = ({target}) => {
-        setNewOrgValue({...newOrgValue, [target.name]: target.value})
     }
 
     return (
@@ -103,7 +119,7 @@ export default function CatalogOrganisations() {
                 <CatalogHeader title={"Каталог организаций"} searchFields={["Название организации"]}></CatalogHeader>
 
                 <div className="options-buttons_up">
-                    <Button onClick={()=> {
+                    <Button onClick={() => {
                         setIsAddingOrg(!isAddingOrg)
                         setAlarm(null)
                     }}>Добавить организацию</Button>
@@ -128,7 +144,7 @@ export default function CatalogOrganisations() {
                         </tr>
                         </thead>
                         <tbody>
-                        {organisation.map(org => (
+                        {orgs.map(org => (
                             <tr key={org.organizationId} data-id={org.organizationId}>
                                 <td className="text-center">{org.organizationId}</td>
                                 <td className="text-center">{org.name}</td>
@@ -163,7 +179,7 @@ export default function CatalogOrganisations() {
                 </div>
 
                 <div className={`add-modal-overlay ${isAddingOrg ? "" : "add-modal-overlay_hidden"}`}>
-                    <form onSubmit={onAddNewOrg} className="add-container">
+                    <form onSubmit={handleSubmit(onAddNewOrg)} className="add-container">
                         <div className="add-modal__title">
                             <h3>Новая организация</h3>
                         </div>
@@ -174,29 +190,22 @@ export default function CatalogOrganisations() {
                                 <tr>
                                     <td>Название<span> *</span></td>
                                     <td className="text-center">
-                                        <input
-                                            name="name"
-                                            type="text"
-                                            value={newOrgValue.name}
-                                            onChange={onNewChange}
-                                        />
+                                        <input type="text" {...register("name")}/>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>Описание</td>
                                     <td>
-                                        <textarea
-                                            name="description"
-                                            value={newOrgValue.description}
-                                            onChange={onNewChange}>
-
-                                        </textarea>
+                                        <textarea {...register("description")}></textarea>
                                     </td>
                                 </tr>
                                 </tbody>
                             </table>
                             <div className="delete-modal__buttons">
-                                <Button type="button" onClick={() => setIsAddingOrg(!isAddingOrg)}>Отмена</Button>
+                                <Button type="button" onClick={() => {
+                                    setIsAddingOrg(!isAddingOrg)
+                                    setAlarm(null)
+                                }}>Отмена</Button>
                                 <Button type="submit">Добавить</Button>
                             </div>
                         </div>

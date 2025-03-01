@@ -5,9 +5,10 @@ import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
 import axios from "axios";
 import {signUpSchema} from "../../store/formSchema.jsx";
+import ApiClient from "../../utils/apiClient.jsx";
 
 
-export default function SignUp({setUserData}) {
+export default function SignUp({setUserData, setIsAdmin, setMainOrg}) {
     const navigate = useNavigate()
     const {
         register,
@@ -34,15 +35,15 @@ export default function SignUp({setUserData}) {
     const sendFormData = async (formData) => {
         console.log(formData)
         try {
-            const res = await axios.post('http://localhost:8080/api/auth/register', formData)
-            setUserData(res.data.user)
-            sessionStorage.setItem("accessToken", res.data.accessToken)
-            sessionStorage.setItem("userId", res.data.user.userId)
-
+            const {user} = await ApiClient('/api/auth/register', 'POST', formData)
+            setUserData(user)
             navigate("/models")
+            setIsAdmin(user.roles.includes("ADMIN"))
+            setMainOrg(user.roles.includes("ORGANIZATION_HEAD"))
+
         } catch (error) {
-            if (error.response?.status === 409) {
-                setError('form', {type: 'server', message: 'Пользователь уже существует'})
+            if (error.status === 409) {
+                setError('form', {type: 'server', message: error.detail})
             } else {
                 console.log(error)
             }

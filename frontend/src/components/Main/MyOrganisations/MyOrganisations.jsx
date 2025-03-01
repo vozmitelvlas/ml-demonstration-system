@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import styles from "./MyOrganisations.module.css"
 import Select from "react-select";
 import {customStyle} from "../../utils/selectStyles.jsx";
-import apiClient from "../../utils/axios.jsx";
+import apiClient from "../../utils/apiClient.jsx";
 import {useNavigate, useParams} from "react-router-dom";
 import alarmLogo from "../../../assets/alarm.svg";
 import acceptLogo from "../../../assets/accept.svg";
@@ -25,12 +25,12 @@ export default function MyOrganisations() {
     const [limit, setLimit] = useState({})
 
     useEffect(() => {
-        apiClient.get(`/api/organizations/${orgId}`).then(res => {
-            setMyOrg(res.data)
-            setLimit(limitOptions.find(limit => res.data.limitsType === limit.value))
+        apiClient(`/api/organizations/${orgId}`).then(res => {
+            setMyOrg(res)
+            setLimit(limitOptions.find(limit => res.limitsType === limit.value))
         })
-        apiClient.get(`/api/organizations/${orgId}/members`).then(res => {
-            setMembers(res.data)
+        apiClient(`/api/organizations/${orgId}/members`).then(res => {
+            setMembers(res)
         })
     }, []);
 
@@ -42,9 +42,8 @@ export default function MyOrganisations() {
         const sendData = {
             limitsType: limit.value
         }
-        console.log(limit, sendData)
         try {
-            await apiClient.put(`/api/organizations/${orgId}/limits-type`, sendData)
+            await apiClient(`/api/organizations/${orgId}/limits-type`, 'PUT', sendData)
             setLogo(acceptLogo)
             setAlarm("Лимит успешно установлен")
         } catch (error) {

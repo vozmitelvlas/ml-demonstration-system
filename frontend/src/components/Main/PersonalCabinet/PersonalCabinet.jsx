@@ -5,7 +5,7 @@ import user_logo from "../../../assets/user2.svg";
 import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
 import {personalCabinetSchema} from "../../store/formSchema.jsx";
-import apiClient from "../../utils/axios.jsx";
+import apiClient from "../../utils/apiClient.jsx";
 import SetNewPassword from "./SetNewPassword.jsx";
 import DeleteModal from "../../utils/DeleteModal.jsx";
 import {useNavigate} from "react-router-dom";
@@ -13,8 +13,6 @@ import alarmLogo from "../../../assets/alarm.svg";
 import acceptLogo from "../../../assets/accept.svg"
 import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx";
 import EditUserData from "./EditUserData.jsx";
-
-
 
 export default function PersonalCabinet({userData, setUserData}) {
     const navigate = useNavigate()
@@ -43,6 +41,14 @@ export default function PersonalCabinet({userData, setUserData}) {
         defaultValues: dataForEdit
     })
 
+    useEffect(() => {
+        const firstErrorKey = Object.keys(errors)[0];
+        if (firstErrorKey) {
+            setLogo(alarmLogo)
+            setAlarm(errors[firstErrorKey].message)
+        }
+    }, [errors]);
+
     const openCloseDeleteModal = () => {
         setIsDeletingProfile(!isDeletingProfile)
     }
@@ -53,19 +59,20 @@ export default function PersonalCabinet({userData, setUserData}) {
 
     const openCloseEditModal = () => {
         reset(dataForEdit)
+        setAlarm(null)
         setIsEditing(!isEditing)
     }
     useEffect(() => {
         if (!userData) {
-            apiClient.get(`/api/users/profile`).then((res) => {
-                setUserData(res.data)
+            apiClient(`/api/users/profile`).then((res) => {
+                setUserData(res)
                 reset({
-                    login: res.data?.login,
-                    email: res.data?.email,
-                    lastName: res.data?.lastName,
-                    firstName: res.data?.firstName,
-                    patronymic: res.data?.patronymic,
-                    description: res.data?.description
+                    login: res.login,
+                    email: res.email,
+                    lastName: res.lastName,
+                    firstName: res.firstName,
+                    patronymic: res.patronymic,
+                    description: res.description
                 })
             }).catch(error => {
                 console.error(error)
@@ -75,19 +82,22 @@ export default function PersonalCabinet({userData, setUserData}) {
 
     const onSaveUserData = async (newUserData) => {
         try {
-            const res = await apiClient.put(`/api/users/profile`, {
+            const res = await apiClient(`/api/users/profile`, 'PUT', {
                 ...newUserData,
                 roles: userData.roles
             })
-            setUserData(res.data)
+            setUserData(res)
             setIsEditing(!isEditing)
+
+            setLogo(acceptLogo)
+            setAlarm("Изменения успешно сохранены")
         } catch (error) {
             console.log(error)
         }
     }
     const onConfirmDeleteProfile = async () => {
         try {
-            await apiClient.delete(`/api/users/profile`)
+            await apiClient(`/api/users/profile`, 'DELETE')
             navigate("/")
         } catch (error) {
             console.log(error)
@@ -103,7 +113,8 @@ export default function PersonalCabinet({userData, setUserData}) {
                 <Button onClick={openCloseDeleteModal}>Удалить профиль</Button>
             </div>
 
-            <div>
+            <div className={styles.userData}>
+                <AlarmMsg logo={logo}>{alarm}</AlarmMsg>
                 <table className={styles.table}>
                     <tbody>
                     <tr>
@@ -143,8 +154,9 @@ export default function PersonalCabinet({userData, setUserData}) {
                 handleSubmit={handleSubmit}
                 onCancel={openCloseEditModal}
                 register={register}
-                >
-            </EditUserData>
+                logo={logo}
+                alarm={alarm}
+            ></EditUserData>
 
             <SetNewPassword
                 passwordChanging={passwordChanging}

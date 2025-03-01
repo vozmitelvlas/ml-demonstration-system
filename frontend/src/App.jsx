@@ -15,33 +15,32 @@ import ModelData from "./components/Main/CatalogModels/ModelData.jsx";
 import SignUp from "./components/Main/SignInUp/SignUp.jsx";
 import PasswordRecover from "./components/Main/SignInUp/PasswordRecover.jsx";
 import MyOrganisations from "./components/Main/MyOrganisations/MyOrganisations.jsx";
-import apiClient from "./components/utils/axios.jsx";
+import apiClient from "./components/utils/apiClient.jsx";
 
 
 function App() {
     const location = useLocation();
     const [isAdminMode, setIsAdminMode] = useState(false);
     const excludedPaths = ['/', '/signup', '/password'];
-
     const [isAdmin, setIsAdmin] = useState(false)
     const [isMainOrg, setMainOrg] = useState(false)
-    // const [login, setLogin] = useState("")
     const [userData, setUserData] = useState(null)
 
     useEffect(() => {
         if (userData === null && !excludedPaths.includes(location.pathname)) {
-            apiClient.get(`/api/users/profile`)
+            apiClient(`/api/users/profile`)
                 .then((res) => {
-                    setUserData(res.data)
-                    setIsAdmin(res.data.roles.includes("ADMIN"))
-                    setMainOrg(res.data.roles.includes("ORGANIZATION_HEAD"))
+                    console.log("user_app", res)
+                    setUserData(res)
+                    setIsAdmin(res.roles.includes("ADMIN"))
+                    setMainOrg(res.roles.includes("ORGANIZATION_HEAD"))
+                    setIsAdminMode(sessionStorage.getItem("isAdminMode"))
                 })
                 .catch(error => {
                     console.error(error)
                 })
         }
-    }, [userData]);
-
+    }, []);
 
     return (
         <div className={isAdminMode ? styles.adminMain : styles.main}>
@@ -59,7 +58,7 @@ function App() {
             <div className={styles.mainContent}>
                 <Routes>
                     <Route path="/" element={<SignIn setUserData={setUserData} setIsAdmin={setIsAdmin} setMainOrg={setMainOrg} />}/>
-                    <Route path="/signup" element={<SignUp setUserData={setUserData}/>}/>
+                    <Route path="/signup" element={<SignUp setUserData={setUserData} setIsAdmin={setIsAdmin} setMainOrg={setMainOrg}/>}/>
                     <Route path="/password" element={<PasswordRecover/>}/>
 
                     <Route path="/profile" element={<PersonalCabinet userData={userData} setUserData={setUserData}/>}/>
