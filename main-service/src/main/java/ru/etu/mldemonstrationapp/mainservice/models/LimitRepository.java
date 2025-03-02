@@ -1,15 +1,14 @@
 package ru.etu.mldemonstrationapp.mainservice.models;
 
-import java.util.List;
-import java.util.Optional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-
 import ru.etu.mldemonstrationapp.mainservice.organizations.ModelOrganizationLimit;
-import ru.etu.mldemonstrationapp.mainservice.organizations.Organization;
 import ru.etu.mldemonstrationapp.mainservice.users.ModelUserLimit;
+import ru.etu.mldemonstrationapp.mainservice.users.User;
+
+import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface LimitRepository extends JpaRepository<Limit, Long> {
@@ -27,9 +26,11 @@ public interface LimitRepository extends JpaRepository<Limit, Long> {
     Optional<ModelUserLimit> findByUserIdAndModelId(Long userId, Long modelId);
 
     @Query("""
-            SELECT l FROM ModelOrganizationLimit l
-            WHERE l.organization = :organization AND l.model NOT IN :models
+            SELECT mol, mul FROM User u
+            INNER JOIN ModelOrganizationLimit mol ON mol.organization = u.organization
+            LEFT JOIN ModelUserLimit mul ON mul.user = u and mul.model = mol.model
+            WHERE u = :user
             """)
-    List<ModelOrganizationLimit> findAllByOrganizationWhereModelNotInList(Organization organization, Iterable<Model> models);
+    List<Object[]> findLimitsForUser(User user);
 }
 

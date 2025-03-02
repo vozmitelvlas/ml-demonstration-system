@@ -9,14 +9,15 @@ import ru.etu.mldemonstrationapp.mainservice.admin.organizations.dto.CreateOrgan
 import ru.etu.mldemonstrationapp.mainservice.admin.organizations.dto.UpdateOrganizationRequest;
 import ru.etu.mldemonstrationapp.mainservice.models.Limit;
 import ru.etu.mldemonstrationapp.mainservice.models.LimitRepository;
-import ru.etu.mldemonstrationapp.mainservice.users.User;
-import ru.etu.mldemonstrationapp.mainservice.users.UserRepository;
 import ru.etu.mldemonstrationapp.mainservice.models.Model;
 import ru.etu.mldemonstrationapp.mainservice.models.ModelRepository;
+import ru.etu.mldemonstrationapp.mainservice.users.User;
+import ru.etu.mldemonstrationapp.mainservice.users.UserRepository;
 
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -78,17 +79,6 @@ public class OrganizationService {
         organizationRepository.save(organization);
     }
 
-    @Transactional
-    public void removeAccessToModel(Long organizationId, Long modelId) {
-        Organization organization = organizationRepository.findById(organizationId).orElseThrow();
-        var limitsIds = organization.getLimits().stream()
-                .filter(limit -> limit.getModel().getModelId().equals(modelId))
-                .map(Limit::getLimitId)
-                .toList();
-        limitRepository.deleteAllByIdInBatch(limitsIds);
-        organizationRepository.save(organization);
-    }
-
 
     @Transactional
     public void deleteOrganization(Long organizationId) {
@@ -126,4 +116,19 @@ public class OrganizationService {
         return limitRepository.save(existingLimit);
     }
 
+    @Transactional
+    public void removeAccessToModel(Long organizationId, Long modelId) {
+        Organization organization = organizationRepository.findById(organizationId).orElseThrow();
+        var organizationModelLimits = organization.getLimits().stream()
+                .filter(limit -> limit.getModel().getModelId().equals(modelId))
+                .map(Limit::getLimitId);
+
+        var userModelLimits = organization.getMembers().stream()
+                .flatMap(user -> user.getLimits().stream()
+                        .filter(limit -> limit.getModel().getModelId().equals(modelId))
+                        .map(Limit::getLimitId));
+
+        limitRepository.deleteAllByIdInBatch((Stream.concat(organizationModelLimits, userModelLimits).toList()));
+        organizationRepository.save(organization);
+    }
 }
