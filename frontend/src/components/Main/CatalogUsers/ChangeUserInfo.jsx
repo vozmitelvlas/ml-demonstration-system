@@ -2,8 +2,9 @@ import {getDateFormat} from "../../utils/DateAndTime.jsx";
 import {Controller} from "react-hook-form";
 import Select from "react-select";
 import Button from "../Button/Button.jsx";
-import React from "react";
+import React, {useState} from "react";
 import {useNavigate} from "react-router-dom";
+import {customStyle, setFirstMultiBackColor, setSecondMultiBackColor} from "../../utils/selectStyles.jsx";
 
 export default function ChangeUserInfo({
                                            handleSubmit,
@@ -12,12 +13,11 @@ export default function ChangeUserInfo({
                                            register,
                                            control,
                                            orgOptions,
-                                           selectStyle,
-                                           setFirstMultiBackColor,
-                                           setSecondMultiBackColor,
                                            rolesOptions
                                        }) {
     const navigate = useNavigate()
+    const [orgSelectStyle, setOrgSelectStyle] = useState(customStyle)
+    const [rolesSelectStyle, setRolesSelectStyle] = useState(customStyle)
     return (
         <>
             <form onSubmit={handleSubmit(submitFunction)} className="change-content">
@@ -55,7 +55,9 @@ export default function ChangeUserInfo({
                                 <input type="text" {...register("firstName")}/>
                             </td>
                         </tr>
-                        <tr>
+                        <tr onMouseEnter={event => setFirstMultiBackColor(event, setOrgSelectStyle, setRolesSelectStyle)}
+                            onMouseLeave={event => setSecondMultiBackColor(event, setOrgSelectStyle, setRolesSelectStyle)}
+                            data-name={"orgs"}>
                             <td>Организация</td>
                             <td>
                                 <Controller
@@ -70,13 +72,15 @@ export default function ChangeUserInfo({
                                             onChange={onChange}
                                             value={value}
                                             isSearchable
-                                            styles={selectStyle}
+                                            styles={orgSelectStyle}
                                         />
                                     )}/>
 
                             </td>
                         </tr>
-                        <tr onMouseEnter={setFirstMultiBackColor} onMouseLeave={setSecondMultiBackColor}>
+                        <tr onMouseEnter={event => setFirstMultiBackColor(event, setOrgSelectStyle, setRolesSelectStyle)}
+                            onMouseLeave={event => setSecondMultiBackColor(event, setOrgSelectStyle, setRolesSelectStyle)}
+                            data-name={"roles"}>
                             <td>Роль</td>
                             <td>
                                 <Controller
@@ -92,7 +96,7 @@ export default function ChangeUserInfo({
                                             value={value}
                                             closeMenuOnSelect={false}
                                             isSearchable
-                                            styles={selectStyle}
+                                            styles={rolesSelectStyle}
                                         />
                                     )}
                                 />

@@ -3,7 +3,7 @@ import Button from "../Button/Button.jsx";
 import React from "react";
 import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx";
 
-export default function EditUserData({isEditing, handleSubmit, submitFunction, register, onCancel, logo, alarm}){
+export default function EditUserDataModal({isEditing, handleSubmit, submitFunction, register, onCancel, logo, alarm}){
     return (
         <>
             <div className={`edit-modal-overlay ${isEditing ? "" : "edit-modal-overlay_hidden"}`}>

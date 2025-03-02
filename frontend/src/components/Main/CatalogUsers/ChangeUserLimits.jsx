@@ -38,7 +38,11 @@ export default function ChangeUserLimits({userLimits, register, handleSubmit, su
                                 }}/>
                             </td>
                             <td className="text-center">
-                                <input type="text" {...register(`requestsPerWeek${model.modelId}`)}/>
+                                <input type="text" {...register(`requestsPerWeek${model.modelId}`)} onChange={e => {
+                                    onInputChange(e);
+                                    register(`requestsPerWeek${model.modelId}`).onChange(e).then(r => {
+                                    });
+                                }}/>
                             </td>
                         </tr>
                     ))}

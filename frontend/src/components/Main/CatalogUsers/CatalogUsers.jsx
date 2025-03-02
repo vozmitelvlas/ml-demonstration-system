@@ -15,6 +15,8 @@ import acceptLogo from "../../../assets/accept.svg"
 import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
 import {signUpSchema} from "../../store/formSchema.jsx";
+import AddNewUserModal from "./AddNewUserModal.jsx";
+
 
 export default function CatalogUsers() {
     const navigate = useNavigate()
@@ -23,21 +25,24 @@ export default function CatalogUsers() {
     const [alarm, setAlarm] = useState(null)
     const [logo, setLogo] = useState(alarmLogo)
     const [users, setUsers] = useState([])
-
     const [isAddingUser, setIsAddingUser] = useState(false)
     const [isDeletingUser, setIsDeletingUser] = useState(false)
-
     const [isAddedUser, setIsAddedUser] = useState(false)
     const [isDeletedUser, setIsDeletedUser] = useState(false)
-
-    const {
-        register,
-        handleSubmit,
-        formState: {errors},
-        reset,
-        setError
-    } = useForm({
-        resolver: yupResolver(signUpSchema)
+    const [orgOptions, setOrgOptions] = useState([])
+    const form = useForm({
+        resolver: yupResolver(signUpSchema),
+        defaultValues: {
+            login: "",
+            password: "",
+            email: "",
+            firstName: "",
+            lastName: "",
+            patronymic: "",
+            organization: null,
+            selectRoles: [],
+            description: "",
+        }
     })
 
     useEffect(() => {
@@ -48,11 +53,23 @@ export default function CatalogUsers() {
         })
     }, [isDeletedUser, isAddedUser])
 
-    const firstErrorKey = Object.keys(errors)[0];
+    useEffect(() => {
+        apiClient(`/api/admin/organizations`).then((res) => {
+            const organisations = []
+            res.forEach(org => {
+                organisations.push({value: org.organizationId, label: org.name})
+            })
+            setOrgOptions(organisations)
+        }).catch(error => {
+            console.log(error)
+        })
+    }, []);
+
+    const firstErrorKey = Object.keys(form.formState.errors)[0];
     useEffect(() => {
         if (firstErrorKey) {
             setLogo(alarmLogo)
-            setAlarm(errors[firstErrorKey].message)
+            setAlarm(form.formState.errors[firstErrorKey].message)
         }
     }, [firstErrorKey])
 
@@ -78,31 +95,34 @@ export default function CatalogUsers() {
         }
     }
     const onSaveUserData = async (newValue) => {
-        newValue["roles"] = ["USER"]
-        newValue["organizationId"] = 4
+        console.log(newValue)
 
         const sendData = {
             ...newValue,
-            roles: ["USER"],
-            organisationId: 4,
+            organizationId: newValue.organization.value,
+            roles: newValue["selectRoles"].map(role => role.value)
         }
 
-        console.log(sendData)
         try {
             await apiClient(`/api/admin/users`, "POST", sendData)
 
             setAlarm("Пользователь успешно создан")
             setLogo(acceptLogo)
-            reset({})
+            form.reset({})
             setIsAddingUser(!isAddingUser)
             setIsAddedUser(true)
         } catch (error) {
             if (error.status === 409) {
-                setError('form', {type: 'server', message: error.detail})
+                form.setError('form', {type: 'server', message: error.detail})
             } else {
                 console.log(error)
             }
         }
+    }
+
+    const onCancelAddingUser = () => {
+        setIsAddingUser(!isAddingUser)
+        setAlarm(null)
     }
 
     return (
@@ -203,71 +223,21 @@ export default function CatalogUsers() {
                 </div>
             </main>
 
-            <div className={`add-modal-overlay ${isAddingUser ? "" : "add-modal-overlay_hidden"}`}>
-                <form onSubmit={handleSubmit(onSaveUserData)} className="add-container">
-                    <div className="add-modal__title">
-                        <h3>Новый пользователь</h3>
-                    </div>
-                    <AlarmMsg logo={logo}>{alarm}</AlarmMsg>
-                    <table className="change-container__table naked-input">
-                        <tbody>
-                        <tr>
-                            <td>Логин<span> *</span></td>
-                            <td className="text-center">
-                                <input type="text" {...register("login")} required/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Фамилия<span> *</span></td>
-                            <td className="text-center">
-                                <input type="text" {...register("lastName")} required/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Имя<span> *</span></td>
-                            <td className="text-center">
-                                <input type="text" {...register("firstName")} required/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Отчество</td>
-                            <td className="text-center">
-                                <input type="text" {...register("patronymic")}/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>E-mail<span> *</span></td>
-                            <td className="text-center">
-                                <input type="text" {...register("email")} required/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Пароль<span> *</span></td>
-                            <td className="text-center">
-                                <input type="password" {...register("password")} required/>
-                            </td>
-                        </tr>
+            <AddNewUserModal
+                form={form}
+                submitFunction={onSaveUserData}
+                isAddingUser={isAddingUser}
+                logo={logo}
+                alarm={alarm}
+                orgOptions={orgOptions}
+                onCancel={onCancelAddingUser}
+            ></AddNewUserModal>
 
-                        <tr>
-                            <td>Описание</td>
-                            <td className="text-center">
-                                <textarea {...register("description")}></textarea>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                    <div className="add-user__buttons">
-                        <Button type="button" onClick={() => {
-                            setIsAddingUser(!isAddingUser)
-                            setAlarm(null)
-                        }}>Отмена</Button>
-                        <Button type="submit">Сохранить</Button>
-                    </div>
-                </form>
-            </div>
-            <DeleteModal open={isDeletingUser} onNo={() => {
-                setIsDeletingUser(false)
-            }} onYes={onConfirmDeletingUser}></DeleteModal>
+            <DeleteModal
+                open={isDeletingUser}
+                onNo={() => setIsDeletingUser(false)}
+                onYes={onConfirmDeletingUser}
+            ></DeleteModal>
         </>
 
     )

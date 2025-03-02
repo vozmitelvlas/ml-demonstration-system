@@ -1,7 +1,6 @@
 import DataHeader from "../Headers/DataHeader.jsx";
 import React, {useEffect, useState} from "react";
-import {useNavigate, useParams} from "react-router-dom";
-import {customStyle, firstStyle, secondStyle} from "../../utils/selectStyles.jsx";
+import {useParams} from "react-router-dom";
 import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx";
 import alarmLogo from "../../../assets/alarm.svg";
 import acceptLogo from "../../../assets/accept.svg";
@@ -30,7 +29,6 @@ export default function ChangeUser() {
     const [logo, setLogo] = useState(alarmLogo)
     const [alarm, setAlarm] = useState(null)
     const [orgOptions, setOrgOptions] = useState([])
-    const [selectStyle, setSelectStyles] = useState(customStyle)
     const [userData, setUserData] = useState({})
     const [userLimits, setUserLimits] = useState([])
 
@@ -108,12 +106,6 @@ export default function ChangeUser() {
     const onInputChange = (newValue) => {
         setAlarm(null)
     }
-    const setFirstMultiBackColor = () => {
-        setSelectStyles((prev) => firstStyle(prev));
-    };
-    const setSecondMultiBackColor = () => {
-        setSelectStyles((prev) => secondStyle(prev));
-    }
     const onSaveUserData = async (newUserData) => {
         const allSendData = {
             ...newUserData,
@@ -141,10 +133,8 @@ export default function ChangeUser() {
                     const [newKey, lastChar] = key.match(/^(.*)(.)$/).slice(1)
                     modelId = lastChar
                     return [newKey, value]
-                });
-
+                })
                 const chunkAsObject = Object.fromEntries(trueChunk)
-                console.log("modelId chunkAsObject", modelId, chunkAsObject)
 
                 await apiClient(`/api/admin/users/${Number(userId)}/models/${Number(modelId)}/limit`, 'PUT',chunkAsObject)
             }
@@ -175,10 +165,7 @@ export default function ChangeUser() {
                     submitFunction={onSaveUserData}
                     displayData={displayData}
                     orgOptions={orgOptions}
-                    selectStyle={selectStyle}
                     rolesOptions={rolesOptions}
-                    setFirstMultiBackColor={setFirstMultiBackColor}
-                    setSecondMultiBackColor={setSecondMultiBackColor}
                 ></ChangeUserInfo>
             )}
             {activeBut === "second" && (

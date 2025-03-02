@@ -55,3 +55,30 @@ export const secondStyle = (prevStyles) => ({
         marginBottom: "10px"
     }),
 })
+
+export const setFirstMultiBackColor = (event, setOrgSelectStyle, setRolesSelectStyle) => {
+    if (!event || !event.target) return;
+
+    const targetRow = event.target.closest("tr");
+    if (!targetRow || !targetRow.dataset.name) return;
+
+    const datasetName = targetRow.dataset.name;
+    if (datasetName === "roles") {
+        setRolesSelectStyle((prev) => firstStyle(prev));
+    } else if (datasetName === "orgs") {
+        setOrgSelectStyle((prev) => firstStyle(prev));
+    }
+}
+export const setSecondMultiBackColor = (event, setOrgSelectStyle, setRolesSelectStyle) => {
+    if (!event || !event.target) return;
+
+    const targetRow = event.target.closest("tr");
+    if (!targetRow || !targetRow.dataset.name) return;
+
+    const datasetName = targetRow.dataset.name;
+    if (datasetName === "roles") {
+        setRolesSelectStyle((prev) => secondStyle(prev));
+    } else if (datasetName === "orgs") {
+        setOrgSelectStyle((prev) => secondStyle(prev));
+    }
+}

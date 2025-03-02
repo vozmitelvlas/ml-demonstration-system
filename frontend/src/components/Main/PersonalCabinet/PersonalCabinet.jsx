@@ -6,13 +6,13 @@ import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
 import {personalCabinetSchema} from "../../store/formSchema.jsx";
 import apiClient from "../../utils/apiClient.jsx";
-import SetNewPassword from "./SetNewPassword.jsx";
+import SetNewPasswordModal from "./SetNewPasswordModal.jsx";
 import DeleteModal from "../../utils/DeleteModal.jsx";
 import {useNavigate} from "react-router-dom";
 import alarmLogo from "../../../assets/alarm.svg";
 import acceptLogo from "../../../assets/accept.svg"
 import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx";
-import EditUserData from "./EditUserData.jsx";
+import EditUserDataModal from "./EditUserDataModal.jsx";
 
 export default function PersonalCabinet({userData, setUserData}) {
     const navigate = useNavigate()
@@ -148,7 +148,7 @@ export default function PersonalCabinet({userData, setUserData}) {
                 </table>
             </div>
 
-            <EditUserData
+            <EditUserDataModal
                 isEditing={isEditing}
                 submitFunction={onSaveUserData}
                 handleSubmit={handleSubmit}
@@ -156,12 +156,12 @@ export default function PersonalCabinet({userData, setUserData}) {
                 register={register}
                 logo={logo}
                 alarm={alarm}
-            ></EditUserData>
+            ></EditUserDataModal>
 
-            <SetNewPassword
+            <SetNewPasswordModal
                 passwordChanging={passwordChanging}
                 setPasswordChanging={setPasswordChanging}>
-            </SetNewPassword>
+            </SetNewPasswordModal>
 
             <DeleteModal
                 open={isDeletingProfile}

@@ -2,15 +2,15 @@ import * as yup from "yup";
 
 export const signUpSchema = yup.object()
     .shape({
+        email: yup.string()
+            // .required('Email обязателен')
+            .email('Некорректный формат Email'),
+
         login: yup.string()
             // .required('Логин обязателен')
             .matches(/^[\w_]*$/, `Неверный логин. Допустимые символы: буквы, цифры и нижнее подчёркивание`)
             .min(3, 'Неверный логин. Должно быть не меньше 3 символов')
             .max(50, 'Неверный логин. Должно быть не больше 50 символов'),
-
-        email: yup.string()
-            // .required('Email обязателен')
-            .email('Некорректный формат Email'),
 
         firstName: yup.string()
             // .required('Имя обязательно')
@@ -31,7 +31,23 @@ export const signUpSchema = yup.object()
             .max(255, 'Неверный пароль. Должно быть не больше 255 символов'),
 
         repeatPassword: yup.string()
-            .oneOf([yup.ref('password'), null], 'Пароли должны совпадать')
+            .oneOf([yup.ref('password'), null], 'Пароли должны совпадать'),
+
+        organization: yup.object()
+            .shape({
+                value: yup.string().required("Значение обязательно"),
+                label: yup.string().required("Метка обязательна")
+            })
+            .nullable()
+            .optional()
+            .required("Выберите организацию"),
+
+        selectRoles: yup
+            .array(
+                yup.object({value: yup.string(), label: yup.string()})
+            )
+            .min(1, "Выберите хотя бы одну роль"),
+
 
     })
 

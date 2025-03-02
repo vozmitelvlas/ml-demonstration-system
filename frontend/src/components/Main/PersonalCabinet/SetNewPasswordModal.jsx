@@ -5,7 +5,7 @@ import {yupResolver} from "@hookform/resolvers/yup";
 import {setNewPasswordSchema} from "../../store/formSchema.jsx";
 import Button from "../Button/Button.jsx";
 
-export default function SetNewPassword({setPasswordChanging, passwordChanging}) {
+export default function SetNewPasswordModal({setPasswordChanging, passwordChanging}) {
     const {
         register,
         handleSubmit,
