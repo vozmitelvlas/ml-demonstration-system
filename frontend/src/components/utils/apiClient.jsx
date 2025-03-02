@@ -1,5 +1,4 @@
 const API_BASE_URL = 'http://localhost:8080'
-const excludedPaths = ['/', '/signup', '/password'];
 
 const apiClient = async (endpoint, method = 'GET', body = null, customHeaders = {}) => {
     const defaultOptions = {
@@ -18,10 +17,10 @@ const apiClient = async (endpoint, method = 'GET', body = null, customHeaders = 
         const response = await fetch(`${API_BASE_URL}${endpoint}`, defaultOptions)
 
         if (response.status === 401) {
-            if(location.pathname !== "/"){
-                window.location.href = '/'
-                return null;
-            }
+            // if(location.pathname !== "/"){
+            //     window.location.href = '/'
+            //     return null;
+            // }
         }
 
         if (!response.ok) {

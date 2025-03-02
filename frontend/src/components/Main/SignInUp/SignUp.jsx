@@ -3,7 +3,6 @@ import {useNavigate} from "react-router-dom";
 import styles from "./SignIn.module.css"
 import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
-import axios from "axios";
 import {signUpSchema} from "../../store/formSchema.jsx";
 import ApiClient from "../../utils/apiClient.jsx";
 
@@ -14,7 +13,8 @@ export default function SignUp({setUserData, setIsAdmin, setMainOrg}) {
         register,
         handleSubmit,
         formState: {errors},
-        setError
+        setError,
+        getValues
     } = useForm({
         defaultValues: {
             login: "",
@@ -28,12 +28,13 @@ export default function SignUp({setUserData, setIsAdmin, setMainOrg}) {
         },
         resolver: yupResolver(signUpSchema)
     })
+    console.log(getValues())
 
     const firstErrorKey = Object.keys(errors)[0];
     const error = firstErrorKey ? errors[firstErrorKey].message : ''
 
     const sendFormData = async (formData) => {
-        console.log(formData)
+        console.log("asd", formData)
         try {
             const {user} = await ApiClient('/api/auth/register', 'POST', formData)
             setUserData(user)
