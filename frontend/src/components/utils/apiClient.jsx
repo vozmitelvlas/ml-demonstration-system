@@ -16,11 +16,11 @@ const apiClient = async (endpoint, method = 'GET', body = null, customHeaders = 
     try {
         const response = await fetch(`${API_BASE_URL}${endpoint}`, defaultOptions)
 
-        if (response.status === 401) {
-            // if(location.pathname !== "/"){
-            //     window.location.href = '/'
-            //     return null;
-            // }
+        if (response.status === 401){
+            if(!["/", "/password-reset"].includes(location.pathname)){
+                window.location.href = '/'
+                return null;
+            }
         }
 
         if (!response.ok) {

@@ -50,10 +50,12 @@ export default function PersonalCabinet({userData, setUserData}) {
     }, [errors]);
 
     const openCloseDeleteModal = () => {
+        setAlarm(null)
         setIsDeletingProfile(!isDeletingProfile)
     }
 
     const openClosePasswordModal = () => {
+        setAlarm(null)
         setPasswordChanging(!passwordChanging)
     }
 
@@ -160,8 +162,12 @@ export default function PersonalCabinet({userData, setUserData}) {
 
             <SetNewPasswordModal
                 passwordChanging={passwordChanging}
-                setPasswordChanging={setPasswordChanging}>
-            </SetNewPasswordModal>
+                setPasswordChanging={setPasswordChanging}
+                setLogo={setLogo}
+                setAlarm={setAlarm}
+                logo={logo}
+                alarm={alarm}
+            ></SetNewPasswordModal>
 
             <DeleteModal
                 open={isDeletingProfile}

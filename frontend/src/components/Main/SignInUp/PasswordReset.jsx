@@ -5,7 +5,6 @@ import {yupResolver} from "@hookform/resolvers/yup";
 import {passwordResetSchema} from "../../store/formSchema.jsx";
 import apiClient from "../../utils/apiClient.jsx";
 import {useNavigate} from "react-router-dom";
-import axios from "axios";
 
 export default function PasswordReset() {
     const navigate = useNavigate()
@@ -37,19 +36,8 @@ export default function PasswordReset() {
     const onResetPassword = async (newValue) => {
         console.log(newValue, token)
         try {
-            // await apiClient('/api/users/profile/password/reset', "POST", {password: newValue.password}, {
-            //     Authorization: `Bearer ${token}`})
-
-            await fetch('/api/users/profile/password/reset', {
-                method: 'POST', // Метод HTTP-запроса
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify({ password: newValue.password }),
-            })
-
-
+            await apiClient('/api/users/profile/password/reset', "POST", {password: newValue.password}, {
+                Authorization: `Bearer ${token}`})
             navigate("/")
         } catch (error) {
             console.log(error)

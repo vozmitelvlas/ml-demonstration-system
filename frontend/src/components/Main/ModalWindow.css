@@ -66,7 +66,7 @@
     font-weight: bold;
     color: #000000;
 }
-.delete-modal__buttons, .edit-modal__buttons, .add-user__buttons {
+.delete-modal__buttons, .edit-modal__buttons {
     display: flex;
     justify-content: space-evenly;
     gap: 100px;
@@ -74,6 +74,14 @@
     margin-top: 20px;
     margin-bottom: 20px;
 }
+.add-user__buttons{
+    display: flex;
+    justify-content: space-evenly;
+    gap: 100px;
+    align-items: center;
+    margin-top: 10px;
+}
+
 .add-modal__buttons{
     display: flex;
     justify-content: space-between;

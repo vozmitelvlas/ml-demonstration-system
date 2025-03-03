@@ -28,13 +28,11 @@ export default function SignUp({setUserData, setIsAdmin, setMainOrg}) {
         },
         resolver: yupResolver(signUpSchema)
     })
-    console.log(getValues())
 
     const firstErrorKey = Object.keys(errors)[0];
     const error = firstErrorKey ? errors[firstErrorKey].message : ''
 
     const sendFormData = async (formData) => {
-        console.log("asd", formData)
         try {
             const {user} = await ApiClient('/api/auth/register', 'POST', formData)
             setUserData(user)

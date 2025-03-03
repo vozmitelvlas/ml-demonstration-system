@@ -147,6 +147,7 @@ export const personalCabinetSchema = yup.object()
 
 export const setNewPasswordSchema = yup.object()
     .shape({
+        oldPassword: yup.string(),
         newPassword: yup.string()
             .min(6, 'Неверный пароль. Должно быть не меньше 6 символов')
             .matches(/[\d]+/ui, 'Неверный пароль. Пароль должен содержать хотя бы одну цифру')

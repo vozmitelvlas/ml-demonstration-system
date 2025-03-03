@@ -76,7 +76,7 @@ export default function CatalogUsers() {
     const onDeleteUserClick = (event) => {
         const tr = event.target.closest("tr")
         setTmpUserId(tr.dataset.id)
-        setIsDeletingUser(!isDeletedUser)
+        setIsDeletingUser(!isDeletingUser)
         setAlarm(null)
     }
     const toggleSidebar = () => {
