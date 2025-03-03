@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import ru.etu.mldemonstrationapp.mainservice.admin.users.dto.CreateUserRequest;
@@ -28,6 +29,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class AdminUserService {
+    private final PasswordEncoder passwordEncoder;
     private final LimitRepository limitRepository;
     private final ModelRepository modelRepository;
     private final UserRepository userRepository;
@@ -77,7 +79,7 @@ public class AdminUserService {
         return userRepository.save(new User(
                 null,
                 dto.login(),
-                dto.password(),
+                passwordEncoder.encode(dto.password()),
                 dto.email(),
                 dto.firstName(),
                 dto.lastName(),

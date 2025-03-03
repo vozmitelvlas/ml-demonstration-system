@@ -13,6 +13,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -88,7 +89,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                     token,
                     tokenString,
-                    userDetails.getAuthorities()
+                    token.authorities().contains("PASSWORD_RESET")
+                            ? token.authorities().stream().map(SimpleGrantedAuthority::new).toList()
+                            : userDetails.getAuthorities()
             );
 
             usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
