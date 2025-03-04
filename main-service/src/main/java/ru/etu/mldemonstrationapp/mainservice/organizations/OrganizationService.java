@@ -98,7 +98,18 @@ public class OrganizationService {
 
         Model model = modelRepository.findById(modelId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Model not found"));
-
+        
+        if (limit == null) {
+            limit = new ModelOrganizationLimit();
+        }
+                    
+        if (limit.getRps() == null) {
+            limit.setRps(model.getLimit().getRps());
+        }
+        if (limit.getRequestsPerWeek() == null) {
+            limit.setRequestsPerWeek(model.getLimit().getRequestsPerWeek());
+        } 
+        
         limit.setOrganization(organization);
         limit.setModel(model);
 
