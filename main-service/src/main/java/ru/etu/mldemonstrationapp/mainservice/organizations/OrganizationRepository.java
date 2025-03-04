@@ -14,4 +14,11 @@ public interface OrganizationRepository extends JpaRepository<Organization, Long
             WHERE o.organizationId = :id
             """)
     boolean containsUsers(Long id);
+
+    @Query("""
+            SELECT o.isEditable 
+            FROM Organization o
+            WHERE o.organizationId = :id
+            """)
+    boolean existsByIdAndIsEditableFalse(Long id);
 }

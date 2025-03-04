@@ -61,7 +61,6 @@ public class OrganizationService {
         }
         organization.setName(dto.name());
         organization.setDescription(dto.description());
-        organization.setEditable(dto.isEditable());
         return organizationRepository.save(organization);
     }
 
@@ -84,6 +83,11 @@ public class OrganizationService {
 
     @Transactional
     public void deleteOrganization(Long organizationId) {
+        if (organizationId == 1L || organizationRepository.existsByIdAndIsEditableFalse(organizationId) == Boolean.FALSE) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Невозможно удалить базовую организацию");
+        }
+
+        // Проверка на наличие пользователей в организации перед удалением
         if (organizationRepository.containsUsers(organizationId)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Organization contains users");
         }
