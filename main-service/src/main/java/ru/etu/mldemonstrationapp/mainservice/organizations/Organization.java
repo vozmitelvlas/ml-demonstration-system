@@ -24,31 +24,34 @@ public class Organization implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long organizationId;
-
+    
     @Column(nullable = false, unique = true)
     private String name;
-
+    
     private String description;
-
+    
     @OneToMany(mappedBy = "organization", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<User> members = new ArrayList<>();
-
+    
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private OrganizationLimitsType limitsType;
-
+    
     @OneToMany(mappedBy = "organization", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<ModelOrganizationLimit> limits = new ArrayList<>();
-
+    
     @UpdateTimestamp
     @Column(nullable = false)
     private Instant updatedAt;
-
+    
     @CreationTimestamp
     @Column(nullable = false)
     private Instant createdAt;
+
+    @Column(nullable = false)
+    private boolean isEditable;
 
     @JsonIgnore
     public List<ModelOrganizationLimitResponse> getModelsLimits() {

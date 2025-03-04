@@ -1,10 +1,10 @@
 INSERT INTO roles (role_id, name) VALUES (1, 'ADMIN'), (2, 'USER'), (3, 'ORGANIZATION_HEAD');
 
-INSERT INTO organizations (organization_id, name, description, limits_type)
-VALUES (1, 'Отдел разработки', 'Организация для разработчиков моделей', 'MODEL_LIMITS'),
-       (2, 'Отдел администрирования', 'Администраторы приложения', 'ORGANIZATION_LIMITS'),
-       (3, 'Управленческий отдел', 'Организация для отдела управленцов', 'MODEL_LIMITS'),
-       (4, 'Пользовательский отдел', 'Работа с пользователями', 'USER_LIMITS');
+INSERT INTO organizations (organization_id, name, description, limits_type, is_editable)
+VALUES (1, 'Отдел разработки', 'Организация для разработчиков моделей', 'MODEL_LIMITS', true),
+       (2, 'Отдел администрирования', 'Администраторы приложения', 'ORGANIZATION_LIMITS', true),
+       (3, 'Управленческий отдел', 'Организация для отдела управленцов', 'MODEL_LIMITS', true),
+       (4, 'Пользовательский отдел', 'Работа с пользователями', 'USER_LIMITS', true);
 
 INSERT INTO users (user_id, login, password, first_name, last_name, email, organization_id)
 VALUES (1, 'admin', '$2a$12$6KB.ORbCJV/655Mso0YO0OtXiygTTKcVpW/cPtcPjiMC1TO9geLDq', 'Админ', 'Админов', 'admin@example.com', 2),

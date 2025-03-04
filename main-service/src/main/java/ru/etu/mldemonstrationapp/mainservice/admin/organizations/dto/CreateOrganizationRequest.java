@@ -9,6 +9,8 @@ public record CreateOrganizationRequest(
         String name,
 
         @Size(max = 500, message = "Description cannot exceed 500 characters")
-        String description
+        String description,
+
+        boolean isEditable
 ) {
 }

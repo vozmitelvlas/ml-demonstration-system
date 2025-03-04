@@ -48,7 +48,8 @@ public class OrganizationService {
                 OrganizationLimitsType.ORGANIZATION_LIMITS,
                 Collections.emptyList(),
                 Instant.now(),
-                Instant.now()
+                Instant.now(),
+                true
         ));
     }
 
@@ -60,6 +61,7 @@ public class OrganizationService {
         }
         organization.setName(dto.name());
         organization.setDescription(dto.description());
+        organization.setEditable(dto.isEditable());
         return organizationRepository.save(organization);
     }
 
