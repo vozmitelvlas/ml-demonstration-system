@@ -99,7 +99,7 @@ public class OrganizationService {
         if (limitRepository.findByOrganizationIdAndModelId(organizationId, modelId).isPresent()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Organization already has access to this model");
         }
-        Organization organization = organizationRepository.findById(1L)
+        Organization organization = organizationRepository.findById(organizationId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Organization not found"));
 
         Model model = modelRepository.findById(modelId)

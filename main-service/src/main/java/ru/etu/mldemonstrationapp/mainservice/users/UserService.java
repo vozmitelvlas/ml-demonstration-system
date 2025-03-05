@@ -51,8 +51,8 @@ public class UserService {
         }
 
         // Default organization
-        Organization organization = organizationRepository.findById(4L)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT, "Organization with id 4 does not exist"));
+        Organization organization = organizationRepository.findById(1L)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT, "Default organization with id 1 does not exist"));
 
         User user = new User();
         user.setLogin(request.login());
