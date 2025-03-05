@@ -48,7 +48,8 @@ public class OrganizationService {
                 OrganizationLimitsType.ORGANIZATION_LIMITS,
                 Collections.emptyList(),
                 Instant.now(),
-                Instant.now()
+                Instant.now(),
+                true
         ));
     }
 
@@ -82,6 +83,11 @@ public class OrganizationService {
 
     @Transactional
     public void deleteOrganization(Long organizationId) {
+        if (organizationRepository.existsByIdAndIsEditableFalse(organizationId) == Boolean.FALSE) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Невозможно удалить базовую организацию");
+        }
+
+        // Проверка на наличие пользователей в организации перед удалением
         if (organizationRepository.containsUsers(organizationId)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Organization contains users");
         }
@@ -98,7 +104,18 @@ public class OrganizationService {
 
         Model model = modelRepository.findById(modelId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Model not found"));
-
+        
+        if (limit == null) {
+            limit = new ModelOrganizationLimit();
+        }
+                    
+        if (limit.getRps() == null) {
+            limit.setRps(model.getLimit().getRps());
+        }
+        if (limit.getRequestsPerWeek() == null) {
+            limit.setRequestsPerWeek(model.getLimit().getRequestsPerWeek());
+        } 
+        
         limit.setOrganization(organization);
         limit.setModel(model);
 
