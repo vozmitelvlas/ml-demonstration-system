@@ -83,7 +83,7 @@ public class OrganizationService {
 
     @Transactional
     public void deleteOrganization(Long organizationId) {
-        if (organizationId == 1L || organizationRepository.existsByIdAndIsEditableFalse(organizationId) == Boolean.FALSE) {
+        if (organizationRepository.existsByIdAndIsEditableFalse(organizationId) == Boolean.FALSE) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Невозможно удалить базовую организацию");
         }
 
@@ -99,7 +99,7 @@ public class OrganizationService {
         if (limitRepository.findByOrganizationIdAndModelId(organizationId, modelId).isPresent()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Organization already has access to this model");
         }
-        Organization organization = organizationRepository.findById(organizationId)
+        Organization organization = organizationRepository.findById(1L)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Organization not found"));
 
         Model model = modelRepository.findById(modelId)
