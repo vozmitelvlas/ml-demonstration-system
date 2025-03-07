@@ -1,13 +1,13 @@
 .users{
     text-align: left;
-    margin-right: 120px;
+    margin-right: 50px;
     height: 100%;
 }
 .users h2{
     margin-left: 30px;
 }
 .users td{
-    padding-right: 250px;
+
 }
 .table{
     padding: 20px;
@@ -17,6 +17,7 @@
 .header{
     display: flex;
     margin: 30px 50px 0 50px;
+    align-items: center;
 }
 .info{
     display: flex;
@@ -24,8 +25,6 @@
     gap: 30px;
     text-align: left;
     height: 100%;
-    margin-left: 120px;
-
 }
 .content{
     display: flex;
@@ -34,6 +33,7 @@
 
     flex-grow: 1;
     overflow: auto;
+    margin-left: 70px;
 }
 .content span{
     color: var(--accent-color);
@@ -60,4 +60,13 @@
 .limits{
     display: flex;
     align-items: center;
+}
+.memberId{
+    width: 10px;
+}
+.member{
+    width: 400px;
+}
+.backBut{
+    margin: 0 50px 20px 20px;
 }

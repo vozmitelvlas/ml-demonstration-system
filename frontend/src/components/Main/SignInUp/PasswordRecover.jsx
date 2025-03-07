@@ -1,29 +1,47 @@
-
 import React, {useState} from "react";
-import {useNavigate} from "react-router-dom";
 import styles from "./SignIn.module.css"
+import apiClient from "../../utils/apiClient.jsx";
 
 export default function PasswordRecover() {
-    let navigate = useNavigate()
     const [email, setEmail] = useState("")
 
-    const sendFormData = (event) => {
+    const sendOnEmail = async (event) => {
         event.preventDefault()
-        navigate("/models")
+        console.log(email)
+        try{
+            await apiClient(`/api/auth/password-reset`, 'POST', {email: email})
+        } catch (error){
+            console.log(error)
+        }
     }
-    const onEmailChange = ({target}) => {
+
+    const oninputChange = ({target}) => {
         setEmail(target.value)
     }
 
     return (
         <div className={styles.signInUp}>
-            <div className={styles.container}>
-                <form onSubmit={sendFormData}>
-                    <p className="text-class">Восстановление пароля</p>
-                    <input value={email} type="email" placeholder="Введите email" onChange={onEmailChange}/>
-                    <button className={styles.button}>Восстановить</button>
-                </form>
-            </div>
+            <form className={styles.container} onSubmit={sendOnEmail}>
+                <div className={`${styles.inData} naked-input`}>
+                    <h2>Восстановление пароля</h2>
+                    <div className={styles.row}>
+                        <div className={styles.inputDiv}>
+                            <label>Введите почту</label>
+                            <div>
+                                <input type="email" placeholder="example@mail.ru" name="email" value={email}
+                                       onChange={oninputChange} required/>
+                            </div>
+                        </div>
+                    </div>
+                    <div className={styles.row}>
+                        <div className={styles.button}>
+                            <div>
+                                <button type="submit">Отправить письмо</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
         </div>
     )
 }

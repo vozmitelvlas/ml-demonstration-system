@@ -1,4 +1,5 @@
 .add-modal-overlay, .delete-modal-overlay, .edit-modal-overlay {
+    /*-> .modal-overlay*/
     position: fixed;
     left: 0;
     right: 0;
@@ -11,7 +12,7 @@
     justify-content: center;
     align-items: center;
 
-    background-color: rgb(84, 103, 145, 0.6);
+    background-color: rgb(84, 103, 145, 0.7);
     z-index: 1000;
     transition: 0.2s ease;
     opacity: 1;
@@ -65,13 +66,22 @@
     font-weight: bold;
     color: #000000;
 }
-.delete-modal__buttons, .edit-modal__buttons, .add-user__buttons {
+.delete-modal__buttons, .edit-modal__buttons {
     display: flex;
     justify-content: space-evenly;
     gap: 100px;
     align-items: center;
     margin-top: 20px;
+    margin-bottom: 20px;
 }
+.add-user__buttons{
+    display: flex;
+    justify-content: space-evenly;
+    gap: 100px;
+    align-items: center;
+    margin-top: 10px;
+}
+
 .add-modal__buttons{
     display: flex;
     justify-content: space-between;
@@ -92,5 +102,11 @@
 .add-modal__inputs input{
     width: calc(24rem + 2px);
     box-shadow: 0 0 0 0 rgba(158, 158, 158, 0.25);
+}
+
+.title{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 

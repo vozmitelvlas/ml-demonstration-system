@@ -11,41 +11,56 @@ import "../select.css"
 import React, {useEffect, useState} from "react";
 import Filter from "../Filter/Filter.jsx";
 import DeleteModal from "../../utils/DeleteModal.jsx";
-import axios from "axios"
+import apiClient from "../../utils/apiClient.jsx"
 import Select from "react-select";
 import {customStyle, firstStyle, secondStyle} from "../../utils/selectStyles.jsx";
-import {useSelector} from "react-redux";
-import {setUserInfo} from "../../store/user-slice.jsx";
+import {getDateFormat} from "../../utils/DateAndTime.jsx";
+import alarmLogo from "../../../assets/alarm.svg"
+import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx";
 
 const options = [
     {value: 'O1', label: 'First'},
     {value: 'O2', label: 'Second'}
 ];
 
-export default function CatalogModels({isAdminMode}) {
-    let navigate = useNavigate()
+export default function CatalogModels({isAdminMode, isAdmin}) {
+    const navigate = useNavigate()
     const [isOpen, setIsOpen] = useState(false);
-    let [isDeletingModel, setIsDeletingModel] = useState(false)
+    const [isDeletingModel, setIsDeletingModel] = useState(false)
+    const [tmpModelId, setTmpModelId] = useState([])
+    const [alarm, setAlarm] = useState(null)
+    const [logo, setLogo] = useState(alarmLogo)
+    const [isAddingModel, setIsAddingModel] = useState(false)
 
-    let closeDeleteModal = () => {
+    const [models, setModels] = useState([])
+    useEffect(() => {
+        apiClient(isAdmin ? '/api/admin/models/versions' : '/api/models/versions').then((res => {
+            setModels(res)
+        })).catch((error) => {
+            console.log(error);
+        });
+    }, [isDeletingModel, isAdmin])
+
+    const closeDeleteModal = () => {
         setIsDeletingModel(false)
     }
-    let onDeleteModelClick = (event) => {
+    const onDeleteModelClick = (event) => {
         let tr = event.target.closest("tr")
+        setTmpModelId(tr.dataset.id.split(" "))
         setIsDeletingModel(true)
     }
-    const toggleSidebar = () => {
-        setIsOpen(!isOpen);
-    };
-    let closeAddModal = (event) => {
-        let addModal = event.target.closest(".add-modal-overlay")
-        addModal.classList.add("add-modal-overlay_hidden")
+    const onConfirmDeletingModel = async () => {
+        try {
+            await apiClient(`/api/admin/models/${tmpModelId[0]}/versions/${tmpModelId[1]}`, 'DELETE');
+            setLogo(acceptLogo)
+            setAlarm("Модель успешно удалена")
+        } catch (serverError) {
+            console.error(serverError)
+        }
+        setIsDeletingModel(false)
     }
-    let openAddModal = () => {
-        let addModal = document.querySelector(".add-modal-overlay")
-        addModal.classList.remove("add-modal-overlay_hidden")
-    }
-    let handleNewModelClick = () => {
+
+    const handleNewModelClick = () => {
         navigate("models/edit")
     }
 
@@ -83,13 +98,19 @@ export default function CatalogModels({isAdminMode}) {
                 <CatalogHeader title={"Каталог моделей"}
                                searchFields={["Название модели", "Тип модели"]}></CatalogHeader>
 
-                {isAdminMode && (
-                    <div className="options-buttons_up">
-                        <Button onClick={openAddModal}>Добавить модель</Button>
-                        <Button>Импорт</Button>
-                        <Button>Экспорт</Button>
-                    </div>
-                )}
+                <div className="options-buttons_up">
+                    {isAdminMode && (
+                        <div>
+                            <Button onClick={() => {
+                                setIsAddingModel(!isAddingModel)
+                                setAlarm(null)
+                            }}>Добавить модель</Button>
+                            <Button>Добавить версию</Button>
+                        </div>
+                    )}
+                </div>
+
+                <AlarmMsg logo={logo}>{alarm}</AlarmMsg>
 
                 <div className="catalog-models">
                     <table className="table-fill">
@@ -111,40 +132,50 @@ export default function CatalogModels({isAdminMode}) {
                         </tr>
                         </thead>
                         <tbody>
-                        <tr id="123">
-                            <td className="text-center">1</td>
-                            <td className="text-center">
-                                <a><img src={acceptLogo}></img></a>
-                            </td>
-                            <td className="text-center"><Link to={`/models/${1}/data`}>Graph-based segmentation
-                                model</Link>
-                            </td>
-                            <td className="text-center">#1</td>
-                            <td className="text-center">type</td>
-                            <td className="text-center">123123</td>
-                            <td className="text-center">
-                                <div className="URL">
-                                    dfpmpdmfpbpm/a/a/
-                                    <a className="a-img" name="copyLogo"><img src={copyLogo}></img></a>
-                                </div>
-                            </td>
-                            {isAdminMode && (
+                        {models.map(model => (
+                            <tr key={`${model.modelId}${model.modelVersionId}`}
+                                data-id={`${model.modelId} ${model.modelVersionId}`}>
+
+                                <td className="text-center">{model.modelVersionId}</td>
                                 <td className="text-center">
-                                    <Link className="a-img" to={`/models/${1}/edit`}><img src={editLogo}></img></Link>
+                                    <a><img src={acceptLogo}></img></a>
                                 </td>
-                            )}
-                            {isAdminMode && (
+                                <td className="text-center"><Link
+                                    to={`/models/${model.modelId}/versions/${model.modelVersionId}/data`}>{model.modelName}</Link>
+                                </td>
+                                <td className="text-center">{model.versionName}</td>
+                                <td className="text-center">{model.problemType}</td>
+                                <td className="text-center">{getDateFormat(new Date(model.createdAt))}</td>
                                 <td className="text-center">
-                                    <a className="a-img" onClick={onDeleteModelClick}><img src={deleteLogo}></img></a>
+                                    <div className="URL">
+                                        {model.uri}
+                                        <a className="a-img" name="copyLogo"><img src={copyLogo}></img></a>
+                                    </div>
                                 </td>
-                            )}
-                        </tr>
+                                {isAdminMode && (
+                                    <td className="text-center">
+                                        <Link className="a-img"
+                                              to={`/models/${model.modelId}/versions/${model.modelVersionId}/edit`}><img
+                                            src={editLogo}></img></Link>
+                                    </td>
+                                )}
+                                {isAdminMode && (
+                                    <td className="text-center">
+                                        <a className="a-img" onClick={onDeleteModelClick}><img
+                                            src={deleteLogo}></img></a>
+                                    </td>
+                                )}
+
+                            </tr>
+                        ))}
                         </tbody>
                     </table>
                 </div>
 
                 <div className="options-buttons">
-                    <Button classNames="filter-button" onClick={toggleSidebar}>Фильтр</Button>
+                    <Button classNames="filter-button" onClick={() => {
+                        setIsOpen(!isOpen)
+                    }}>Фильтр</Button>
                     {isAdminMode && (
                         <div className="options-buttons_right-down">
                             <Button onClick={() => {
@@ -160,20 +191,19 @@ export default function CatalogModels({isAdminMode}) {
                     )}
                 </div>
 
-                <div className="add-modal-overlay add-modal-overlay_hidden">
-                    <div className="add-user-modal">
+                <div className={`add-modal-overlay ${isAddingModel ? "" : "add-modal-overlay_hidden"}`}>
+                    <form className="add-container">
                         <div className="add-modal__title">
                             <h3>Новая модель</h3>
                         </div>
+                        <AlarmMsg logo={logo}>{alarm}</AlarmMsg>
                         <div className="add-modal__table">
-                            <table className="change-container__table tableHover naked-input">
+                            <table className="change-container__table naked-input">
                                 <tbody>
                                 <tr>
                                     <td>Название<span> *</span></td>
                                     <td className="text-center"><input type="text" defaultValue={""} required/></td>
                                 </tr>
-
-
                                 <tr onMouseEnter={setFirstMultiBackColor} onMouseLeave={setSecondMultiBackColor}>
                                     <td>Тип задачи<span> *</span></td>
                                     <td>
@@ -196,12 +226,18 @@ export default function CatalogModels({isAdminMode}) {
                             </table>
                         </div>
                         <div className="delete-modal__buttons">
-                            <Button onClick={closeAddModal}>Отмена</Button>
+                            <Button onClick={() => {
+                                setIsAddingModel(!isAddingModel)
+                            }}>Отмена</Button>
                             <Button onClick={handleNewModelClick}>Добавить</Button>
                         </div>
-                    </div>
+                    </form>
                 </div>
-                <DeleteModal open={isDeletingModel} onNo={closeDeleteModal}></DeleteModal>
+                <DeleteModal
+                    open={isDeletingModel}
+                    onNo={closeDeleteModal}
+                    onYes={onConfirmDeletingModel}>
+                </DeleteModal>
             </main>
         </>
     )

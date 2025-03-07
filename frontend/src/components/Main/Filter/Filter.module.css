@@ -1,6 +1,6 @@
 .filter{
     width: 330px;
-    height: 105%;
+    height: 100%;
     background-color: #ffffff;
     border-right: 2px solid #e3e3e3;
 
@@ -27,7 +27,6 @@
 
 }
 .line {
-    border: none;
     height: 2px; /* Толщина линии */
     background: #e3e3e3;
 
@@ -35,6 +34,8 @@
 }
 .item{
     margin-top: 30px;
+    margin-right: 10px;
+
 }
 
 .item button{

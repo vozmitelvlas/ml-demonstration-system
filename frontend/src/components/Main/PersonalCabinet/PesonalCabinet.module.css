@@ -5,7 +5,15 @@
     display: flex;
     gap: 200px;
 }
+.container{
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    background-color: white;
 
+    padding: 15px;
+    border-radius: 15px;
+}
 .userOptions{
     display: flex;
     flex-direction: column;
@@ -49,5 +57,11 @@
     padding-top: 15px;
     width: 400px;
     vertical-align: middle;
+}
+
+.userData{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
 

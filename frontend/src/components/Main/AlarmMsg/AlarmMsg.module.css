@@ -1,0 +1,17 @@
+.alarmContainer{
+    height: 47px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+}
+.alarm{
+    color: #49C5BA;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+}
+.alarm a{
+    cursor: default;
+}
