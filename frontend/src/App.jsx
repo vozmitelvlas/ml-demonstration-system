@@ -31,11 +31,10 @@ function App() {
         if (userData === null && !excludedPaths.includes(location.pathname)) {
             apiClient(`/api/users/profile`)
                 .then((res) => {
-                    console.log("user_app", res)
                     setUserData(res)
                     setIsAdmin(res.roles.includes("ADMIN"))
                     setMainOrg(res.roles.includes("ORGANIZATION_HEAD"))
-                    setIsAdminMode(sessionStorage.getItem("isAdminMode"))
+                    setIsAdminMode(JSON.parse(sessionStorage.getItem("isAdminMode")))
                 })
                 .catch(error => {
                     console.error(error)
@@ -64,7 +63,7 @@ function App() {
                     <Route path="/password-reset" element={<PasswordReset/>}/>
 
                     <Route path="/profile" element={<PersonalCabinet userData={userData} setUserData={setUserData}/>}/>
-                    <Route path="/models" element={<CatalogModels isAdminMode={isAdminMode} isAdmin={isAdmin}/>}/>
+                    <Route path="/models" element={<CatalogModels isAdminMode={isAdminMode}/>}/>
 
                     <Route path="/models/:modelId/versions/:versionId/edit" element={<ChangeModel/>}/>
                     <Route path="/models/:modelId/versions/:versionId/data" element={<ModelData isAdmin={isAdmin}/>}/>

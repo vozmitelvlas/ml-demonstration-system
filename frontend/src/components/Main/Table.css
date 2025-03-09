@@ -82,6 +82,7 @@ div.table-title {
     background: var(--accent-color);
     color: #FFFFFF;
     border-top: 1px solid #22262e;
+    transition: color 0.2s ease;
 }
 .table-fill tr:first-child {
     border-top: none;
@@ -148,16 +149,23 @@ td.text-right {
 }
 tr:hover input {
     background-color: #ffffff;
-    transition: background-color 0.2s ease;
+    transition: background-color 0.5s ease;
 }
-tr:hover select {
-    background-color: white;
-    transition: background-color 0.2s ease;
-}
+/*tr:hover select {*/
+/*    background-color: white;*/
+/*    transition: background-color 0.2s ease;*/
+/*}*/
 tr:hover textarea {
     background-color: #ffffff;
-    transition: background-color 0.2s ease;
+    transition: background-color 0.5s ease;
 }
 td {
     transition: background-color 0.2s ease, color 0.2s ease;
+}
+tr:hover .custom-link{
+    color: #ffffff;
+    transition: color 0.2s;
+}
+tr:hover .status-img{
+    filter: grayscale(100%) brightness(100);
 }

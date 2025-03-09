@@ -1,5 +1,4 @@
 .add-modal-overlay, .delete-modal-overlay, .edit-modal-overlay {
-    /*-> .modal-overlay*/
     position: fixed;
     left: 0;
     right: 0;
@@ -16,6 +15,7 @@
     z-index: 1000;
     transition: 0.2s ease;
     opacity: 1;
+    overflow: auto;
 }
 
 .add-modal-overlay_hidden, .delete-modal-overlay_hidden, .edit-modal-overlay_hidden {

@@ -10,7 +10,7 @@ export default function EditUserDataModal({isEditing, handleSubmit, submitFuncti
                 <form onSubmit={handleSubmit(submitFunction)} className={styles.container}>
                     <h3>Редактирование данных</h3>
                     <AlarmMsg logo={logo}>{alarm}</AlarmMsg>
-                    <table className="change-container__table naked-input">
+                    <table className="change-container__table naked-input data-input">
                         <tbody>
                         <tr>
                             <td>Логин</td>

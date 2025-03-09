@@ -64,20 +64,20 @@ export const addNewUserSchema = yup.object()
             .matches(/[a-zA-Z]/i, 'Неверный пароль. Пароль должен состоять из латинских букв')
             .max(255, 'Неверный пароль. Должно быть не больше 255 символов'),
 
-        organization: yup.object()
-            .shape({
-                value: yup.string().required("Значение обязательно"),
-                label: yup.string().required("Метка обязательна")
-            })
-            .nullable()
-            .optional()
-            .required("Выберите организацию"),
-
-        selectRoles: yup
-            .array(
-                yup.object({value: yup.string(), label: yup.string()})
-            )
-            .min(1, "Выберите хотя бы одну роль"),
+        // organization: yup.object()
+        //     .shape({
+        //         value: yup.string().required("Значение обязательно"),
+        //         label: yup.string().required("Метка обязательна")
+        //     })
+        //     .nullable()
+        //     .optional()
+        //     .required("Выберите организацию"),
+        //
+        // selectRoles: yup
+        //     .array(
+        //         yup.object({value: yup.string(), label: yup.string()})
+        //     )
+        //     .min(1, "Выберите хотя бы одну роль"),
     })
 
 export const signInSchema = yup.object()
@@ -177,14 +177,13 @@ export const limitsSchema = yup.object().strict().test(
         return Object.entries(obj)
             .filter(([key]) => key.startsWith('rps') || key.startsWith('requestsPerWeek'))
             .every(([key, value]) => {
-                if (value === undefined || value === null || value === "") return false; // Обязательность
+                if (value === undefined || value === null || value === "") return false
                 const val = Number(value);
-                if (isNaN(val)) return false; // Число
-                if (!Number.isInteger(val)) return false; // Целое число
-                return true;
-            });
+                if (isNaN(val)) return false
+                return Number.isInteger(val)
+            })
     }
-);
+)
 
 export const newOrgSchema = yup.object()
     .shape({
