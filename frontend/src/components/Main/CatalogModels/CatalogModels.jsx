@@ -33,6 +33,7 @@ export default function CatalogModels({isAdminMode}) {
     const [isAddingVersion, setIsAddingVersion] = useState(false)
     const [formatModels, setFormatModels] = useState([])
     const [isAddedModel, setIsAddedModel] = useState(false)
+    const [isDeletedModel, setIsDeletedModel] = useState(false)
 
     const modelForm = useForm({
         resolver: yupResolver(yup.object()),
@@ -73,7 +74,8 @@ export default function CatalogModels({isAdminMode}) {
             console.log(error)
         })
         setIsAddedModel(false)
-    }, [isAddedModel])
+        setIsDeletedModel(false)
+    }, [isAddedModel, isDeletedModel])
 
     const firstErrorKey1 = Object.keys(modelForm.formState.errors)[0];
     useEffect(() => {
@@ -106,10 +108,11 @@ export default function CatalogModels({isAdminMode}) {
             setModels(models.filter(model => model.modelVersionId !== Number(tmpModelId[1])))
             setLogo(acceptLogo)
             setAlarm("Модель успешно удалена")
+            setIsDeletedModel(true)
+            setIsDeletingModel(false)
         } catch (serverError) {
             console.error(serverError)
         }
-        setIsDeletingModel(false)
     }
 
     const onAddNewModel = async (newValue) => {
@@ -140,6 +143,7 @@ export default function CatalogModels({isAdminMode}) {
         try {
             const {selectModel, ...formatValues} = newValue
             const modelId = selectModel.value
+            console.log(formatValues)
             const res = await apiClient(`/api/admin/models/${modelId}/versions`, 'POST', formatValues)
 
             setModels([...models, res])
