@@ -241,6 +241,7 @@ export default function CatalogModels({isAdminMode}) {
                                 <td className="text-center">
                                     <Link
                                         className="custom-link"
+                                        state={{ message: model.modelName }}
                                         to={`/models/${model.modelId}/versions/${model.modelVersionId}/data`}>
                                         {model.modelName}
                                     </Link>

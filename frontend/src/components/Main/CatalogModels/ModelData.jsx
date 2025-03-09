@@ -1,7 +1,7 @@
 import DataHeader from "../Headers/DataHeader.jsx";
 import Button from "../Button/Button.jsx";
 import React, {useEffect, useState} from "react";
-import {useNavigate, useParams} from "react-router-dom";
+import {useLocation, useNavigate, useParams} from "react-router-dom";
 import styles from "./ModelData.module.css"
 import apiClient from "../../utils/apiClient.jsx";
 
@@ -9,9 +9,12 @@ import apiClient from "../../utils/apiClient.jsx";
 export default function ModelData({isAdmin}) {
     const navigate = useNavigate()
     const {modelId, versionId} = useParams()
-    const [activeBut, setActiveBut] = useState("first");
+    const [activeBut, setActiveBut] = useState("first")
+    const [modelData, setModelData] = useState({})
 
-    const [modelData, setModelData] = useState({});
+    const location = useLocation()
+    const modelName = location.state?.message
+
     useEffect(() => {
         apiClient(isAdmin ? `/api/admin/models/${modelId}/versions/${versionId}` : `/api/models/versions/${versionId}`).then(res => {
             setModelData(res)
@@ -28,7 +31,7 @@ export default function ModelData({isAdmin}) {
                         setActiveBut={setActiveBut}
                         buttons={["ИНФОРМАЦИЯ", "ВИЗУАЛИЗАЦИЯ"]}
                         names={["first", "second"]}>
-                Модель Graph-based segmentation model
+                {modelName}
             </DataHeader>
 
             {activeBut === "first" && (
