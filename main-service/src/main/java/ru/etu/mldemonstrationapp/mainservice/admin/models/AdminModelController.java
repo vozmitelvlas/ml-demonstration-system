@@ -56,15 +56,16 @@ public class AdminModelController {
     @Operation(description = "Register new model")
     @ApiResponse(useReturnTypeSchema = true, responseCode = "201")
     @PostMapping
-    public ResponseEntity<Model> registerModel(@Valid @RequestBody CreateModelRequest createModelRequest,
+    public ResponseEntity<ModelVersion> registerModel(@Valid @RequestBody CreateModelRequest createModelRequest,
                                                UriComponentsBuilder uriComponentsBuilder) {
         Model model = adminModelsService.createModel(createModelRequest);
+        ModelVersion modelVersion = model.getModelVersions().get(0);
         return ResponseEntity
                 .created(uriComponentsBuilder
-                        .replacePath("/api/admin/models/{modelId}")
-                        .build(Map.of("modelId", model.getModelId()))
+                        .replacePath("/api/admin/models/{modelId}/versions/{versionId}")
+                        .build(Map.of("modelId", model.getModelId(), "versionId", modelVersion.getModelVersionId()))
                 )
-                .body(model);
+                .body(modelVersion);
     }
 
     @Operation(description = "Create a new version of an existing model")
