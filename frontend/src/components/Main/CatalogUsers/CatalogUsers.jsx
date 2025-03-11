@@ -27,8 +27,6 @@ export default function CatalogUsers() {
     const [users, setUsers] = useState([])
     const [isAddingUser, setIsAddingUser] = useState(false)
     const [isDeletingUser, setIsDeletingUser] = useState(false)
-    const [isAddedUser, setIsAddedUser] = useState(false)
-    const [isDeletedUser, setIsDeletedUser] = useState(false)
     const [orgOptions, setOrgOptions] = useState([])
     const form = useForm({
         resolver: yupResolver(signUpSchema),
@@ -51,7 +49,7 @@ export default function CatalogUsers() {
         }).catch(error => {
             console.error(error)
         })
-    }, [isDeletedUser, isAddedUser])
+    }, [])
 
     useEffect(() => {
         apiClient(`/api/admin/organizations`).then((res) => {
@@ -89,14 +87,12 @@ export default function CatalogUsers() {
             setAlarm("Пользователь успешно удален")
             setLogo(acceptLogo)
             setIsDeletingUser(!isDeletingUser)
-            setIsDeletedUser(true)
+            setUsers(users.filter(user => user.userId !== Number(tmpUserId)))
         } catch (error) {
             console.error(error)
         }
     }
     const onSaveUserData = async (newValue) => {
-        console.log(newValue)
-
         const sendData = {
             ...newValue,
             organizationId: newValue.organization.value,
@@ -104,13 +100,13 @@ export default function CatalogUsers() {
         }
 
         try {
-            await apiClient(`/api/admin/users`, "POST", sendData)
+            const res = await apiClient(`/api/admin/users`, "POST", sendData)
 
+            setUsers([...users, res])
             setAlarm("Пользователь успешно создан")
             setLogo(acceptLogo)
-            form.reset({})
+            form.reset()
             setIsAddingUser(!isAddingUser)
-            setIsAddedUser(true)
         } catch (error) {
             if (error.status === 409) {
                 form.setError('form', {type: 'server', message: error.detail})

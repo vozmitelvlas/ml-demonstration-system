@@ -149,13 +149,23 @@ export default function CatalogOrganisations() {
                                 <td className="text-center">{org.organizationId}</td>
                                 <td className="text-center">{org.name}</td>
                                 <td className="text-center">{getDateFormat(new Date(org.createdAt))}</td>
-                                <td className="text-center">
-                                    <Link className="a-img" to={`/organisations/${org.organizationId}/edit`}><img
-                                        src={editLogo}></img></Link>
-                                </td>
-                                <td className="text-center">
-                                    <a className="a-img" onClick={onDeleteOrgClick}><img src={deleteLogo}></img></a>
-                                </td>
+                                 <td className="text-center">
+                                     <Link className="a-img" to={`/organisations/${org.organizationId}/edit`}>
+                                        <img src={editLogo}></img>
+                                     </Link>
+                                 </td>
+                                {org.editable ? (
+                                    <>
+                                        <td className="text-center">
+                                            <a className="a-img" onClick={onDeleteOrgClick}><img src={deleteLogo}></img></a>
+                                        </td>
+                                    </>
+                                ) : (
+                                    <>
+                                        <td></td>
+                                        <td></td>
+                                    </>
+                                )}
                             </tr>
                         ))}
 
@@ -185,7 +195,7 @@ export default function CatalogOrganisations() {
                         </div>
                         <AlarmMsg logo={logo}>{alarm}</AlarmMsg>
                         <div className="add-modal__table">
-                            <table className="change-container__table naked-input">
+                            <table className="change-container__table naked-input data-input">
                                 <tbody>
                                 <tr>
                                     <td>Название<span> *</span></td>

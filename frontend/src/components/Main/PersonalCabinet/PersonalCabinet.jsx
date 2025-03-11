@@ -143,7 +143,11 @@ export default function PersonalCabinet({userData, setUserData}) {
                     <tr>
                         <td>Описание</td>
                         <td>
-                            <textarea disabled value={userData?.description ? userData?.description : ""}></textarea>
+                            <textarea
+                                id={styles.description}
+                                value={userData?.description ? userData?.description : ""}
+                                disabled
+                            ></textarea>
                         </td>
                     </tr>
                     </tbody>

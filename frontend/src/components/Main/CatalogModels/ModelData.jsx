@@ -9,9 +9,9 @@ import apiClient from "../../utils/apiClient.jsx";
 export default function ModelData({isAdmin}) {
     const navigate = useNavigate()
     const {modelId, versionId} = useParams()
-    const [activeBut, setActiveBut] = useState("first");
+    const [activeBut, setActiveBut] = useState("first")
+    const [modelData, setModelData] = useState({})
 
-    const [modelData, setModelData] = useState({});
     useEffect(() => {
         apiClient(isAdmin ? `/api/admin/models/${modelId}/versions/${versionId}` : `/api/models/versions/${versionId}`).then(res => {
             setModelData(res)
@@ -28,7 +28,7 @@ export default function ModelData({isAdmin}) {
                         setActiveBut={setActiveBut}
                         buttons={["ИНФОРМАЦИЯ", "ВИЗУАЛИЗАЦИЯ"]}
                         names={["first", "second"]}>
-                Модель Graph-based segmentation model
+                {modelData.modelName}
             </DataHeader>
 
             {activeBut === "first" && (

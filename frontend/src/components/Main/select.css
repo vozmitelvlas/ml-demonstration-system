@@ -12,3 +12,9 @@ select {
 
     cursor: pointer;
 }
+
+.custom-link {
+    color: #49C5BA;
+    text-decoration: underline;
+    font-weight: bold;
+}

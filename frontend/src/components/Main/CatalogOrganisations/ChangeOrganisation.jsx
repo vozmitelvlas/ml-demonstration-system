@@ -54,26 +54,29 @@ export default function ChangeOrganisation() {
         })
 
         apiClient(`/api/admin/models`).then(res => {
-            const formatAllModels = []
-            res.map(model => {
-                formatAllModels.push({value: model.modelId, label: model.name})
-            })
-
             setAllModels(res)
-            setModelOptions(formatAllModels)
+            setModelOptions(
+                res.map(model => ({
+                    value: model.modelId,
+                    label: model.name
+                }))
+            )
+        }).catch(error => {
+            console.log(error)
         })
 
         apiClient(`/api/admin/organizations/${orgId}/models`).then(res => {
-            const formatOrgModels = {}
-            res.forEach(model => {
-                    formatOrgModels[`rps${model.modelId}`] = model.limit.rps.toString()
-                    formatOrgModels[`requestsPerWeek${model.modelId}`] = model.limit.requestsPerWeek.toString()
-                }
-            );
+            const formatOrgModels = res.reduce((acc, model) => {
+                acc[`rps${model.modelId}`] = model.limit.rps.toString();
+                acc[`requestsPerWeek${model.modelId}`] = model.limit.requestsPerWeek.toString();
+                return acc;
+            }, {});
+            const resModelIds = new Set(res.map(model => model.modelId));
+
             setOrgModels(res.sort((a, b) => a.modelId - b.modelId))
             secondForm.reset({
-                limitsType: limitsType,
-                selectModels: modelOptions.filter(model => res.some(item => item.modelId === model.value)),
+                limitsType,
+                selectModels: modelOptions.filter(model => resModelIds.has(model.value)),
                 ...formatOrgModels,
             })
         }).catch(error => {

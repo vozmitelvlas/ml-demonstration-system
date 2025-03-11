@@ -9,7 +9,6 @@ export const customStyle = {
         color: "var(--accent-color)",
         marginTop: "10px",
         marginBottom: "10px",
-
     }),
     container: (provided) => ({
         ...provided,
@@ -41,7 +40,8 @@ export const firstStyle = (prevStyles) => ({
         border: "1px solid var(--accent-color)",
         color: "var(--accent-color)",
         marginTop: "10px",
-        marginBottom: "10px"
+        marginBottom: "10px",
+        transition: "background-color 0.5s ease"
     }),
 })
 export const secondStyle = (prevStyles) => ({
@@ -52,7 +52,8 @@ export const secondStyle = (prevStyles) => ({
         border: "1px solid var(--accent-color)",
         color: "var(--accent-color)",
         marginTop: "10px",
-        marginBottom: "10px"
+        marginBottom: "10px",
+
     }),
 })
 

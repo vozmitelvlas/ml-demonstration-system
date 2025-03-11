@@ -39,7 +39,7 @@
 .change-container__table tr:hover td {
     background: var(--accent-color);
     color: #FFFFFF;
-
+    transition: color 0.2s ease;
 }
 .change-container__table tr:nth-child(odd):hover td {
     background: var(--accent-color);

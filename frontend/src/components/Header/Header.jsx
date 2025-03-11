@@ -26,6 +26,7 @@ export default function Header({login, isAdminMode, setIsAdminMode, isAdmin, isM
     const toggleAdminMode = () => {
         setIsAdminMode(!isAdminMode)
         sessionStorage.setItem("isAdminMode", !isAdminMode)
+        console.log(sessionStorage.getItem("isAdminMode"))
         navigate('/models')
     }
 

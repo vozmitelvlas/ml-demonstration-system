@@ -26,10 +26,7 @@ export default function SignIn({setUserData, setIsAdmin, setMainOrg}) {
 
     const sendFormData = async (formData) => {
         try {
-            console.log(formData)
             const {user} = await apiClient('/api/auth/login', 'POST', formData)
-
-            console.log("USER_in ", user)
 
             setUserData(user)
             setIsAdmin(user.roles.includes("ADMIN"))

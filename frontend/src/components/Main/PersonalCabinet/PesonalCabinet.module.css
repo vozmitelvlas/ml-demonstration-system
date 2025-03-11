@@ -64,4 +64,7 @@
     flex-direction: column;
     align-items: flex-start;
 }
+.table tr:hover textarea {
+    background-color: var(--light-accent-color);
+}
 
