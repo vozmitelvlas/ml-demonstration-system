@@ -19,6 +19,10 @@ import ru.etu.mldemonstrationapp.mainservice.dto.UserRegistrationRequest;
 import ru.etu.mldemonstrationapp.mainservice.service.AuthService;
 import ru.etu.mldemonstrationapp.mainservice.service.JwtService;
 
+/**
+ * Controller for handling authentication-related requests.
+ * 
+ */
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor

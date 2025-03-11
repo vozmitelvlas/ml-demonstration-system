@@ -19,6 +19,10 @@ import ru.etu.mldemonstrationapp.mainservice.entity.User;
 import ru.etu.mldemonstrationapp.mainservice.service.JwtService;
 import ru.etu.mldemonstrationapp.mainservice.service.UserService;
 
+/**
+ * Controller for handling user-related requests.
+ * 
+ */
 @RestController
 @RequestMapping("/api/users")
 @SecurityRequirement(name = "jwt-bearer")
@@ -29,12 +33,25 @@ public class UserController {
     @Autowired
     private JwtService jwtService;
 
+    /**
+     * Get the current user's profile.
+     *
+     * @param token The JWT token containing the user ID
+     * @return The current user's profile
+     */
     @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
     @GetMapping("/profile")
     public ResponseEntity<User> getProfile(@AuthenticationPrincipal JwtToken token) {
         return ResponseEntity.ok(userService.getUserById(token.userId()));
     }
 
+    /**
+     * Update the current user's profile.
+     *
+     * @param token The JWT token containing the user ID
+     * @param request The update request containing new user details
+     * @return The updated user profile
+     */
     @Operation(description = "Update your own user profile")
     @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
     @PutMapping("/profile")
@@ -42,6 +59,12 @@ public class UserController {
         return ResponseEntity.ok(userService.updateUser(token.userId(), request));
     }
 
+    /**
+     * Delete the current user's profile.
+     *
+     * @param token The JWT token containing the user ID
+     * @return No content if successful
+     */
     @Operation(description = "Set a new password using a password reset token")
     @ApiResponse(useReturnTypeSchema = true, responseCode = "204")
     @PostMapping("/profile/password/reset")
@@ -50,6 +73,13 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Update the current user's password.
+     * 
+     * @param jwtToken The JWT token containing the user ID
+     * @param updatePasswordRequest The request containing the old and new passwords
+     * @return No content if successful
+     */
     @Operation(description = "Update password with confirmation of the old one")
     @ApiResponse(useReturnTypeSchema = true, responseCode = "204")
     @PutMapping("/profile/password")
@@ -58,6 +88,12 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Delete the current user's profile.
+     * 
+     * @param jwtToken The JWT token containing the user ID
+     * @return No content if successful
+     */
     @Operation(description = "Delete your own user")
     @ApiResponse(useReturnTypeSchema = true, responseCode = "204")
     @DeleteMapping("/profile")

@@ -37,6 +37,12 @@ public class AdminUserController {
         return adminUserService.getUser(id);
     }
 
+    /**
+     * Create a new user.
+     * 
+     * @param dto The request body containing the user details.
+     * @return The created user.
+     */
     @ApiResponse(useReturnTypeSchema = true, responseCode = "201")
     @PostMapping
     public ResponseEntity<User> createUser(@Valid @RequestBody CreateUserRequest dto, UriComponentsBuilder uriComponentsBuilder) {
@@ -49,12 +55,25 @@ public class AdminUserController {
                 .body(user);
     }
 
+    /**
+     * Update an existing user.
+     * 
+     * @param id The ID of the user to update.
+     * @param dto The request body containing the updated user details.
+     * @return The updated user.
+     */
     @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
     @PutMapping("/{id}")
     public User updateUser(@PathVariable Long id, @Valid @RequestBody UpdateUserRequest dto) {
         return adminUserService.updateUser(id, dto);
     }
 
+    /**
+     * Delete a user.
+     * 
+     * @param id The ID of the user to delete.
+     * @return A response entity indicating that the user was deleted successfully.
+     */
     @ApiResponse(responseCode = "204")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
@@ -62,6 +81,12 @@ public class AdminUserController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Get all user limits for all available models.
+     * 
+     * @param userId The ID of the user.
+     * @return A list of user limits for all available models.
+     */
     @Operation(description = "Get all user limits for model")
     @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
     @GetMapping("/{userId}/limits")
@@ -69,6 +94,14 @@ public class AdminUserController {
         return ResponseEntity.ok(adminUserService.getAllUserLimits(userId));
     }
 
+    /**
+     * Create or update a user limit.
+     * 
+     * @param userId The ID of the user.
+     * @param modelId The ID of the model.
+     * @param limit The limit to create or update.
+     * @return The created or updated user limit.
+     */
     @Operation(description = "Create or update user limit")
     @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
     @PutMapping("/{userId}/models/{modelId}/limit")
