@@ -23,10 +23,14 @@ import java.util.Map;
 @SecurityRequirement(name = "jwt-bearer")
 @RequestMapping("/api/admin/models")
 public class AdminModelController {
-
     @Autowired
     private AdminModelsService adminModelsService;
 
+    /**
+     * Get all models with a list of versions.
+     *
+     * @return List of all models with versions.
+     */
     @Operation(description = "Get all models with a list of versions for each of them")
     @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
     @GetMapping
@@ -34,6 +38,12 @@ public class AdminModelController {
         return adminModelsService.getModels();
     }
 
+    /**
+     * Get model by its ID with a list of versions.
+     *
+     * @param id The ID of the model.
+     * @return The model with the specified ID.
+     */
     @Operation(description = "Get model by id with a list of versions")
     @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
     @GetMapping("/{id}")
@@ -41,6 +51,13 @@ public class AdminModelController {
         return adminModelsService.getModel(id);
     }
 
+    /**
+     * Get version of the model by model ID and version ID.
+     *
+     * @param modelId The ID of the model.
+     * @param versionId The ID of the model version.
+     * @return The version of the model.
+     */
     @Operation(description = "Get version of a model by model id and version id")
     @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
     @GetMapping("/{modelId}/versions/{versionId}")
@@ -48,6 +65,11 @@ public class AdminModelController {
         return adminModelsService.getModelVersion(versionId);
     }
 
+    /**
+     * Get a list of all model versions.
+     *
+     * @return List of all model versions.
+     */
     @Operation(description = "Get all versions of all models")
     @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
     @GetMapping("/versions")
@@ -55,7 +77,14 @@ public class AdminModelController {
         return adminModelsService.getModelsVersions();
     }
 
-    @Operation(description = "Register new model")
+    /**
+     * Register a new model with a default model version creating.
+     *
+     * @param createModelRequest Request with a new model data.
+     * @param uriComponentsBuilder URI builder used to specify a Location header.
+     * @return The default version of the new model.
+     */
+    @Operation(description = "Register a new model")
     @ApiResponse(useReturnTypeSchema = true, responseCode = "201")
     @PostMapping
     public ResponseEntity<ModelVersion> registerModel(@Valid @RequestBody CreateModelRequest createModelRequest,
@@ -70,6 +99,14 @@ public class AdminModelController {
                 .body(modelVersion);
     }
 
+    /**
+     * Create a new version of an existing model
+     *
+     * @param id The ID of the model.
+     * @param createModelVersionRequest Request with a new model version data
+     * @param uriComponentsBuilder URI builder used to specify a Location header.
+     * @return New version of the model with specified ID.
+     */
     @Operation(description = "Create a new version of an existing model")
     @ApiResponse(useReturnTypeSchema = true, responseCode = "201")
     @PostMapping("/{id}/versions")
@@ -89,6 +126,14 @@ public class AdminModelController {
 
     }
 
+    /**
+     * Update a version of the model.
+     *
+     * @param modelId The ID of the model.
+     * @param versionId The ID of the model version.
+     * @param updateModelVersionRequest The update request with a new model version details.
+     * @return Updated model version.
+     */
     @Operation(description = "Update model version")
     @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
     @PutMapping("/{modelId}/versions/{versionId}")
@@ -98,13 +143,27 @@ public class AdminModelController {
     }
 
 
-    @Operation(description = "Update modeL limit")
+    /**
+     * Update model limit
+     *
+     * @param id The ID of the model.
+     * @param limit New limit of the model.
+     * @return {@link Limit}
+     */
+    @Operation(description = "Update model limit")
     @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
     @PutMapping("/{id}/limit")
     public Limit updateModelLimit(@PathVariable Long id, @Valid @RequestBody Limit limit) {
         return adminModelsService.updateModelLimit(id, limit);
     }
 
+    /**
+     * Delete version of the model by model ID and version ID.
+     *
+     * @param modelId The ID of the model.
+     * @param versionId The ID of the model version.
+     * @return No content if successful.
+     */
     @Operation(description = "Delete model version. If deleted version was last then delete model too")
     @ApiResponse(responseCode = "204")
     @DeleteMapping("/{modelId}/versions/{versionId}")

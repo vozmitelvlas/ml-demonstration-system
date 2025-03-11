@@ -72,7 +72,7 @@ public class AdminUserController {
      * Delete a user.
      * 
      * @param id The ID of the user to delete.
-     * @return A response entity indicating that the user was deleted successfully.
+     * @return No content if successful.
      */
     @ApiResponse(responseCode = "204")
     @DeleteMapping("/{id}")
@@ -82,7 +82,7 @@ public class AdminUserController {
     }
 
     /**
-     * Get all user limits for all available models.
+     * Get all user limits for the all available models.
      * 
      * @param userId The ID of the user.
      * @return A list of user limits for all available models.
