@@ -22,7 +22,6 @@ import ru.etu.mldemonstrationapp.mainservice.service.UserService;
 @RestController
 @RequestMapping("/api/users")
 @SecurityRequirement(name = "jwt-bearer")
-@RequiredArgsConstructor
 public class UserController {
     @Autowired
     private UserService userService;

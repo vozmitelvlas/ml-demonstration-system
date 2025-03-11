@@ -21,7 +21,6 @@ import java.util.List;
 @RestController
 @SecurityRequirement(name = "jwt-bearer")
 @RequestMapping("/api/models")
-@RequiredArgsConstructor
 public class ModelController {
     @Autowired
     private ModelService modelService;

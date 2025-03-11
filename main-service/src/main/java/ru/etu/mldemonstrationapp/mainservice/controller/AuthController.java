@@ -21,7 +21,6 @@ import ru.etu.mldemonstrationapp.mainservice.service.JwtService;
 
 @RestController
 @RequestMapping("/api/auth")
-@RequiredArgsConstructor
 public class AuthController {
     @Autowired
     private AuthService authService;
