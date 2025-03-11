@@ -1,0 +1,46 @@
+package ru.etu.mldemonstrationapp.mainservice.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+import ru.etu.mldemonstrationapp.mainservice.entity.Model;
+import ru.etu.mldemonstrationapp.mainservice.entity.Organization;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface ModelRepository extends JpaRepository<Model, Long> {
+    boolean existsByName(String name);
+
+    @Modifying
+    @Query("""
+            DELETE FROM Limit l
+            WHERE l.limitId IN (
+                SELECT m.limit.limitId FROM Model m
+                JOIN Limit l ON l.limitId = m.limit.limitId
+                WHERE m.modelId = :modelId)
+             AND NOT EXISTS (
+                SELECT m from Model m
+                JOIN ModelVersion mv ON mv.model.modelId = m.modelId
+                WHERE m.modelId = :modelId
+            )
+            """)
+    void deleteModelIfVersionsListEmpty(Long modelId);
+
+
+    @Query("""
+            SELECT m FROM ModelOrganizationLimit mol
+                JOIN mol.model m
+            WHERE mol.organization = :organization
+            """)
+    List<Model> findAllByOrganization(Organization organization);
+
+    @Query("""
+            SELECT m FROM ModelOrganizationLimit mol
+                JOIN mol.model m
+            WHERE mol.organization = :organization AND m.modelId = :id
+            """)
+    Optional<Model> findByIdAndOrganization(Long id, Organization organization);
+}
