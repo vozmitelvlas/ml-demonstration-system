@@ -21,6 +21,14 @@ import java.util.Map;
 @SecurityRequirement(name = "jwt-bearer")
 @RequestMapping("/api/admin/organizations")
 public class AdminOrganizationController extends OrganizationController {
+
+    /**
+     * Create a new organization.
+     *
+     * @param dto Request body with a new organization data.
+     * @param uriComponentsBuilder URI builder used to specify a Location header.
+     * @return New organization details.
+     */
     @ApiResponse(useReturnTypeSchema = true, responseCode = "201")
     @PostMapping
     public ResponseEntity<Organization> createOrganization(@Valid @RequestBody CreateOrganizationRequest dto,
@@ -34,12 +42,25 @@ public class AdminOrganizationController extends OrganizationController {
                 .body(organization);
     }
 
+    /**
+     * Update organization.
+     *
+     * @param id The ID of the organization.
+     * @param dto Update request with a new organization details.
+     * @return Updated organization.
+     */
     @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
     @PutMapping("/{id}")
     public Organization updateOrganization(@PathVariable Long id, @Valid @RequestBody UpdateOrganizationRequest dto) {
         return organizationService.updateOrganization(id, dto);
     }
 
+    /**
+     * Delete empty organization by its ID.
+     *
+     * @param id The ID of the organization.
+     * @return No content if successful. Conflict if the organization contains users.
+     */
     @ApiResponse(responseCode = "204")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteOrganization(@PathVariable Long id) {
@@ -47,6 +68,14 @@ public class AdminOrganizationController extends OrganizationController {
         return ResponseEntity.noContent().build();
     }
 
+
+    /**
+     * Open access and create limit to the model for the organization.
+     *
+     * @param id The ID of the organization.
+     * @param request Request with an ID of the model and limit info.
+     * @return {@link ModelOrganizationLimitResponse}
+     */
     @Operation(description = "Open access to the model for the organization")
     @ApiResponse(useReturnTypeSchema = true, responseCode = "201")
     @PostMapping("/{id}/models")
@@ -61,6 +90,14 @@ public class AdminOrganizationController extends OrganizationController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    /**
+     * Update a model limit for the organization.
+     *
+     * @param organizationId The ID of the organization.
+     * @param modelId The ID of the model.
+     * @param limit New limit to the model for the organization.
+     * @return {@link ModelOrganizationLimitResponse}
+     */
     @Operation(description = "Update organization limit for available model")
     @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
     @PutMapping("/{organizationId}/models/{modelId}/limit")
@@ -68,6 +105,14 @@ public class AdminOrganizationController extends OrganizationController {
         return organizationService.updateModelLimit(organizationId, modelId, limit);
     }
 
+
+    /**
+     * Close access to the model and delete the model limit for the organization.
+     *
+     * @param organizationId The ID of the organization.
+     * @param modelId The ID of the model.
+     * @return No content if successful.
+     */
     @Operation(description = "Close access to model for organization")
     @ApiResponse(useReturnTypeSchema = true, responseCode = "204")
     @DeleteMapping("/{organizationId}/models/{modelId}")

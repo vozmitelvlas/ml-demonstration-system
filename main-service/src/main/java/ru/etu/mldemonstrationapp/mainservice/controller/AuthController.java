@@ -3,7 +3,6 @@ package ru.etu.mldemonstrationapp.mainservice.controller;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -12,10 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import ru.etu.mldemonstrationapp.mainservice.dto.LoginRequest;
-import ru.etu.mldemonstrationapp.mainservice.dto.LoginResponse;
-import ru.etu.mldemonstrationapp.mainservice.dto.ResetPasswordRequest;
-import ru.etu.mldemonstrationapp.mainservice.dto.UserRegistrationRequest;
+import ru.etu.mldemonstrationapp.mainservice.configuration.JwtToken;
+import ru.etu.mldemonstrationapp.mainservice.dto.*;
 import ru.etu.mldemonstrationapp.mainservice.service.AuthService;
 import ru.etu.mldemonstrationapp.mainservice.service.JwtService;
 
@@ -32,25 +29,50 @@ public class AuthController {
     @Autowired
     private JwtService jwtService;
 
+    /**
+     * Login to the application.
+     *
+     * @param loginRequest Request with data required to log in.
+     * @return {@link LoginResponse}.
+     */
     @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
     @PostMapping("/login")
     ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
         return authService.login(loginRequest);
     }
 
+
+    /**
+     * Register in the application.
+     * @param createUserRequest Request with a new user details.
+     * @return {@link LoginResponse}
+     */
     @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
     @PostMapping("/register")
     ResponseEntity<LoginResponse> register(@Valid @RequestBody UserRegistrationRequest createUserRequest) {
         return authService.register(createUserRequest);
     }
 
+    /**
+     * Log out of the application.
+     *
+     * @return No content with removed authentication token cookie.
+     */
     @ApiResponse(useReturnTypeSchema = true, responseCode = "204")
     @GetMapping("/logout")
-    ResponseEntity<Void> logout(HttpServletRequest request) {
+    ResponseEntity<Void> logout() {
         ResponseCookie authCookie = jwtService.getEmptyTokenCookie();
         return ResponseEntity.noContent().header(HttpHeaders.SET_COOKIE, authCookie.toString()).build();
     }
 
+    /**
+     * Get a password reset token via email. Token can be used to set new password
+     * in the {@link UserController#setNewPassword(JwtToken, NewPasswordRequest)}
+     *
+     * @param passwordResetRequest Request body with an email of the user.
+     * @param request HttpServletRequest to get Origin header to generate a link.
+     * @return No content if successful. Forbidden if user with specified email is not found.
+     */
     @ApiResponse(useReturnTypeSchema = true, responseCode = "204")
     @PostMapping("/password-reset")
     ResponseEntity<Void> getPasswordResetToken(@RequestBody ResetPasswordRequest passwordResetRequest,

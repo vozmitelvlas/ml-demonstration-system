@@ -3,7 +3,6 @@ package ru.etu.mldemonstrationapp.mainservice.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,6 +24,12 @@ public class ModelController {
     @Autowired
     private ModelService modelService;
 
+    /**
+     * Get all models available to the current user.
+     *
+     * @param jwtToken The JWT token containing the user ID.
+     * @return No content if successful.
+     */
     @Operation(description = "Get available models")
     @ApiResponse(responseCode = "200", useReturnTypeSchema = true)
     @GetMapping
@@ -32,18 +37,38 @@ public class ModelController {
         return ResponseEntity.ok(modelService.getAvailableModels(jwtToken.userId()));
     }
 
+    /**
+     * Get model by its ID with a list of versions
+     *
+     * @param id The ID of the model
+     * @param jwtToken The JWT token containing the user ID.
+     * @return The model with the specified ID if user has access to it, otherwise not found.
+     */
     @GetMapping("/{id}")
     @ApiResponse(responseCode = "200", useReturnTypeSchema = true)
     public ResponseEntity<Model> getModelById(@PathVariable Long id, @AuthenticationPrincipal JwtToken jwtToken) {
         return ResponseEntity.ok(modelService.getModelById(id, jwtToken.userId()));
     }
 
+    /**
+     * Get version of the model by version ID.
+     *
+     * @param id The ID of the model version.
+     * @param jwtToken The JWT token containing the user ID.
+     * @return The version of the model if user has access to it, otherwise not found.
+     */
     @ApiResponse(responseCode = "200", useReturnTypeSchema = true)
     @GetMapping("/versions/{id}")
     public ResponseEntity<ModelVersion> getModelVersionById(@PathVariable Long id, @AuthenticationPrincipal JwtToken jwtToken) {
         return ResponseEntity.ok(modelService.getModelVersionById(id, jwtToken.userId()));
     }
 
+    /**
+     * Get all versions of the models available to the current user.
+     *
+     * @param jwtToken The JWT token containing the user ID.
+     * @return List of all versions of the models available to the current user.
+     */
     @Operation(description = "Get all versions of available models")
     @ApiResponse(responseCode = "200", useReturnTypeSchema = true)
     @GetMapping("/versions")

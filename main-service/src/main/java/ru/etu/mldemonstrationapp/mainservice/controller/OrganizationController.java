@@ -54,7 +54,7 @@ public class OrganizationController {
     }
 
     /**
-     * Get the models limits for an organization.
+     * Get the models limits for an organization. A model limit only exists if organization has access to the model.
      * 
      * @param id The ID of the organization.
      * @return A list of models limits for the specified organization.
@@ -83,7 +83,7 @@ public class OrganizationController {
      * @param id The ID of the organization.
      * @param jwtToken JWT token for authentication.
      * @param updateLimitsTypeRequest Request body containing the new limits type.
-     * @return A response entity with no content.
+     * @return No content if successful.
      */
     @Operation(description = "Change a type of limits for organization members")
     @ApiResponse(useReturnTypeSchema = true, responseCode = "204")
