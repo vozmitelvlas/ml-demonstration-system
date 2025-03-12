@@ -12,9 +12,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.etu.mldemonstrationapp.mainservice.configuration.JwtToken;
 import ru.etu.mldemonstrationapp.mainservice.entity.Model;
+import ru.etu.mldemonstrationapp.mainservice.entity.ModelProblemType;
+import ru.etu.mldemonstrationapp.mainservice.entity.ModelRuntime;
 import ru.etu.mldemonstrationapp.mainservice.entity.ModelVersion;
 import ru.etu.mldemonstrationapp.mainservice.service.ModelService;
 
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -40,7 +43,7 @@ public class ModelController {
     /**
      * Get model by its ID with a list of versions
      *
-     * @param id The ID of the model
+     * @param id       The ID of the model
      * @param jwtToken The JWT token containing the user ID.
      * @return The model with the specified ID if user has access to it, otherwise not found.
      */
@@ -53,7 +56,7 @@ public class ModelController {
     /**
      * Get version of the model by version ID.
      *
-     * @param id The ID of the model version.
+     * @param id       The ID of the model version.
      * @param jwtToken The JWT token containing the user ID.
      * @return The version of the model if user has access to it, otherwise not found.
      */
@@ -74,5 +77,32 @@ public class ModelController {
     @GetMapping("/versions")
     public ResponseEntity<List<ModelVersion>> getAvailableModelsVersions(@AuthenticationPrincipal JwtToken jwtToken) {
         return ResponseEntity.ok(modelService.getAvailableModelsVersions(jwtToken.userId()));
+    }
+
+    /**
+     * Get all supported runtimes for models. Supported runtimes are specified in the {@link ModelRuntime} enum.
+     *
+     * @see ModelRuntime
+     * @return List of supported runtimes for models.
+     */
+    @Operation(description = "Get all supported runtimes for models")
+    @ApiResponse(responseCode = "200", useReturnTypeSchema = true)
+    @GetMapping("/runtimes")
+    public List<ModelRuntime> getSupportedRuntimes() {
+        return Arrays.asList(ModelRuntime.values());
+    }
+
+    /**
+     * Get all supported problem types for models. Supported problem types.
+     * are specified in the {@link ModelProblemType} enum.
+     *
+     * @see ModelProblemType
+     * @return List of supported problem types for models.
+     */
+    @Operation(description = "Get all supported problem types for models")
+    @ApiResponse(responseCode = "200", useReturnTypeSchema = true)
+    @GetMapping("/problem-types")
+    public List<ModelProblemType> getSupportedProblemTypes() {
+        return Arrays.asList(ModelProblemType.values());
     }
 }
