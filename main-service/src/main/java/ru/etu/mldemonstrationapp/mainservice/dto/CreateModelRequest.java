@@ -3,6 +3,8 @@ package ru.etu.mldemonstrationapp.mainservice.dto;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.hibernate.validator.constraints.URL;
+import ru.etu.mldemonstrationapp.mainservice.entity.ModelProblemType;
+import ru.etu.mldemonstrationapp.mainservice.entity.ModelRuntime;
 
 public record CreateModelRequest(
         @NotNull(message = "Model name cannot be null")
@@ -18,11 +20,9 @@ public record CreateModelRequest(
         String description,
 
         @NotNull(message = "Problem type cannot be null")
-        @Size(min = 1, max = 255, message = "Problem type must be between 1 and 255 characters")
-        String problemType,
+        ModelProblemType problemType,
 
         @NotNull(message = "Runtime cannot be null")
-        @Size(min = 1, max = 255, message = "Runtime must be between 1 and 255 characters")
-        String runtime
+        ModelRuntime runtime
 ) {
 }

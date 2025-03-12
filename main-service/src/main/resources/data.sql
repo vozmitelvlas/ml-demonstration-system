@@ -1,7 +1,7 @@
 INSERT INTO roles (role_id, name) VALUES (1, 'ADMIN'), (2, 'USER'), (3, 'ORGANIZATION_HEAD');
 
 INSERT INTO organizations (organization_id, name, description, limits_type, is_editable)
-VALUES (1, 'Базовая организация', 'Организация по умолчанию', 'ORGANIZATION_LIMITS', false),
+VALUES (1, 'Без организации', 'Объединение пользователей, которым не назначено ни одной организации. Назначается при регистрации пользователей', 'ORGANIZATION_LIMITS', false),
        (2, 'Отдел разработки', 'Организация для разработчиков моделей', 'MODEL_LIMITS', true),
        (3, 'Отдел администрирования', 'Администраторы приложения', 'ORGANIZATION_LIMITS', true),
        (4, 'Управленческий отдел', 'Организация для отдела управленцов', 'MODEL_LIMITS', true),
@@ -23,7 +23,7 @@ INSERT INTO models (model_id, name, limit_id)
 VALUES (1, 'DenseNet', 1), (2, 'ALBERT', 2);
 
 INSERT INTO model_info (model_id, runtime, problem_type)
-VALUES (1, 'PyTorch', 'Классификация изображений'), (2, 'TensorFlow', 'Обработка естественного языка');
+VALUES (1, 'TRITON_INFERENCE_SERVER', 'IMAGE_CLASSIFICATION'), (2, 'MONAI_DEPLOY', 'NLP');
 
 INSERT INTO model_versions (model_version_id, model_id, version_name, uri, description)
 VALUES (1, 1, '121', 'http://localhost:4000/densenet/121', 'A DenseNet convolutional neural network. Version with 121 layers'),
