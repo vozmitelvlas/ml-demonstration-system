@@ -28,7 +28,6 @@ public class ModelVersion implements Serializable {
     private String description;
 
     @Column(nullable = false)
-    @URL()
     private String uri;
 
     @ManyToOne
