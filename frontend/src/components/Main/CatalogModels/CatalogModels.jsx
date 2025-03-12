@@ -19,7 +19,6 @@ import AddNewModelModal from "./AddNewModelModal.jsx";
 import {useForm} from "react-hook-form";
 import {AddNewModelVersionModal} from "./AddNewModelVersionModal.jsx";
 import {yupResolver} from "@hookform/resolvers/yup";
-import {signUpSchema} from "../../store/formSchema.jsx";
 import * as yup from "yup";
 
 export default function CatalogModels({isAdminMode}) {
@@ -32,9 +31,6 @@ export default function CatalogModels({isAdminMode}) {
     const [isAddingModel, setIsAddingModel] = useState(false)
     const [isAddingVersion, setIsAddingVersion] = useState(false)
     const [formatModels, setFormatModels] = useState([])
-    const [isAddedModel, setIsAddedModel] = useState(false)
-    const [isDeletedModel, setIsDeletedModel] = useState(false)
-
     const modelForm = useForm({
         resolver: yupResolver(yup.object()),
         defaultValues: {
@@ -54,28 +50,31 @@ export default function CatalogModels({isAdminMode}) {
             description: "",
         }
     })
-
     const [models, setModels] = useState([])
+
     useEffect(() => {
-        const utl = isAdminMode ? '/api/admin/models/versions' : '/api/models/versions'
-        apiClient(utl).then((res => {
+        const url = isAdminMode ? '/api/admin/models/versions' : '/api/models/versions'
+        apiClient(url).then((res => {
             setModels(res)
         })).catch((error) => {
             console.log(error)
         })
-    }, [isAdminMode])
-    useEffect(() => {
-        apiClient(`/api/admin/models`).then(res => {
-            setFormatModels(res.map(model => ({
-                value: model.modelId,
-                label: model.name
-            })))
-        }).catch(error => {
-            console.log(error)
-        })
-        setIsAddedModel(false)
-        setIsDeletedModel(false)
-    }, [isAddedModel, isDeletedModel])
+
+        if (isAddingVersion) {
+            apiClient('/api/admin/models')
+                .then((res) => {
+                    setFormatModels(
+                        res.map((model) => ({
+                            value: model.modelId,
+                            label: model.name,
+                        }))
+                    );
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+        }
+    }, [isAdminMode, isAddingVersion])
 
     const firstErrorKey1 = Object.keys(modelForm.formState.errors)[0];
     useEffect(() => {
@@ -84,7 +83,6 @@ export default function CatalogModels({isAdminMode}) {
             setAlarm(modelForm.formState.errors[firstErrorKey1].message)
         }
     }, [firstErrorKey1])
-
     const firstErrorKey2 = Object.keys(versionForm.formState.errors)[0];
     useEffect(() => {
         if (firstErrorKey2) {
@@ -108,23 +106,20 @@ export default function CatalogModels({isAdminMode}) {
             setModels(models.filter(model => model.modelVersionId !== Number(tmpModelId[1])))
             setLogo(acceptLogo)
             setAlarm("Модель успешно удалена")
-            setIsDeletedModel(true)
             setIsDeletingModel(false)
         } catch (serverError) {
             console.error(serverError)
         }
     }
-
     const onAddNewModel = async (newValue) => {
         const formatValues = {...newValue}
-        formatValues["problemType"] = newValue.problemType.label
+        formatValues["problemType"] = newValue.problemType.value
+        formatValues["runtime"] = newValue.runtime.value
 
         try {
             const res = await apiClient(`/api/admin/models`, 'POST', formatValues)
-
             setModels([...models, res])
-            setIsAddingModel(!isAddingModel)
-            setIsAddedModel(true)
+            setIsAddingModel(false)
             modelForm.reset()
             setAlarm("Модель успешно добавлена")
             setLogo(acceptLogo)
@@ -158,14 +153,6 @@ export default function CatalogModels({isAdminMode}) {
                 console.log(error)
         }
     }
-    const closeAddModal = () => {
-        setIsAddingModel(!isAddingModel)
-        setAlarm(null)
-    }
-    const closeVersion = () => {
-        setIsAddingVersion(!isAddingVersion)
-        setAlarm(null)
-    }
 
     return (
         <>
@@ -197,11 +184,11 @@ export default function CatalogModels({isAdminMode}) {
                     {isAdminMode && (
                         <div>
                             <Button onClick={() => {
-                                setIsAddingModel(!isAddingModel)
+                                setIsAddingModel(true)
                                 setAlarm(null)
                             }}>Добавить модель</Button>
                             <Button onClick={() => {
-                                setIsAddingVersion(!isAddingVersion)
+                                setIsAddingVersion(true)
                                 setAlarm(null)
                             }}>Добавить версию</Button>
                         </div>
@@ -301,7 +288,10 @@ export default function CatalogModels({isAdminMode}) {
                     isAddingModel={isAddingModel}
                     setIsAddingModel={setIsAddingModel}
                     onAdd={onAddNewModel}
-                    onCancel={closeAddModal}
+                    onCancel={() => {
+                        setIsAddingModel(false)
+                        setAlarm(null)
+                    }}
                     form={modelForm}
                 ></AddNewModelModal>
 
@@ -311,7 +301,10 @@ export default function CatalogModels({isAdminMode}) {
                     isAddingVersion={isAddingVersion}
                     setIsAddingVersion={setIsAddingVersion}
                     onAdd={onAddNewVersion}
-                    onCancel={closeVersion}
+                    onCancel={() => {
+                        setIsAddingVersion(false)
+                        setAlarm(null)
+                    }}
                     form={versionForm}
                     allModels={formatModels}
                 ></AddNewModelVersionModal>
