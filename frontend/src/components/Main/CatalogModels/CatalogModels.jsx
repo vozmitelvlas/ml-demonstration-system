@@ -246,7 +246,7 @@ export default function CatalogModels({isAdminMode}) {
                                     </Link>
                                 </td>
                                 <td className="text-center">{model.versionName}</td>
-                                <td className="text-center">{model.problemType}</td>
+                                <td className="text-center">{model.problemType.value}</td>
                                 <td className="text-center">{getDateFormat(new Date(model.createdAt))}</td>
                                 <td className="text-center">
                                     <div className="URL">

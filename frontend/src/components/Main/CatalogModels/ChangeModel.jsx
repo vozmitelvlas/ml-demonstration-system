@@ -44,8 +44,8 @@ export default function ChangeModel() {
                 versionName: res.versionName,
                 description: res.description,
                 uri: res.uri,
-                runtime: res.runtime,
-                problemType: res.problemType,
+                runtime: res.runtime.value,
+                problemType: res.problemType.value,
             }
             const dataForDisplay = {
                 modelId: res.modelId,
