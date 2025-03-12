@@ -2,11 +2,11 @@ import Button from "../Button/Button.jsx";
 import React from "react";
 import {useNavigate} from "react-router-dom";
 
-export default function ChangeModelLimit({register, handleSubmit, submitFunction}) {
+export default function ChangeModelLimit({form, submitFunction}) {
     const navigate = useNavigate()
     return(
         <>
-            <form onSubmit={handleSubmit(submitFunction)} className="change-content">
+            <form onSubmit={form.handleSubmit(submitFunction)} className="change-content">
                 <div>
                     <h2>Лимиты по умолчанию</h2>
                     <table className="change-container__table naked-input">
@@ -14,13 +14,13 @@ export default function ChangeModelLimit({register, handleSubmit, submitFunction
                         <tr>
                             <td>Лимит RPS</td>
                             <td>
-                                <input type="text"{...register("rps")}/>
+                                <input type="text"{...form.register("rps")}/>
                             </td>
                         </tr>
                         <tr>
                             <td>Лимит запросов/нед</td>
                             <td>
-                                <input type="text"{...register("requestsPerWeek")}/>
+                                <input type="text"{...form.register("requestsPerWeek")}/>
                             </td>
                         </tr>
                         </tbody>

@@ -11,6 +11,7 @@ import {changeModelDataSchema, limitsSchema} from "../../store/formSchema.jsx";
 import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx"
 import {ChangeModelInfo} from "./ChangeModelInfo.jsx";
 import ChangeModelLimit from "./ChangeModelLimit.jsx";
+import {useRequestGetProblemTypes, useRequestGetRunTimes} from "./hooks/index.js";
 
 const modelDataForDisplay = {
     modelId: "",
@@ -25,11 +26,10 @@ export default function ChangeModel() {
     const [logo, setLogo] = useState(alarmLogo)
     const [modelData, setModelData] = useState({})
     const [displayData, setDisplayData] = useState(modelDataForDisplay)
-
-    const firstForm = useForm({
+    const infoForm = useForm({
         resolver: yupResolver(changeModelDataSchema)
     })
-    const secondForm = useForm({
+    const limitForm = useForm({
         resolver: yupResolver(limitsSchema),
         defaultValues: {
             rps: "",
@@ -44,8 +44,8 @@ export default function ChangeModel() {
                 versionName: res.versionName,
                 description: res.description,
                 uri: res.uri,
-                runtime: res.runtime.value,
-                problemType: res.problemType.value,
+                runtime: {value: res.runtime.name, label: res.runtime.value},
+                problemType: {value: res.problemType.name, label: res.problemType.value}
             }
             const dataForDisplay = {
                 modelId: res.modelId,
@@ -60,30 +60,33 @@ export default function ChangeModel() {
             setModelData(res)
             setDisplayData(dataForDisplay)
 
-            firstForm.reset(dataForEdit)
-            secondForm.reset(limitData)
+            infoForm.reset(dataForEdit)
+            limitForm.reset(limitData)
         }).catch(error => {
             console.log(error)
         })
 
         setAlarm(null)
-    }, [activeBut]);
+    }, [activeBut])
 
     useEffect(() => {
         if (activeBut === "first") {
-            const firstErrorKey1 = Object.keys(firstForm.formState.errors)[0];
+            const firstErrorKey1 = Object.keys(infoForm.formState.errors)[0];
             if (firstErrorKey1) {
                 setLogo(alarmLogo)
-                setAlarm(firstForm.formState.errors[firstErrorKey1].message)
+                setAlarm(infoForm.formState.errors[firstErrorKey1].message)
             }
         } else if (activeBut === "second") {
-            const firstErrorKey2 = Object.keys(secondForm.formState.errors)[0];
+            const firstErrorKey2 = Object.keys(limitForm.formState.errors)[0];
             if (firstErrorKey2 !== undefined) {
                 setLogo(alarmLogo)
-                setAlarm(secondForm.formState.errors[firstErrorKey2].message)
+                setAlarm(limitForm.formState.errors[firstErrorKey2].message)
             }
         }
-    }, [firstForm.formState.errors, secondForm.formState.errors]);
+    }, [infoForm.formState.errors, limitForm.formState.errors])
+
+    const {runtimes} = useRequestGetRunTimes()
+    const {problemTypes} = useRequestGetProblemTypes()
 
     const onChangeName = () => {
         setLogo(alarmLogo)
@@ -93,8 +96,13 @@ export default function ChangeModel() {
         setAlarm(null)
     }
     const onSaveModelData = async (newModelData) => {
+        const formatValues = {
+            ...newModelData,
+            problemType: newModelData.problemType.value,
+            runtime: newModelData.runtime.value
+        }
         try {
-            await apiClient(`/api/admin/models/${modelId}/versions/${versionId}`, 'PUT', newModelData);
+            await apiClient(`/api/admin/models/${modelId}/versions/${versionId}`, 'PUT', formatValues)
             setLogo(acceptLogo)
             setAlarm('Изменения сохранены')
         } catch (error) {
@@ -125,10 +133,11 @@ export default function ChangeModel() {
 
             {activeBut === "first" && (
                 <ChangeModelInfo
+                    runtimes={runtimes}
+                    problemTypes={problemTypes}
                     onChangeName={onChangeName}
                     onBlurName={onBlurName}
-                    handleSubmit={firstForm.handleSubmit}
-                    register={firstForm.register}
+                    form={infoForm}
                     submitFunction={onSaveModelData}
                     displayData={displayData}
                 ></ChangeModelInfo>
@@ -136,8 +145,7 @@ export default function ChangeModel() {
 
             {activeBut === "second" && (
                 <ChangeModelLimit
-                    register={secondForm.register}
-                    handleSubmit={secondForm.handleSubmit}
+                    form={limitForm}
                     submitFunction={onSaveModelLimit}
                 ></ChangeModelLimit>
             )}

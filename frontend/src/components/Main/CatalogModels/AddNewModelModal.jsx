@@ -5,16 +5,7 @@ import React, {useState} from "react";
 import {customStyle, setFirstMultiBackColor, setSecondMultiBackColor} from "../../utils/selectStyles.jsx";
 import {Controller} from "react-hook-form";
 
-const problemTypesOptions = [
-    {value: 'IMAGE_CLASSIFICATION', label: 'Классификация изображений'},
-    {value: 'NLP', label: 'Обработка естественного языка'}
-]
-const runtimeOptions = [
-    {value: 'TRITON_INFERENCE_SERVER', label: 'Triton Inference Server'},
-    {value: 'MONAI_DEPLOY', label: 'MONAI Deploy'}
-]
-
-export default function AddNewModelModal({isAddingModel, logo, alarm, onCancel, onAdd, form}) {
+export default function AddNewModelModal({runtimes, problemTypes, isAddingModel, logo, alarm, onCancel, onAdd, form}) {
     const [runTimeStyle, setRunTimeStyle] = useState(customStyle)
     const [problemStyle, setProblemStyle] = useState(customStyle)
 
@@ -54,7 +45,7 @@ export default function AddNewModelModal({isAddingModel, logo, alarm, onCancel, 
 
                                                  }) => (
                                             <Select
-                                                options={runtimeOptions}
+                                                options={runtimes}
                                                 onChange={onChange}
                                                 placeholder="Тип"
                                                 value={value}
@@ -78,7 +69,7 @@ export default function AddNewModelModal({isAddingModel, logo, alarm, onCancel, 
 
                                                  }) => (
                                             <Select
-                                                options={problemTypesOptions}
+                                                options={problemTypes}
                                                 onChange={onChange}
                                                 placeholder="Тип"
                                                 value={value}

@@ -107,12 +107,6 @@ export const changeModelDataSchema = yup.object()
 
         uri: yup.string()
             .required('Поля должны быть заполнены'),
-
-        runtime: yup.string()
-            .required('Поля должны быть заполнены'),
-
-        problemType: yup.string()
-            .required('Поля должны быть заполнены'),
     })
 
 export const changeUserDataSchema = yup.object()

@@ -39,7 +39,6 @@ export default function CatalogUsers() {
             patronymic: "",
             organization: null,
             selectRoles: [],
-            description: "",
         }
     })
 

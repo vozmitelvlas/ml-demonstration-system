@@ -1,13 +1,18 @@
 import Button from "../Button/Button.jsx";
-import React from "react";
+import React, {useState} from "react";
 import {useNavigate} from "react-router-dom";
+import {Controller} from "react-hook-form";
+import Select from "react-select";
+import {customStyle} from "../../utils/selectStyles.jsx";
 
-export function ChangeModelInfo({submitFunction, handleSubmit, displayData, onChangeName, onBlurName, register}) {
+export function ChangeModelInfo({runtimes, problemTypes, form, submitFunction, displayData, onChangeName, onBlurName}) {
     const navigate = useNavigate()
+    const [runTimeStyle, setRunTimeStyle] = useState(customStyle)
+    const [problemStyle, setProblemStyle] = useState(customStyle)
 
     return (
         <>
-            <form onSubmit={handleSubmit(submitFunction)} className="change-content">
+            <form onSubmit={form.handleSubmit(submitFunction)} className="change-content">
                 <div>
                     <table className="change-container__table naked-input data-input">
                         <tbody>
@@ -28,15 +33,15 @@ export function ChangeModelInfo({submitFunction, handleSubmit, displayData, onCh
                             <td className="text-center">
                                 <input
                                     type="text"
-                                    {...register("modelName")}
+                                    {...form.register("modelName")}
                                     onChange={e => {
                                         onChangeName();
-                                        register("modelName").onChange(e).then(r => {
+                                        form.register("modelName").onChange(e).then(r => {
                                         });
                                     }}
                                     onBlur={e => {
                                         onBlurName();
-                                        register("modelName").onBlur(e).then(r => {
+                                        form.register("modelName").onBlur(e).then(r => {
                                         });
                                     }}
                                 />
@@ -45,32 +50,64 @@ export function ChangeModelInfo({submitFunction, handleSubmit, displayData, onCh
                         <tr>
                             <td>Версия</td>
                             <td className="text-center">
-                                <input type="text" {...register("versionName")}/>
+                                <input type="text" {...form.register("versionName")}/>
                             </td>
                         </tr>
                         <tr>
                             <td>RunTime</td>
                             <td className="text-center">
-                                <input type="text" {...register("runtime")}/>
+                                <Controller
+                                    control={form.control}
+                                    name="runtime"
+                                    render={({
+                                                 field: {onChange, value},
+
+                                             }) => (
+                                        <Select
+                                            options={runtimes}
+                                            onChange={onChange}
+                                            placeholder="Тип"
+                                            value={value}
+                                            isSearchable
+                                            styles={runTimeStyle}
+                                            required
+                                        />
+                                    )}/>
                             </td>
                         </tr>
                         <tr>
                             <td>Тип задачи</td>
                             <td className="text-center">
-                                <input type="text" {...register("problemType")}/>
+                                <Controller
+                                    control={form.control}
+                                    name="problemType"
+                                    render={({
+                                                 field: {onChange, value},
+
+                                             }) => (
+                                        <Select
+                                            options={problemTypes}
+                                            onChange={onChange}
+                                            placeholder="Тип"
+                                            value={value}
+                                            isSearchable
+                                            styles={problemStyle}
+                                            required
+                                        />
+                                    )}/>
                             </td>
                         </tr>
 
                         <tr>
                             <td>URI модели</td>
                             <td className="text-center">
-                                <input type="text" {...register("uri")}/>
+                                <input type="text" {...form.register("uri")}/>
                             </td>
                         </tr>
                         <tr>
                             <td>Описание</td>
                             <td>
-                                <textarea name="description"{...register("description")}></textarea>
+                                <textarea name="description"{...form.register("description")}></textarea>
                             </td>
                         </tr>
                         </tbody>
