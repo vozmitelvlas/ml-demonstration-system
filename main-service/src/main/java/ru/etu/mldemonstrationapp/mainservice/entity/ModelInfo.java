@@ -22,7 +22,8 @@ public class ModelInfo implements Serializable {
     @JoinColumn(name = "model_id")
     private Model model;
 
-    private String runtime;
+    @Enumerated(EnumType.STRING)
+    private ModelRuntime runtime;
 
     private String problemType;
 }

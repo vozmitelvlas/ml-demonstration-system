@@ -46,7 +46,7 @@ public class Model implements Serializable {
     @Column(nullable = false)
     private Instant createdAt;
 
-    public String getRuntime() {
+    public ModelRuntime getRuntime() {
         return modelInfo.getRuntime();
     }
 

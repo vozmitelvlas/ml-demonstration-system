@@ -50,7 +50,7 @@ public class ModelVersion implements Serializable {
         return model.getName();
     }
 
-    public String getRuntime() {
+    public ModelRuntime getRuntime() {
         return model.getRuntime();
     }
 

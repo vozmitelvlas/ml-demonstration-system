@@ -23,7 +23,7 @@ INSERT INTO models (model_id, name, limit_id)
 VALUES (1, 'DenseNet', 1), (2, 'ALBERT', 2);
 
 INSERT INTO model_info (model_id, runtime, problem_type)
-VALUES (1, 'PyTorch', 'Классификация изображений'), (2, 'TensorFlow', 'Обработка естественного языка');
+VALUES (1, 'TRITON_INFERENCE_SERVER', 'Классификация изображений'), (2, 'MONAI_DEPLOY', 'Обработка естественного языка');
 
 INSERT INTO model_versions (model_version_id, model_id, version_name, uri, description)
 VALUES (1, 1, '121', 'http://localhost:4000/densenet/121', 'A DenseNet convolutional neural network. Version with 121 layers'),

@@ -2,6 +2,7 @@ package ru.etu.mldemonstrationapp.mainservice.dto;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import ru.etu.mldemonstrationapp.mainservice.entity.ModelRuntime;
 
 public record UpdateModelVersionRequest(
         @NotNull(message = "Model name cannot be null")
@@ -21,7 +22,7 @@ public record UpdateModelVersionRequest(
 
         @NotNull(message = "Runtime cannot be null")
         @Size(min = 1, max = 255, message = "Runtime must be between 1 and 255 characters")
-        String runtime,
+        ModelRuntime runtime,
 
         @NotNull(message = "Problem type cannot be null")
         @Size(min = 1, max = 255, message = "Problem type must be between 1 and 255 characters")
