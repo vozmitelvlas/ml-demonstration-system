@@ -29,10 +29,10 @@
                 />
             </column>
             <column name="other_data" type="jsonb"/>
-            <column name="updated_at" type="timestamp" defaultValueComputed="current_timestamp">
+            <column name="updated_at" type="timestamptz" defaultValueComputed="current_timestamp">
                 <constraints nullable="false"/>
             </column>
-            <column name="created_at" type="timestamp" defaultValueComputed="current_timestamp">
+            <column name="created_at" type="timestamptz" defaultValueComputed="current_timestamp">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -55,10 +55,10 @@
                 <constraints nullable="false"/>
             </column>
             <column name="description" type="text"/>
-            <column name="updated_at" type="timestamp" defaultValueComputed="current_timestamp">
+            <column name="updated_at" type="timestamptz" defaultValueComputed="current_timestamp">
                 <constraints nullable="false"/>
             </column>
-            <column name="created_at" type="timestamp" defaultValueComputed="current_timestamp">
+            <column name="created_at" type="timestamptz" defaultValueComputed="current_timestamp">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -87,10 +87,10 @@
             <column name="limits_type" type="varchar(100)">
                 <constraints nullable="false"/>
             </column>
-            <column name="updated_at" type="timestamp" defaultValueComputed="current_timestamp">
+            <column name="updated_at" type="timestamptz" defaultValueComputed="current_timestamp">
                 <constraints nullable="false"/>
             </column>
-            <column name="created_at" type="timestamp" defaultValueComputed="current_timestamp">
+            <column name="created_at" type="timestamptz" defaultValueComputed="current_timestamp">
                 <constraints nullable="false"/>
             </column>
             <column name="is_editable" type="boolean" defaultValueBoolean="true">
@@ -160,10 +160,10 @@
             <column name="patronymic" type="varchar(255)"/>
             <column name="description" type="text"/>
             <column name="other_data" type="jsonb"/>
-            <column name="updated_at" type="timestamp" defaultValueComputed="current_timestamp">
+            <column name="updated_at" type="timestamptz" defaultValueComputed="current_timestamp">
                 <constraints nullable="false"/>
             </column>
-            <column name="created_at" type="timestamp" defaultValueComputed="current_timestamp">
+            <column name="created_at" type="timestamptz" defaultValueComputed="current_timestamp">
                 <constraints nullable="false"/>
             </column>
         </createTable>
