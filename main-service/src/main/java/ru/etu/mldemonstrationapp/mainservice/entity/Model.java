@@ -50,7 +50,7 @@ public class Model implements Serializable {
         return modelInfo.getRuntime();
     }
 
-    public String getProblemType() {
+    public ModelProblemType getProblemType() {
         return modelInfo.getProblemType();
     }
 

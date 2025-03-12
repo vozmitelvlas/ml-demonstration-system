@@ -25,5 +25,6 @@ public class ModelInfo implements Serializable {
     @Enumerated(EnumType.STRING)
     private ModelRuntime runtime;
 
-    private String problemType;
+    @Enumerated(EnumType.STRING)
+    private ModelProblemType problemType;
 }

@@ -2,6 +2,8 @@ package ru.etu.mldemonstrationapp.mainservice.dto;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.hibernate.validator.constraints.URL;
+import ru.etu.mldemonstrationapp.mainservice.entity.ModelProblemType;
 import ru.etu.mldemonstrationapp.mainservice.entity.ModelRuntime;
 
 public record UpdateModelVersionRequest(
@@ -17,15 +19,14 @@ public record UpdateModelVersionRequest(
         String description,
 
         @NotNull(message = "URI cannot be null")
+        @URL(message = "Invalid URI format")
         @Size(min = 1, max = 255, message = "URI must be between 1 and 255 characters")
         String uri,
 
         @NotNull(message = "Runtime cannot be null")
-        @Size(min = 1, max = 255, message = "Runtime must be between 1 and 255 characters")
         ModelRuntime runtime,
 
         @NotNull(message = "Problem type cannot be null")
-        @Size(min = 1, max = 255, message = "Problem type must be between 1 and 255 characters")
-        String problemType
+        ModelProblemType problemType
 ) {
 }

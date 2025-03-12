@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.validator.constraints.URL;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -27,6 +28,7 @@ public class ModelVersion implements Serializable {
     private String description;
 
     @Column(nullable = false)
+    @URL()
     private String uri;
 
     @ManyToOne
@@ -54,7 +56,7 @@ public class ModelVersion implements Serializable {
         return model.getRuntime();
     }
 
-    public String getProblemType() {
+    public ModelProblemType getProblemType() {
         return model.getProblemType();
     }
 
