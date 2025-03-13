@@ -37,7 +37,7 @@ public class AuthController {
      */
     @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
     @PostMapping("/login")
-    ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
         return authService.login(loginRequest);
     }
 
@@ -49,7 +49,7 @@ public class AuthController {
      */
     @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
     @PostMapping("/register")
-    ResponseEntity<LoginResponse> register(@Valid @RequestBody UserRegistrationRequest createUserRequest) {
+    public ResponseEntity<LoginResponse> register(@Valid @RequestBody UserRegistrationRequest createUserRequest) {
         return authService.register(createUserRequest);
     }
 
@@ -60,7 +60,7 @@ public class AuthController {
      */
     @ApiResponse(useReturnTypeSchema = true, responseCode = "204")
     @GetMapping("/logout")
-    ResponseEntity<Void> logout() {
+    public ResponseEntity<Void> logout() {
         ResponseCookie authCookie = jwtService.getEmptyTokenCookie();
         return ResponseEntity.noContent().header(HttpHeaders.SET_COOKIE, authCookie.toString()).build();
     }
@@ -75,7 +75,7 @@ public class AuthController {
      */
     @ApiResponse(useReturnTypeSchema = true, responseCode = "204")
     @PostMapping("/password-reset")
-    ResponseEntity<Void> getPasswordResetToken(@RequestBody ResetPasswordRequest passwordResetRequest,
+    public ResponseEntity<Void> getPasswordResetToken(@RequestBody ResetPasswordRequest passwordResetRequest,
                                                HttpServletRequest request) {
 
         String origin = request.getHeader("Origin");
