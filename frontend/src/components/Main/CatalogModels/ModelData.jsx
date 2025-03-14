@@ -54,11 +54,11 @@ export default function ModelData({isAdmin}) {
                             </tr>
                             <tr>
                                 <td>RunTime</td>
-                                <td className="text-center">{modelData.runtime}</td>
+                                <td className="text-center">{modelData.runtime?.value}</td>
                             </tr>
                             <tr>
                                 <td>Тип задачи</td>
-                                <td className="text-center">{modelData.problemType}</td>
+                                <td className="text-center">{modelData.problemType?.value}</td>
                             </tr>
                             <tr>
                                 <td>URI модели</td>

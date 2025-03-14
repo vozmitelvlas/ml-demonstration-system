@@ -5,7 +5,6 @@ import {Controller} from "react-hook-form";
 import Select from "react-select";
 import {customStyle, setFirstMultiBackColor, setSecondMultiBackColor} from "../../utils/selectStyles.jsx";
 
-
 const rolesOptions = [
     {value: 'ADMIN', label: 'Администратор'},
     {value: 'ORGANIZATION_HEAD', label: 'Руководитель организации'},
@@ -17,7 +16,6 @@ export default function AddNewUserModal({isAddingUser, submitFunction, alarm, lo
     const [rolesSelectStyle, setRolesSelectStyle] = useState(customStyle)
 
     return (
-
             <div className={`add-modal-overlay ${isAddingUser ? "" : "add-modal-overlay_hidden"}`}>
                 <form onSubmit={form.handleSubmit(submitFunction)} className="add-container">
                     <div className="add-modal__title">
@@ -65,7 +63,7 @@ export default function AddNewUserModal({isAddingUser, submitFunction, alarm, lo
                             </tr>
                             <tr onMouseEnter={event => setFirstMultiBackColor(event, setOrgSelectStyle, setRolesSelectStyle)}
                                 onMouseLeave={event => setSecondMultiBackColor(event, setOrgSelectStyle, setRolesSelectStyle)}
-                                data-name={"orgs"}>
+                                data-name={"first"}>
                                 <td>Организация<span> *</span></td>
                                 <td>
                                     <Controller
@@ -89,7 +87,7 @@ export default function AddNewUserModal({isAddingUser, submitFunction, alarm, lo
                             </tr>
                             <tr onMouseEnter={event => setFirstMultiBackColor(event, setOrgSelectStyle, setRolesSelectStyle)}
                                 onMouseLeave={event => setSecondMultiBackColor(event, setOrgSelectStyle, setRolesSelectStyle)}
-                                data-name={"roles"}>
+                                data-name={"second"}>
                                 <td>Роль<span> *</span></td>
                                 <td>
                                     <Controller
@@ -113,13 +111,6 @@ export default function AddNewUserModal({isAddingUser, submitFunction, alarm, lo
 
                                 </td>
                             </tr>
-
-                            <tr>
-                                <td>Описание</td>
-                                <td className="text-center">
-                                    <textarea {...form.register("description")}></textarea>
-                                </td>
-                            </tr>
                             </tbody>
                         </table>
                     </div>
@@ -128,9 +119,6 @@ export default function AddNewUserModal({isAddingUser, submitFunction, alarm, lo
                         <Button type="submit">Сохранить</Button>
                     </div>
                 </form>
-
             </div>
-
     )
-
 }

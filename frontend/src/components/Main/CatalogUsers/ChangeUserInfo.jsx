@@ -57,7 +57,7 @@ export default function ChangeUserInfo({
                         </tr>
                         <tr onMouseEnter={event => setFirstMultiBackColor(event, setOrgSelectStyle, setRolesSelectStyle)}
                             onMouseLeave={event => setSecondMultiBackColor(event, setOrgSelectStyle, setRolesSelectStyle)}
-                            data-name={"orgs"}>
+                            data-name={"first"}>
                             <td>Организация</td>
                             <td>
                                 <Controller
@@ -80,7 +80,7 @@ export default function ChangeUserInfo({
                         </tr>
                         <tr onMouseEnter={event => setFirstMultiBackColor(event, setOrgSelectStyle, setRolesSelectStyle)}
                             onMouseLeave={event => setSecondMultiBackColor(event, setOrgSelectStyle, setRolesSelectStyle)}
-                            data-name={"roles"}>
+                            data-name={"second"}>
                             <td>Роль</td>
                             <td>
                                 <Controller

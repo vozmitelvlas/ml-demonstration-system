@@ -2,22 +2,12 @@ import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx";
 import Select from "react-select";
 import Button from "../Button/Button.jsx";
 import React, {useState} from "react";
-import {customStyle, firstStyle, secondStyle} from "../../utils/selectStyles.jsx";
+import {customStyle, setFirstMultiBackColor, setSecondMultiBackColor} from "../../utils/selectStyles.jsx";
 import {Controller} from "react-hook-form";
 
-const options = [
-    {value: 'O1', label: 'First'},
-    {value: 'O2', label: 'Second'}
-];
-
-export default function AddNewModelModal({isAddingModel, logo, alarm, onCancel, onAdd, form}) {
-    const [style, setStyle] = useState(customStyle)
-    const setFirstMultiBackColor = () => {
-        setStyle(prevState => firstStyle(prevState))
-    }
-    const setSecondMultiBackColor = () => {
-        setStyle(prevState => secondStyle(prevState))
-    }
+export default function AddNewModelModal({runtimes, problemTypes, isAddingModel, logo, alarm, onCancel, onAdd, form}) {
+    const [runTimeStyle, setRunTimeStyle] = useState(customStyle)
+    const [problemStyle, setProblemStyle] = useState(customStyle)
 
     return (
         <>
@@ -42,13 +32,33 @@ export default function AddNewModelModal({isAddingModel, logo, alarm, onCancel, 
                                     <input type="text" {...form.register("uri")} required/>
                                 </td>
                             </tr>
-                            <tr>
+                            <tr onMouseEnter={event => setFirstMultiBackColor(event, setRunTimeStyle, setProblemStyle)}
+                                onMouseLeave={event => setSecondMultiBackColor(event, setRunTimeStyle, setProblemStyle)}
+                                data-name={"first"}>
                                 <td>RunTime<span> *</span></td>
                                 <td className="text-center">
-                                    <input type="text" {...form.register("runtime")} required/>
+                                    <Controller
+                                        control={form.control}
+                                        name="runtime"
+                                        render={({
+                                                     field: {onChange, value},
+
+                                                 }) => (
+                                            <Select
+                                                options={runtimes}
+                                                onChange={onChange}
+                                                placeholder="Тип"
+                                                value={value}
+                                                isSearchable
+                                                styles={runTimeStyle}
+                                                required
+                                            />
+                                        )}/>
                                 </td>
                             </tr>
-                            <tr onMouseEnter={setFirstMultiBackColor} onMouseLeave={setSecondMultiBackColor}>
+                            <tr onMouseEnter={event => setFirstMultiBackColor(event, setRunTimeStyle, setProblemStyle)}
+                                onMouseLeave={event => setSecondMultiBackColor(event, setRunTimeStyle, setProblemStyle)}
+                                data-name={"second"}>
                                 <td>Тип задачи<span> *</span></td>
                                 <td>
                                     <Controller
@@ -59,12 +69,12 @@ export default function AddNewModelModal({isAddingModel, logo, alarm, onCancel, 
 
                                                  }) => (
                                             <Select
-                                                options={options}
+                                                options={problemTypes}
                                                 onChange={onChange}
                                                 placeholder="Тип"
                                                 value={value}
                                                 isSearchable
-                                                styles={style}
+                                                styles={problemStyle}
                                                 required
                                             />
                                         )}/>

@@ -53,7 +53,7 @@ h3 {
 }
 
 textarea {
-    height: calc(8rem + 2px);
+    height: calc(7.5rem + 2px);
     width: calc(22rem + 2px);
 
     border: 1px solid var(--accent-color);
