@@ -7,6 +7,6 @@ RUN npm run build
 
 FROM tomcat:10.1.39-jre17-temurin-noble
 COPY --from=builder /app/dist /usr/local/tomcat/webapps/ROOT
-COPY WEB-INF /usr/local/tomcat/webapps/ROOT/WEB-INF
+COPY web.xml /usr/local/tomcat/webapps/ROOT/WEB-INF/web.xml
 EXPOSE 8080
 CMD ["catalina.sh", "run"]
