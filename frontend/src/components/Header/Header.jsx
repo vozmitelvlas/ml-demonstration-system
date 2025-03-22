@@ -20,8 +20,8 @@ export default function Header({login, isAdminMode, setIsAdminMode, isAdmin, isM
                 setTmpTime(new Date())
         }, 1000)
 
-        return () => clearInterval(timer);
-    }, []);
+        return () => clearInterval(timer)
+    }, [])
 
     const toggleAdminMode = () => {
         setIsAdminMode(!isAdminMode)
@@ -32,7 +32,7 @@ export default function Header({login, isAdminMode, setIsAdminMode, isAdmin, isM
     const onExitClick = async () => {
         try {
             sessionStorage.clear()
-            setIsAdminMode(false)
+            // setIsAdminMode(false)
 
             await apiClient(`/api/auth/logout`)
             navigate("/")

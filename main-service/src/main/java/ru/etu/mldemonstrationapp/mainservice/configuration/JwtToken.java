@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public record JwtToken(UUID id, String subject, Long userId, String email, List<String> authorities,
+public record JwtToken(UUID id, String subject, Long userId, String email, Boolean emailConfirm, List<String> authorities,
                           Instant issuedAt,
                           Instant expiresAt) implements Principal{
 
@@ -26,6 +26,7 @@ public record JwtToken(UUID id, String subject, Long userId, String email, List<
                 claims.getSubject(),
                 claims.get("user_id", Long.class),
                 claims.get("email", String.class),
+                claims.get("email_confirm", Boolean.class),
                 convertAuthoritiesClaim(claims),
                 claims.getIssuedAt().toInstant(),
                 claims.getExpiration().toInstant()

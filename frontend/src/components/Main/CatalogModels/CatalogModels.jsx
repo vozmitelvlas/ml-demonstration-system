@@ -53,6 +53,22 @@ export default function CatalogModels({isAdminMode}) {
         }
     })
 
+    const [token, setToken] = useState('')
+    useEffect(() => {
+        async function fetchData() {
+            const urlParams = new URLSearchParams(window.location.search)
+            const tokenFromUrl = urlParams.get('token')
+            if (tokenFromUrl) {
+                await apiClient('/api/users/profile/email/confirm', "POST", {
+                    Authorization: `Bearer ${tokenFromUrl}`
+                })
+                setAlarm("Адрес электронной почты подтвержден")
+                setLogo(acceptLogo)
+            }
+        }
+        fetchData().then(r => {})
+    }, [])
+
     useEffect(() => {
         const url = isAdminMode ? '/api/admin/models/versions' : '/api/models/versions'
         apiClient(url).then((res => {
@@ -60,8 +76,6 @@ export default function CatalogModels({isAdminMode}) {
         })).catch((error) => {
             console.log(error)
         })
-
-
     }, [isAdminMode])
 
     useEffect(() => {

@@ -1,13 +1,14 @@
 import styles from "./SignIn.module.css"
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import apiClient from "../../utils/apiClient.jsx";
 import {useForm} from 'react-hook-form';
 import {yupResolver} from '@hookform/resolvers/yup';
 import {signInSchema} from "../../store/formSchema.jsx";
 
-export default function SignIn({setUserData, setIsAdmin, setMainOrg}) {
+export default function SignIn({setUserData, setIsAdmin, setMainOrg, setIsAdminMode}) {
     const navigate = useNavigate()
+    const [alarm, setAlarm] = useState("")
     const {
         register,
         handleSubmit,
@@ -21,6 +22,23 @@ export default function SignIn({setUserData, setIsAdmin, setMainOrg}) {
         resolver: yupResolver(signInSchema)
     })
 
+
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search)
+        const tokenFromUrl = urlParams.get('token')
+        if (tokenFromUrl) {
+            apiClient('/api/users/profile/email/confirm', "POST", {emailConfirm: true}, {
+                Authorization: `Bearer ${tokenFromUrl}`
+            }).then(r => {})
+            setAlarm("Адрес электронной почты подтвержден")
+        }
+        setIsAdminMode(false)
+    }, [])
+
+    const onInputFocus = () => {
+        setAlarm("")
+    }
+
     const firstErrorKey = Object.keys(errors)[0];
     const error = firstErrorKey ? errors[firstErrorKey].message : ''
 
@@ -33,10 +51,8 @@ export default function SignIn({setUserData, setIsAdmin, setMainOrg}) {
             setMainOrg(user.roles.includes("ORGANIZATION_HEAD"))
             navigate("/models")
         } catch (error) {
-            if(error.status === 401)
-                setError('form', {type: 'server', message: error.detail})
-            else
-                console.log(error)
+            setError('form', {type: 'server', message: error.detail})
+            console.log(error)
         }
     }
 
@@ -45,17 +61,28 @@ export default function SignIn({setUserData, setIsAdmin, setMainOrg}) {
             <form onSubmit={handleSubmit(sendFormData)} className={styles.container}>
                 <div className={`${styles.inData} naked-input`}>
                     <h2>Вход в ML models</h2>
+                    {alarm && <span className={styles.emailAlarm}>{alarm}</span>}
                     <div className={styles.row}>
                         <div className={styles.inputDiv}>
                             <div>
-                                <input type="text" placeholder="Логин" {...register("login")} required/>
+                                <input
+                                    type="text"
+                                    placeholder="Логин"
+                                    {...register("login")}
+                                    onFocus={onInputFocus}
+                                    required/>
                             </div>
                         </div>
                     </div>
                     <div className={styles.row}>
                         <div className={styles.inputDiv}>
                             <div>
-                                <input type="password" placeholder="Пароль" {...register("password")} required/>
+                                <input
+                                    type="password"
+                                    placeholder="Пароль"
+                                    {...register("password")}
+                                    onFocus={onInputFocus}
+                                    required/>
                             </div>
                         </div>
                     </div>

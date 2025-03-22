@@ -47,7 +47,7 @@
     flex-direction: column;
     text-align: left;
     width: 100%;
-    margin: 2px 8px;
+    margin: 2px 15px;
 
     justify-content: center;
 }
@@ -94,7 +94,45 @@
     top:1px;
 }
 .password{
-    font-size: 14px;
+    font-size: 16px;
     color: #49C5BA;
     cursor: pointer;
+}
+.emailConfirm{
+    display: flex;
+    text-align: left;
+    font-size: 18px;
+    color: #49C5BA;
+}
+
+.contButton{
+    margin-top: 30px;
+    display: flex;
+    width: 100%;
+}
+.authButton{
+    width: 100%;
+    height: 45px;
+    color:#ffffff;
+    background-color:var(--accent-color);
+    font-size: 16px;
+    padding: 10px;
+    border: unset;
+    cursor: pointer;
+}
+.confirmContainer{
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    max-width: 450px;
+
+    padding: 15px;
+    border-radius: 15px;
+}
+.confirmContainer > h2 {
+    margin-right: auto;
+}
+.emailAlarm{
+    color: #49C5BA;
+    font-size: 16px;
 }

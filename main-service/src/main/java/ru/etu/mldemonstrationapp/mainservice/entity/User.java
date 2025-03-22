@@ -45,6 +45,8 @@ public class User implements Serializable {
 
     private String description;
 
+    private Boolean emailConfirm;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<ModelUserLimit> limits = new ArrayList<>();

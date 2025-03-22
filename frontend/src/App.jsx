@@ -57,8 +57,11 @@ function App() {
             }
             <div className={styles.mainContent}>
                 <Routes>
-                    <Route path="/" element={<SignIn setUserData={setUserData} setIsAdmin={setIsAdmin} setMainOrg={setMainOrg} />}/>
-                    <Route path="/signup" element={<SignUp setUserData={setUserData} setIsAdmin={setIsAdmin} setMainOrg={setMainOrg}/>}/>
+                    <Route path="/"
+                           element={<SignIn setUserData={setUserData} setIsAdmin={setIsAdmin} setMainOrg={setMainOrg}
+                                            setIsAdminMode={setIsAdminMode}/>}/>
+                    <Route path="/signup" element={<SignUp setUserData={setUserData} setIsAdmin={setIsAdmin}
+                                                           setMainOrg={setMainOrg}/>}/>
                     <Route path="/password" element={<PasswordRecover/>}/>
                     <Route path="/password-reset" element={<PasswordReset/>}/>
 

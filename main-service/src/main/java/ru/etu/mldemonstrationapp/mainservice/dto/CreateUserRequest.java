@@ -37,6 +37,8 @@ public record CreateUserRequest(
         @NotNull(message = "OrganizationId must not be null")
         Long organizationId,
 
+        Boolean emailConfirm,
+
         @NotNull(message = "Roles must not be null")
         @Size(min = 1, max = 3)
         List<String> roles

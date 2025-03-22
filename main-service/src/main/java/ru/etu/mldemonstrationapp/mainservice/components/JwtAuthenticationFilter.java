@@ -89,12 +89,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             SecurityContext context = SecurityContextHolder.createEmptyContext();
 
+            var authorities = token.authorities().contains("PASSWORD_RESET") || token.authorities().contains("EMAIL_CONFIRM")
+                    ? token.authorities().stream().map(SimpleGrantedAuthority::new).toList()
+                    : userDetails.getAuthorities();
+
             var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                     token,
                     tokenString,
-                    token.authorities().contains("PASSWORD_RESET")
-                            ? token.authorities().stream().map(SimpleGrantedAuthority::new).toList()
-                            : userDetails.getAuthorities()
+                    authorities
             );
 
             usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

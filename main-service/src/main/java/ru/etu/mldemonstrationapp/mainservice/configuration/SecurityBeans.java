@@ -57,6 +57,7 @@ public class SecurityBeans {
                         .requestMatchers("/api/organizations/*/members").hasRole("ORGANIZATION_HEAD")
                         .requestMatchers("/api/organizations/*/limits-type").hasRole("ORGANIZATION_HEAD")
                         .requestMatchers(HttpMethod.POST, "/api/users/profile/password/reset").hasAuthority("PASSWORD_RESET")
+                        .requestMatchers(HttpMethod.POST, "/api/users/profile/email/confirm").hasAuthority("EMAIL_CONFIRM")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/**").hasAnyRole("USER", "ADMIN")
                 )

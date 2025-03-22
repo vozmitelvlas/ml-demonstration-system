@@ -73,6 +73,8 @@ public class UserServiceImpl implements UserService {
         user.setRoles(userRoles);
         user.setOrganization(organization);
 
+        user.setEmailConfirm(false);
+
         return userRepository.save(user);
     }
 
@@ -115,6 +117,17 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
+    }
+
+    @Transactional
+    @Override
+    public void setUserEmailConfirm(Long id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "User not found")
+        );
+        user.setEmailConfirm(true);
+        userRepository.save(user);
     }
 
 }

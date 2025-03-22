@@ -95,7 +95,8 @@ export default function CatalogUsers() {
         const sendData = {
             ...newValue,
             organizationId: newValue.organization.value,
-            roles: newValue["selectRoles"].map(role => role.value)
+            roles: newValue["selectRoles"].map(role => role.value),
+            emailConfirm: true,
         }
 
         try {

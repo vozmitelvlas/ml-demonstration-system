@@ -12,10 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ru.etu.mldemonstrationapp.mainservice.configuration.JwtToken;
-import ru.etu.mldemonstrationapp.mainservice.dto.NewPasswordRequest;
-import ru.etu.mldemonstrationapp.mainservice.dto.ResetPasswordRequest;
-import ru.etu.mldemonstrationapp.mainservice.dto.UpdatePasswordRequest;
-import ru.etu.mldemonstrationapp.mainservice.dto.UpdateProfileRequest;
+import ru.etu.mldemonstrationapp.mainservice.dto.*;
 import ru.etu.mldemonstrationapp.mainservice.entity.User;
 import ru.etu.mldemonstrationapp.mainservice.service.JwtService;
 import ru.etu.mldemonstrationapp.mainservice.service.UserService;
@@ -73,6 +70,14 @@ public class UserController {
     @PostMapping("/profile/password/reset")
     public ResponseEntity<Void> setNewPassword(@AuthenticationPrincipal JwtToken resetPasswordToken, @Valid @RequestBody NewPasswordRequest newPasswordRequest) {
         userService.setUserPassword(resetPasswordToken.userId(), newPasswordRequest.password());
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(description = "Set a new password using a password reset token")
+    @ApiResponse(useReturnTypeSchema = true, responseCode = "204")
+    @PostMapping("/profile/email/confirm")
+    public ResponseEntity<Void> setEmailConfirm(@AuthenticationPrincipal JwtToken emailConfirmToken) {
+        userService.setUserEmailConfirm(emailConfirmToken.userId());
         return ResponseEntity.noContent().build();
     }
 

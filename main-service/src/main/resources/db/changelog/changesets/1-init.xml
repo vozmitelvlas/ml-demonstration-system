@@ -159,6 +159,9 @@
             </column>
             <column name="patronymic" type="varchar(255)"/>
             <column name="description" type="text"/>
+            <column name="email_confirm" type="boolean">
+                <constraints nullable="false"/>
+            </column>
             <column name="other_data" type="jsonb"/>
             <column name="updated_at" type="timestamptz" defaultValueComputed="current_timestamp">
                 <constraints nullable="false"/>

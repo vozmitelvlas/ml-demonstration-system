@@ -17,6 +17,7 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.Date;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 @Service
 public class JwtServiceImpl implements JwtService {
@@ -44,9 +45,31 @@ public class JwtServiceImpl implements JwtService {
                 .signWith(getSecretKey(), Jwts.SIG.HS256)
                 .compact();
     }
-
+        @Override
+        public String generateAccessToken(CustomUserDetails userDetails) {
+            Instant issuedAt = Instant.now();
+            return Jwts.builder()
+                    .header().type("JWT")
+                    .and()
+                    .id(UUID.randomUUID().toString())
+                    .subject(userDetails.getUsername())
+                    .issuedAt(Date.from(issuedAt))
+                    .expiration(Date.from(issuedAt.plus(accessTokenTtl)))
+                    .claim("user_id", userDetails.user().getUserId())
+                    .claim("email", userDetails.user().getEmail())
+                    .claim("authorities", userDetails
+                            .getAuthorities()
+                            .stream()
+                            .map(GrantedAuthority::getAuthority)
+                            .toList()
+                    )
+                    .claim("email_confirm", userDetails.user().getEmailConfirm())
+                    .signWith(getSecretKey(), Jwts.SIG.HS256)
+                    .compact();
+        }
     @Override
-    public String generateAccessToken(CustomUserDetails userDetails) {
+
+    public String generateRegisterToken(CustomUserDetails userDetails) {
         Instant issuedAt = Instant.now();
         return Jwts.builder()
                 .header().type("JWT")
@@ -57,16 +80,15 @@ public class JwtServiceImpl implements JwtService {
                 .expiration(Date.from(issuedAt.plus(accessTokenTtl)))
                 .claim("user_id", userDetails.user().getUserId())
                 .claim("email", userDetails.user().getEmail())
-                .claim("authorities", userDetails
-                        .getAuthorities()
-                        .stream()
-                        .map(GrantedAuthority::getAuthority)
-                        .toList()
+                .claim("authorities", Stream.concat(
+                                userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority),
+                                Stream.of("EMAIL_CONFIRM")
+                        ).toList()
                 )
+                .claim("email_confirm", userDetails.user().getEmailConfirm())
                 .signWith(getSecretKey(), Jwts.SIG.HS256)
                 .compact();
     }
-
     @Override
     public ResponseCookie generateAccessTokenCookie(String token) {
         return ResponseCookie.from(AUTH_TOKEN_COOKIE_NAME, token)
