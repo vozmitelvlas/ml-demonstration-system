@@ -25,7 +25,7 @@ JWT_SECRET=example-of-secret-not-for-production-use
 SMTP_USERNAME=ml.demonstation.app@gmail.com
 SMTP_PASSWORD=password
 ```
-or using Spring Boot configuration file [application.yaml](main-service/src/main/resources/application.yaml).
+or using Spring Boot configuration file [application.yaml](https://gitlab.com/ml-demonstration-system-group/ml-demonstration-system/-/blob/main/main-service/src/main/resources/application.yaml?ref_type=heads).
 2. Start Spring Boot application using
 ```bash
 $ ./gradlew :main-service:bootRun
@@ -45,24 +45,11 @@ http://localhost:5173
 ```
 
 #### Using Docker
-1. Build JAR-file
-```bash
-$ ./gradlew :main-service:bootJar
-```
-2. Run Spring Boot application using
+1. Run application using
 ```bash
 $ docker compose up -d --build
 ```
-3. Navigate to the frontend directory and install dependencies:
-```bash
-$ cd frontend
-$ npm install
-```
-4. Run React.js application in dev-mode
-```bash
-$ npm run dev
-```
-5. Open your browser and go to
+2. Open your browser and go to
 ```
 http://localhost:5173
 ```
