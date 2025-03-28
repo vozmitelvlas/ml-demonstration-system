@@ -3,6 +3,7 @@ package ru.etu.mldemonstrationapp.mainservice.service.impl;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,8 @@ import ru.etu.mldemonstrationapp.mainservice.service.UserService;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -128,6 +131,11 @@ public class UserServiceImpl implements UserService {
         );
         user.setEmailConfirm(true);
         userRepository.save(user);
+    }
+    @Transactional
+    @Scheduled(fixedDelay = 1, timeUnit = TimeUnit.HOURS)
+    public void deleteUnconfirmedUsers(){
+        userRepository.deleteAllByEmailConfirm(false);
     }
 
 }
