@@ -38,7 +38,7 @@ allprojects {
 		runtimeOnly("org.postgresql:postgresql")
 
 		// Liquibase
-		implementation("org.liquibase:liquibase-core:4.27.0")
+		implementation("org.liquibase:liquibase-core")
 
 		// JWT
 		implementation("io.jsonwebtoken:jjwt-api:0.12.6")

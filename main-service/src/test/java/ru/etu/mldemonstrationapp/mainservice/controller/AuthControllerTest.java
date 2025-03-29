@@ -2,19 +2,12 @@ package ru.etu.mldemonstrationapp.mainservice.controller;
 
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.web.servlet.function.ServerRequest;
-import org.testcontainers.shaded.org.bouncycastle.mime.Headers;
-import ru.etu.mldemonstrationapp.mainservice.service.EmailService;
 import ru.etu.mldemonstrationapp.mainservice.service.JwtService;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
