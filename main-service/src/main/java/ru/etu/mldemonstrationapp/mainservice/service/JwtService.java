@@ -11,7 +11,7 @@ public interface JwtService {
 
     String generateAccessToken(CustomUserDetails userDetails);
 
-    String generateRegisterToken(CustomUserDetails userDetails);
+    String generateEmailConfirmToken(CustomUserDetails userDetails);
 
     ResponseCookie generateAccessTokenCookie(String token);
 

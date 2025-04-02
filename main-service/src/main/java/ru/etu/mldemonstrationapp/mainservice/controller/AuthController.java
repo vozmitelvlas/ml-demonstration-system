@@ -50,7 +50,7 @@ public class AuthController {
      */
     @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
     @PostMapping("/register")
-    public ResponseEntity<LoginResponse> register(@Valid @RequestBody UserRegistrationRequest createUserRequest,
+    public RegisterResponse register(@Valid @RequestBody UserRegistrationRequest createUserRequest,
                                                   HttpServletRequest request) {
         String origin = request.getHeader("Origin");
         if (!StringUtils.hasLength(origin)) {
@@ -92,19 +92,4 @@ public class AuthController {
         authService.sendResetPasswordToken(passwordResetRequest, origin);
         return ResponseEntity.noContent().build();
     }
-
-    @ApiResponse(useReturnTypeSchema = true, responseCode = "204")
-    @PostMapping("/email-confirm")
-    public ResponseEntity<Void> getEmailConfirmToken(@RequestBody ResetPasswordRequest passwordResetRequest,
-                                                      HttpServletRequest request) {
-
-        String origin = request.getHeader("Origin");
-        if (!StringUtils.hasLength(origin)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Origin header does not presented in the request");
-        }
-        authService.sendEmailConfirmToken(passwordResetRequest, origin);
-        return ResponseEntity.noContent().build();
-    }
-
-
 }

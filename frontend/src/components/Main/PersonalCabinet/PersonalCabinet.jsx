@@ -1,18 +1,17 @@
 import React, {useEffect, useState} from 'react';
 import styles from "./PesonalCabinet.module.css"
-import Button from "../Button/Button.jsx";
+import Button from "../Buttons/Button.jsx";
 import user_logo from "../../../assets/user2.svg";
 import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
 import {personalCabinetSchema} from "../../store/formSchema.jsx";
 import apiClient from "../../utils/apiClient.jsx";
-import SetNewPasswordModal from "./SetNewPasswordModal.jsx";
+import {SetNewPasswordModal, EditUserDataModal} from "./components/index.js";
 import DeleteModal from "../../utils/DeleteModal.jsx";
 import {useNavigate} from "react-router-dom";
 import alarmLogo from "../../../assets/alarm.svg";
 import acceptLogo from "../../../assets/accept.svg"
 import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx";
-import EditUserDataModal from "./EditUserDataModal.jsx";
 
 export default function PersonalCabinet({userData, setUserData}) {
     const navigate = useNavigate()

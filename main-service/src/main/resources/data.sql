@@ -9,7 +9,7 @@ VALUES (1, 'Без организации', 'Объединение пользо
 
 INSERT INTO users (user_id, login, password, first_name, last_name, email, organization_id, email_confirm)
 VALUES (1, 'admin', '$2a$12$6KB.ORbCJV/655Mso0YO0OtXiygTTKcVpW/cPtcPjiMC1TO9geLDq', 'Админ', 'Админов', 'admin@example.com', 3, true),
-       (2, 'user', '$2a$12$G0rJlsDW5ngdlv4NxZgz4OqhS48ue4lPbdyy1hTaDomjMJbEHH8xK', 'Иван', 'Иванов', 'user@example.com', 2, false),
+       (2, 'user', '$2a$12$G0rJlsDW5ngdlv4NxZgz4OqhS48ue4lPbdyy1hTaDomjMJbEHH8xK', 'Иван', 'Иванов', 'user@example.com', 2, true),
        (3, 'director', '$2a$12$w3lt4S/p.HKujZFUlBKpfOTUlraarBUG0Z2e7lE.5mKJmWDjdOQPC', 'Сергей', 'Сергеев', 'director@example.com', 4, true);
 
 

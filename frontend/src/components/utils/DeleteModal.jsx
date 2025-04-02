@@ -1,4 +1,4 @@
-import Button from "../Main/Button/Button.jsx";
+import Button from "../Main/Buttons/Button.jsx";
 import React from "react";
 
 export default function DeleteModal({onNo, onYes, open}){

@@ -28,6 +28,7 @@ public class JwtServiceImpl implements JwtService {
 
     private final Duration accessTokenTtl = Duration.ofDays(1);
     private final Duration resetTokenTtl = Duration.ofMinutes(5);
+    private final Duration confirmTokenTtl = Duration.ofMinutes(5);
 
     @Override
     public String generateResetPasswordToken(CustomUserDetails userDetails) {
@@ -68,27 +69,22 @@ public class JwtServiceImpl implements JwtService {
                     .compact();
         }
     @Override
-
-    public String generateRegisterToken(CustomUserDetails userDetails) {
+    public String generateEmailConfirmToken(CustomUserDetails userDetails) {
         Instant issuedAt = Instant.now();
         return Jwts.builder()
                 .header().type("JWT")
                 .and()
                 .id(UUID.randomUUID().toString())
                 .subject(userDetails.getUsername())
-                .issuedAt(Date.from(issuedAt))
-                .expiration(Date.from(issuedAt.plus(accessTokenTtl)))
                 .claim("user_id", userDetails.user().getUserId())
                 .claim("email", userDetails.user().getEmail())
-                .claim("authorities", Stream.concat(
-                                userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority),
-                                Stream.of("EMAIL_CONFIRM")
-                        ).toList()
-                )
-                .claim("email_confirm", userDetails.user().getEmailConfirm())
+                .claim("authorities", Collections.singletonList("EMAIL_CONFIRM"))
+                .issuedAt(Date.from(issuedAt))
+                .expiration(Date.from(issuedAt.plus(confirmTokenTtl)))
                 .signWith(getSecretKey(), Jwts.SIG.HS256)
                 .compact();
     }
+
     @Override
     public ResponseCookie generateAccessTokenCookie(String token) {
         return ResponseCookie.from(AUTH_TOKEN_COOKIE_NAME, token)

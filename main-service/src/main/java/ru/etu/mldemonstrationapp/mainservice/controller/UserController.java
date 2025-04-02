@@ -11,6 +11,7 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import ru.etu.mldemonstrationapp.mainservice.configuration.CustomUserDetails;
 import ru.etu.mldemonstrationapp.mainservice.configuration.JwtToken;
 import ru.etu.mldemonstrationapp.mainservice.dto.*;
 import ru.etu.mldemonstrationapp.mainservice.entity.User;
@@ -73,12 +74,17 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(description = "Set a new password using a password reset token")
+    @Operation(description = "Confirm email")
     @ApiResponse(useReturnTypeSchema = true, responseCode = "204")
     @PostMapping("/profile/email/confirm")
     public ResponseEntity<Void> setEmailConfirm(@AuthenticationPrincipal JwtToken emailConfirmToken) {
+        User user = userService.getUserByEmail(emailConfirmToken.email());
+        String token = jwtService.generateAccessToken(new CustomUserDetails(user));
+        ResponseCookie cookie = jwtService.generateAccessTokenCookie(token);
+
         userService.setUserEmailConfirm(emailConfirmToken.userId());
-        return ResponseEntity.noContent().build();
+
+        return ResponseEntity.noContent().header(HttpHeaders.SET_COOKIE, cookie.toString()).build();
     }
 
     /**
