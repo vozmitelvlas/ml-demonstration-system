@@ -1,5 +1,5 @@
-import CatalogHeader from "../Headers/CatalogHeader.jsx";
-import Button from "../Button/Button.jsx";
+import CatalogHeader from "../Headers/CatalogHeader/CatalogHeader.jsx";
+import Button from "../Buttons/Button.jsx";
 import deleteLogo from "../../../assets/delete.svg";
 import editLogo from "../../../assets/edit.svg"
 import copyLogo from "../../../assets/copy.svg"

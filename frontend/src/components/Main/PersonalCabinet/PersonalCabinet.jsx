@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import styles from "./PesonalCabinet.module.css"
-import Button from "../Button/Button.jsx";
+import Button from "../Buttons/Button.jsx";
 import user_logo from "../../../assets/user2.svg";
 import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";

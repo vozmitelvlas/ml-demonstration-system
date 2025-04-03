@@ -2,12 +2,14 @@ package ru.etu.mldemonstrationapp.mainservice.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import ru.etu.mldemonstrationapp.mainservice.configuration.CustomUserDetails;
 import ru.etu.mldemonstrationapp.mainservice.dto.LoginRequest;
 import ru.etu.mldemonstrationapp.mainservice.dto.LoginResponse;
@@ -37,6 +39,12 @@ public class AuthServiceImpl implements AuthService {
                 loginRequest.password())
         );
         var userDetails = (CustomUserDetails) authentication.getPrincipal();
+
+
+        if (!userDetails.user().isActive()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Вход запрещен, обратитесь к администратору сервиса");
+        }
+
         String token = jwtService.generateAccessToken(userDetails);
         ResponseCookie cookie = jwtService.generateAccessTokenCookie(token);
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(new LoginResponse(userDetails.user(), token));

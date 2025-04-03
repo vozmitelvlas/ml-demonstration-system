@@ -1,7 +1,7 @@
 import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx";
 import {Controller} from "react-hook-form";
 import Select from "react-select";
-import Button from "../Button/Button.jsx";
+import Button from "../Buttons/Button.jsx";
 import React, {useState} from "react";
 import {customStyle, firstStyle, secondStyle} from "../../utils/selectStyles.jsx";
 

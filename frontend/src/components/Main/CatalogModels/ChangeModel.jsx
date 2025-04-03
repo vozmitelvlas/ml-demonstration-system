@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import "../ChangeData.css"
-import DataHeader from "../Headers/DataHeader.jsx";
+import DataHeader from "../Headers/DataHeader/DataHeader.jsx";
 import {useParams} from "react-router-dom";
 import acceptLogo from "../../../assets/accept.svg"
 import alarmLogo from "../../../assets/alarm.svg"

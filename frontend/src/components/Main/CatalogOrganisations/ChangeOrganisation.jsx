@@ -1,4 +1,4 @@
-import DataHeader from "../Headers/DataHeader.jsx";
+import DataHeader from "../Headers/DataHeader/DataHeader.jsx";
 import React, {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx";

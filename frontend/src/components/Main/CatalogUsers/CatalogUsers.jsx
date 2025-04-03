@@ -1,25 +1,20 @@
-import CatalogHeader from "../Headers/CatalogHeader.jsx";
-import Button from "../Button/Button.jsx";
-import deleteLogo from "../../../assets/delete.svg";
-import editLogo from "../../../assets/edit.svg"
-import {Link, useNavigate} from "react-router-dom";
+import CatalogHeader from "../Headers/CatalogHeader/CatalogHeader.jsx";
+import Button from "../Buttons/Button.jsx";
 import React, {useEffect, useState} from "react";
 import Filter from "../Filter/Filter.jsx";
-
 import DeleteModal from "../../utils/DeleteModal.jsx";
 import apiClient from "../../utils/apiClient.jsx";
-import {getDateFormat} from "../../utils/DateAndTime.jsx";
 import alarmLogo from "../../../assets/alarm.svg";
 import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx";
 import acceptLogo from "../../../assets/accept.svg"
 import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
 import {signUpSchema} from "../../store/formSchema.jsx";
-import AddNewUserModal from "./AddNewUserModal.jsx";
+import {Users, AddNewUserModal} from "./components/index.js";
+import {NavigateButtons} from "../Buttons/NavigateButtons.jsx";
 
 
 export default function CatalogUsers() {
-    const navigate = useNavigate()
     const [isOpen, setIsOpen] = useState(false)
     const [tmpUserId, setTmpUserId] = useState("")
     const [alarm, setAlarm] = useState(null)
@@ -44,7 +39,7 @@ export default function CatalogUsers() {
 
     useEffect(() => {
         apiClient('/api/admin/users').then((res) => {
-            setUsers(res)
+            setUsers(res.sort((a, b) => a.userId - b.userId))
         }).catch(error => {
             console.error(error)
         })
@@ -60,7 +55,7 @@ export default function CatalogUsers() {
         }).catch(error => {
             console.log(error)
         })
-    }, []);
+    }, [])
 
     const firstErrorKey = Object.keys(form.formState.errors)[0];
     useEffect(() => {
@@ -76,9 +71,6 @@ export default function CatalogUsers() {
         setIsDeletingUser(!isDeletingUser)
         setAlarm(null)
     }
-    const toggleSidebar = () => {
-        setIsOpen(!isOpen)
-    }
 
     const onConfirmDeletingUser = async () => {
         try {
@@ -91,11 +83,13 @@ export default function CatalogUsers() {
             console.error(error)
         }
     }
-    const onSaveUserData = async (newValue) => {
+    const onAddNewUser = async (newValue) => {
         const sendData = {
             ...newValue,
             organizationId: newValue.organization.value,
-            roles: newValue["selectRoles"].map(role => role.value)
+            roles: newValue["selectRoles"].map(role => role.value),
+            emailConfirm: true,
+            active: true,
         }
 
         try {
@@ -120,6 +114,28 @@ export default function CatalogUsers() {
         setAlarm(null)
     }
 
+    const onSetActive = async ({target}) => {
+        try{
+            const tr = event.target.closest("tr")
+            const userId = tr.dataset.id
+
+
+            setUsers(prevUsers =>
+                prevUsers.map(user =>
+                    user.userId === Number(userId)
+                        ? { ...user, active: target.checked }
+                        : user
+                )
+            )
+            if(target.checked)
+                await apiClient(`/api/admin/users/activate/${userId}`, 'PUT')
+            else
+                await apiClient(`/api/admin/users/deactivate/${userId}`, 'PUT')
+        } catch (error){
+            console.log(error)
+        }
+    }
+
     return (
         <>
             {isOpen &&
@@ -133,8 +149,8 @@ export default function CatalogUsers() {
                     }}
                     sorts={{
                         "Сортировать": {
-                            options: ["Фамилии (ФИ)", "Логину"],
-                            names: ["FI", "login"]
+                            options: ["Фамилии (ФИ)", "Логину", "Доступу"],
+                            names: ["FI", "login", "access"]
                         },
                     }}></Filter>
             }
@@ -149,78 +165,14 @@ export default function CatalogUsers() {
                 </div>
                 <AlarmMsg logo={logo}>{alarm}</AlarmMsg>
 
-                <div className="catalog-users">
-                    <table className="table-fill">
-                        <thead>
-                        <tr>
-                            <th className="text-center"></th>
-                            <th className="text-center">
-                                <strong>Фамилия</strong>
-                            </th>
-                            <th className="text-center">
-                                <strong>Имя</strong>
-                            </th>
-                            <th className="text-center">
-                                <strong>Логин</strong>
-                            </th>
-                            <th className="text-center">
-                                <strong>Почта</strong>
-                            </th>
-                            <th className="text-center">
-                                <strong>Организация</strong>
-                            </th>
-                            <th className="text-center">
-                                <strong>Дата регистрации</strong>
-                            </th>
-                            <th></th>
-                            <th></th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {users.map(user => (
-                            <tr key={user.userId}
-                                data-id={user.userId}>
-                                <td className="text-center">
-                                    <input type="checkbox"/>
-                                </td>
-                                <td className="text-center">{user.lastName}</td>
-                                <td className="text-center">{user.firstName}</td>
-                                <td className="text-center">{user.login}</td>
-                                <td className="text-center">{user.email}</td>
-                                <td className="text-center">{user.organization.name}</td>
-                                <td className="text-center">{getDateFormat(new Date(user.createdAt))}</td>
-                                <td className="text-center">
-                                    <Link className="a-img" to={`/users/${user.userId}/edit`}><img
-                                        src={editLogo}></img></Link>
-                                </td>
-                                <td className="text-center">
-                                    <a className="a-img" onClick={onDeleteUserClick}><img src={deleteLogo}></img></a>
-                                </td>
-                            </tr>
-                        ))}
-                        </tbody>
-                    </table>
-                </div>
+                <Users users={users} onDeleteUserClick={onDeleteUserClick} onSetActive={onSetActive}/>
 
-                <div className="options-buttons">
-                    <Button classNames="filter-button" onClick={toggleSidebar}>Фильтр</Button>
-                    <div className="options-buttons_right-down">
-                        <Button onClick={() => {
-                            navigate("/models")
-                        }}>Модели</Button>
-                        <Button onClick={() => {
-                            navigate("/users")
-                        }}>Пользователи</Button>
-                        <Button onClick={() => {
-                            navigate("/organisations")
-                        }}>Организации</Button>
-                    </div>
-                </div>
+                <NavigateButtons setIsOpen={setIsOpen} isOpen={isOpen} isAdminMode={true}/>
             </main>
 
             <AddNewUserModal
                 form={form}
-                submitFunction={onSaveUserData}
+                submitFunction={onAddNewUser}
                 isAddingUser={isAddingUser}
                 logo={logo}
                 alarm={alarm}

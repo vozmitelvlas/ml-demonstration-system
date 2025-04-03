@@ -1,4 +1,4 @@
-import Button from "../Button/Button.jsx";
+import Button from "../Buttons/Button.jsx";
 import React from "react";
 import {useNavigate} from "react-router-dom";
 

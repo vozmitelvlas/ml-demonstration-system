@@ -1,5 +1,5 @@
 import styles from "./PesonalCabinet.module.css";
-import Button from "../Button/Button.jsx";
+import Button from "../Buttons/Button.jsx";
 import React from "react";
 import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx";
 

@@ -1,5 +1,5 @@
-import DataHeader from "../Headers/DataHeader.jsx";
-import Button from "../Button/Button.jsx";
+import DataHeader from "../Headers/DataHeader/DataHeader.jsx";
+import Button from "../Buttons/Button.jsx";
 import React, {useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import styles from "./ModelData.module.css"

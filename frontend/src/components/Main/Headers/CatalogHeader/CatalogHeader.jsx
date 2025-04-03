@@ -1,6 +1,6 @@
-import searchLogo from "../../../assets/search.svg";
-import styles from"./CatalogHeader.module.css"
-import Button from "../Button/Button.jsx";
+import searchLogo from "../../../../assets/search.svg";
+import styles from "./CatalogHeader.module.css"
+import Button from "../../Buttons/Button.jsx";
 import React from "react";
 
 export default function CatalogHeader({title, searchFields = []}) {

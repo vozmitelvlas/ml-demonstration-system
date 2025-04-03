@@ -115,6 +115,19 @@ public class AdminUserController {
                 "/api/models/%d".formatted(modelUserLimit.getModel().getModelId())
         );
     }
+
+    @ApiResponse(responseCode = "200")
+    @PutMapping("activate/{id}")
+    public ResponseEntity<Void> activateUser(@PathVariable Long id) {
+        adminUserService.activateUser(id);
+        return ResponseEntity.noContent().build();
+    }
+    @ApiResponse(responseCode = "200")
+    @PutMapping("deactivate/{id}")
+    public ResponseEntity<Void> deactivateUser(@PathVariable Long id) {
+        adminUserService.deactivateUser(id);
+        return ResponseEntity.noContent().build();
+    }
 }
 
 

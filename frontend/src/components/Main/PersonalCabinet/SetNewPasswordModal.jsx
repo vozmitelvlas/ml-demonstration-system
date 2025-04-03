@@ -3,7 +3,7 @@ import styles from "./SetNewPassword.module.css"
 import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
 import {setNewPasswordSchema} from "../../store/formSchema.jsx";
-import Button from "../Button/Button.jsx";
+import Button from "../Buttons/Button.jsx";
 import alarmLogo from "../../../assets/alarm.svg";
 import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx";
 import apiClient from "../../utils/apiClient.jsx";

@@ -96,6 +96,7 @@ public class AdminUserServiceImpl implements AdminUserService {
                 dto.lastName(),
                 dto.patronymic(),
                 dto.description(),
+                dto.active(),
                 Collections.emptyList(),
                 organization,
                 findRolesOrThrowConflict(dto.roles()), // Получение и проверка ролей
@@ -167,5 +168,27 @@ public class AdminUserServiceImpl implements AdminUserService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Not found any valid roles for the user");
         }
         return roles;
+    }
+
+    @Transactional
+    @Override
+    public void activateUser(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "User not found")
+        );
+        user.setActive(true);
+        userRepository.save(user);
+    }
+
+    @Transactional
+    @Override
+    public void deactivateUser(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "User not found")
+        );
+        user.setActive(false);
+        userRepository.save(user);
     }
 }

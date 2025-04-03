@@ -1,9 +1,9 @@
-import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx";
-import Button from "../Button/Button.jsx";
+import {AlarmMsg} from "../../AlarmMsg/AlarmMsg.jsx";
+import Button from "../../Buttons/Button.jsx";
 import React, {useState} from "react";
 import {Controller} from "react-hook-form";
 import Select from "react-select";
-import {customStyle, setFirstMultiBackColor, setSecondMultiBackColor} from "../../utils/selectStyles.jsx";
+import {customStyle, setFirstMultiBackColor, setSecondMultiBackColor} from "../../../utils/selectStyles.jsx";
 
 const rolesOptions = [
     {value: 'ADMIN', label: 'Администратор'},
@@ -11,7 +11,7 @@ const rolesOptions = [
     {value: 'USER', label: 'Пользователь'},
 ]
 
-export default function AddNewUserModal({isAddingUser, submitFunction, alarm, logo, onCancel, form, orgOptions}) {
+export function AddNewUserModal({isAddingUser, submitFunction, alarm, logo, onCancel, form, orgOptions}) {
     const [orgSelectStyle, setOrgSelectStyle] = useState(customStyle)
     const [rolesSelectStyle, setRolesSelectStyle] = useState(customStyle)
 
@@ -116,7 +116,7 @@ export default function AddNewUserModal({isAddingUser, submitFunction, alarm, lo
                     </div>
                     <div className="add-user__buttons">
                         <Button type="button" onClick={onCancel}>Отмена</Button>
-                        <Button type="submit">Сохранить</Button>
+                        <Button type="submit">Добавить</Button>
                     </div>
                 </form>
             </div>

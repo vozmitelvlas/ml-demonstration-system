@@ -39,5 +39,8 @@ public record CreateUserRequest(
 
         @NotNull(message = "Roles must not be null")
         @Size(min = 1, max = 3)
-        List<String> roles
+        List<String> roles,
+
+        @NotNull(message = "Active must not be null")
+        Boolean active
 ) {}

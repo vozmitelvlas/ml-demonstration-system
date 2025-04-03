@@ -19,6 +19,7 @@ public class EmailServiceImpl implements EmailService {
         try {
             var message = new SimpleMailMessage();
             message.setTo(to);
+            message.setFrom("ml.demonstation.app@gmail.com");
             message.setSubject(subject);
             message.setText(text);
             mailSender.send(message);
