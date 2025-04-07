@@ -1,29 +1,21 @@
-import CatalogHeader from "../Headers/CatalogHeader.jsx";
-import Button from "../Button/Button.jsx";
-import deleteLogo from "../../../assets/delete.svg";
-import editLogo from "../../../assets/edit.svg"
-import copyLogo from "../../../assets/copy.svg"
+import CatalogHeader from "../Headers/CatalogHeader/CatalogHeader.jsx";
 import acceptLogo from "../../../assets/accept.svg"
-import rejectLogo from "../../../assets/reject.svg"
-import {Link, useNavigate} from "react-router-dom";
 import "../ModalWindow.css"
 import "../select.css"
 import React, {useEffect, useState} from "react";
 import Filter from "../Filter/Filter.jsx";
 import DeleteModal from "../../utils/DeleteModal.jsx";
 import apiClient from "../../utils/apiClient.jsx"
-import {getDateFormat} from "../../utils/DateAndTime.jsx";
 import alarmLogo from "../../../assets/alarm.svg"
 import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx";
-import AddNewModelModal from "./AddNewModelModal.jsx";
 import {useForm} from "react-hook-form";
-import {AddNewModelVersionModal} from "./AddNewModelVersionModal.jsx";
+import {AddNewModelVersionModal, TopButtons, Models, AddNewModelModal} from "./components/index.js";
 import {yupResolver} from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import {useRequestGetRunTimes, useRequestGetProblemTypes} from "./hooks";
+import {NavigateButtons} from "../Buttons/NavigateButtons.jsx";
 
-export default function CatalogModels({isAdminMode}) {
-    const navigate = useNavigate()
+export default function CatalogModels({isAdminMode, isConfirmed, setIsConfirmed}) {
     const [isOpen, setIsOpen] = useState(false);
     const [isDeletingModel, setIsDeletingModel] = useState(false)
     const [tmpModelId, setTmpModelId] = useState([])
@@ -53,19 +45,40 @@ export default function CatalogModels({isAdminMode}) {
         }
     })
 
+
     useEffect(() => {
-        const url = isAdminMode ? '/api/admin/models/versions' : '/api/models/versions'
-        apiClient(url).then((res => {
-            setModels(res)
-        })).catch((error) => {
-            console.log(error)
+        async function fetchData() {
+            const urlParams = new URLSearchParams(window.location.search)
+            const tokenFromUrl = urlParams.get('token')
+            if (tokenFromUrl && !isConfirmed) {
+                console.log(tokenFromUrl)
+                await apiClient(`/api/auth/logout`)
+                await apiClient('/api/users/profile/email/confirm', "POST", null, {
+                    Authorization: `Bearer ${tokenFromUrl}`
+                })
+                setAlarm("Адрес электронной почты подтвержден")
+                setLogo(acceptLogo)
+            }
+            setIsConfirmed(true)
+        }
+
+        fetchData().then(r => {
         })
-
-
-    }, [isAdminMode])
+    }, [])
 
     useEffect(() => {
-        if (isAddingVersion) {
+        if (isConfirmed) {
+            const url = isAdminMode ? '/api/admin/models/versions' : '/api/models/versions'
+            apiClient(url).then((res => {
+                setModels(res)
+            })).catch((error) => {
+                console.log(error)
+            })
+        }
+    }, [isAdminMode, isConfirmed])
+
+    useEffect(() => {
+        if (isAddingVersion && isConfirmed) {
             apiClient('/api/admin/models')
                 .then((res) => {
                     setFormatModels(
@@ -76,13 +89,13 @@ export default function CatalogModels({isAdminMode}) {
                     )
                 })
                 .catch((error) => {
-                    console.log(error);
+                    console.log(error)
                 })
         }
-    }, [isAddingVersion])
+    }, [isAddingVersion, isConfirmed])
 
-    const {runtimes} = useRequestGetRunTimes()
-    const {problemTypes} = useRequestGetProblemTypes()
+    const {runtimes} = useRequestGetRunTimes(isConfirmed)
+    const {problemTypes} = useRequestGetProblemTypes(isConfirmed)
 
     const firstErrorKey1 = Object.keys(modelForm.formState.errors)[0];
     useEffect(() => {
@@ -189,107 +202,15 @@ export default function CatalogModels({isAdminMode}) {
                 <CatalogHeader title={"Каталог моделей"}
                                searchFields={["Название модели", "Тип модели"]}></CatalogHeader>
 
-                <div className="options-buttons_up">
-                    {isAdminMode && (
-                        <div>
-                            <Button onClick={() => {
-                                setIsAddingModel(true)
-                                setAlarm(null)
-                            }}>Добавить модель</Button>
-                            <Button onClick={() => {
-                                setIsAddingVersion(true)
-                                setAlarm(null)
-                            }}>Добавить версию</Button>
-                        </div>
-                    )}
-                </div>
+                <TopButtons isAdminMode={isAdminMode} setIsAddingModel={setIsAddingModel}
+                                setIsAddingVersion={setIsAddingVersion} setAlarm={setAlarm}/>
 
                 <AlarmMsg logo={logo}>{alarm}</AlarmMsg>
 
-                <div className="catalog-models">
-                    <table className="table-fill">
-                        <thead>
-                        <tr>
-                            <th className="text-center">ID</th>
-                            <th className="text-center">Статус</th>
-                            <th className="text-center">Название</th>
-                            <th className="text-center">Версия</th>
-                            <th className="text-center">Тип модели</th>
-                            <th className="text-center">Дата добавления</th>
-                            <th className="text-center">URI модели</th>
-                            {isAdminMode && (
-                                <th></th>
-                            )}
-                            {isAdminMode && (
-                                <th></th>
-                            )}
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {models.map(model => (
-                            <tr key={`${model.modelId}${model.modelVersionId}`}
-                                data-id={`${model.modelId} ${model.modelVersionId}`}>
 
-                                <td className="text-center">{model.modelVersionId}</td>
-                                <td className="text-center">
-                                    <a><img src={acceptLogo} className="status-img"></img></a>
-                                </td>
-                                <td className="text-center">
-                                    <Link
-                                        className="custom-link"
-                                        to={`/models/${model.modelId}/versions/${model.modelVersionId}/data`}>
-                                        {model.modelName}
-                                    </Link>
-                                </td>
-                                <td className="text-center">{model.versionName}</td>
-                                <td className="text-center">{model.problemType.value}</td>
-                                <td className="text-center">{getDateFormat(new Date(model.createdAt))}</td>
-                                <td className="text-center">
-                                    <div className="URL">
-                                        {model.uri}
-                                        <a className="a-img" name="copyLogo"><img src={copyLogo}></img></a>
-                                    </div>
-                                </td>
-                                {isAdminMode && (
-                                    <td className="text-center">
-                                        <Link className="a-img"
-                                              to={`/models/${model.modelId}/versions/${model.modelVersionId}/edit`}>
-                                            <img src={editLogo}></img>
-                                        </Link>
-                                    </td>
-                                )}
-                                {isAdminMode && (
-                                    <td className="text-center">
-                                        <a className="a-img" onClick={onDeleteModelClick}>
-                                            <img src={deleteLogo}></img>
-                                        </a>
-                                    </td>
-                                )}
+                <Models isAdminMode={isAdminMode} models={models} onDeleteModelClick={onDeleteModelClick}/>
 
-                            </tr>
-                        ))}
-                        </tbody>
-                    </table>
-                </div>
-
-                <div className="options-buttons">
-                    <Button classNames="filter-button" onClick={() => {
-                        setIsOpen(!isOpen)
-                    }}>Фильтр</Button>
-                    {isAdminMode && (
-                        <div className="options-buttons_right-down">
-                            <Button onClick={() => {
-                                navigate("/models")
-                            }}>Модели</Button>
-                            <Button onClick={() => {
-                                navigate("/users")
-                            }}>Пользователи</Button>
-                            <Button onClick={() => {
-                                navigate("/organisations")
-                            }}>Организации</Button>
-                        </div>
-                    )}
-                </div>
+                <NavigateButtons setisOpen={setIsOpen} isOpen={isOpen} isAdminMode={isAdminMode}/>
 
                 <AddNewModelModal
                     runtimes={runtimes}

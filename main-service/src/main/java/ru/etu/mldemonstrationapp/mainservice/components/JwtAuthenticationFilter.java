@@ -52,13 +52,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-        if (ignoredRequestsMatcher.matches(request) || SecurityContextHolder.getContext().getAuthentication() != null) {
+        if (ignoredRequestsMatcher.matches(request)) {
             filterChain.doFilter(request, response);
             return;
         }
 
         String authHeader = request.getHeader("Authorization");
         Cookie cookie = WebUtils.getCookie(request, JwtService.AUTH_TOKEN_COOKIE_NAME);
+
         if (cookie == null && (!StringUtils.hasLength(authHeader) || !authHeader.startsWith(AUTHORIZATION_PREFIX))) {
             this.authenticationEntryPoint.commence(request, response,
                     new AuthenticationCredentialsNotFoundException("Authorization token not found"));
@@ -72,33 +73,37 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             tokenString = cookie.getValue();
         }
 
-        Claims claims;
-        UserDetails userDetails;
-        try {
-            claims = jwtService.parseToken(tokenString);
-            userDetails = userDetailsService.loadUserByUsername(claims.getSubject());
-        } catch (JwtException | UsernameNotFoundException e) {
-            this.authenticationEntryPoint.commence(request, response,
-                    new BadCredentialsException("Authorization token is invalid"));
-            return;
+        if (SecurityContextHolder.getContext().getAuthentication() == null) {
+            Claims claims;
+            UserDetails userDetails;
+            try {
+                claims = jwtService.parseToken(tokenString);
+                userDetails = userDetailsService.loadUserByUsername(claims.getSubject());
+            } catch (JwtException | UsernameNotFoundException e) {
+                this.authenticationEntryPoint.commence(request, response,
+                        new BadCredentialsException("Authorization token is invalid"));
+                return;
+            }
+
+            JwtToken token = JwtToken.fromClaims(claims);
+
+            SecurityContext context = SecurityContextHolder.createEmptyContext();
+
+            var authorities = token.authorities().contains("PASSWORD_RESET") || token.authorities().contains("EMAIL_CONFIRM")
+                    ? token.authorities().stream().map(SimpleGrantedAuthority::new).toList()
+                    : userDetails.getAuthorities();
+
+            var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+                    token,
+                    tokenString,
+                    authorities
+            );
+
+            usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            context.setAuthentication(usernamePasswordAuthenticationToken);
+            SecurityContextHolder.setContext(context);
+
         }
-
-        JwtToken token = JwtToken.fromClaims(claims);
-
-        SecurityContext context = SecurityContextHolder.createEmptyContext();
-
-        var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-                token,
-                tokenString,
-                token.authorities().contains("PASSWORD_RESET")
-                        ? token.authorities().stream().map(SimpleGrantedAuthority::new).toList()
-                        : userDetails.getAuthorities()
-        );
-
-        usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-        context.setAuthentication(usernamePasswordAuthenticationToken);
-        SecurityContextHolder.setContext(context);
-
         filterChain.doFilter(request, response);
     }
 }

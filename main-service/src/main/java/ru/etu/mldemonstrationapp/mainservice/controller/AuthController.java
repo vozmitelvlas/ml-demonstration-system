@@ -3,6 +3,7 @@ package ru.etu.mldemonstrationapp.mainservice.controller;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.apache.tomcat.websocket.AuthenticationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -37,7 +38,7 @@ public class AuthController {
      */
     @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest){
         return authService.login(loginRequest);
     }
 
@@ -45,12 +46,19 @@ public class AuthController {
     /**
      * Register in the application.
      * @param createUserRequest Request with a new user details.
-     * @return {@link LoginResponse}
+     * @param request HttpServletRequest to get Origin header to generate a link.
+     * @return {@link RegisterResponse}
      */
     @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
     @PostMapping("/register")
-    public ResponseEntity<LoginResponse> register(@Valid @RequestBody UserRegistrationRequest createUserRequest) {
-        return authService.register(createUserRequest);
+    public RegisterResponse register(@Valid @RequestBody UserRegistrationRequest createUserRequest,
+                                                  HttpServletRequest request) {
+        String origin = request.getHeader("Origin");
+        if (!StringUtils.hasLength(origin)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Origin header does not presented in the request");
+        }
+
+        return authService.register(createUserRequest, origin);
     }
 
     /**
@@ -85,6 +93,4 @@ public class AuthController {
         authService.sendResetPasswordToken(passwordResetRequest, origin);
         return ResponseEntity.noContent().build();
     }
-
-
 }

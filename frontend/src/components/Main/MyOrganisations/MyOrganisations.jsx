@@ -7,7 +7,7 @@ import {useNavigate, useParams} from "react-router-dom";
 import alarmLogo from "../../../assets/alarm.svg";
 import acceptLogo from "../../../assets/accept.svg";
 import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx";
-import Button from "../Button/Button.jsx";
+import Button from "../Buttons/Button.jsx";
 
 const limitOptions = [
     {value: 'ORGANIZATION_LIMITS', label: 'Лимит организации'},

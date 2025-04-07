@@ -2,17 +2,16 @@ package ru.etu.mldemonstrationapp.mainservice.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import ru.etu.mldemonstrationapp.mainservice.configuration.CustomUserDetails;
-import ru.etu.mldemonstrationapp.mainservice.dto.LoginRequest;
-import ru.etu.mldemonstrationapp.mainservice.dto.LoginResponse;
-import ru.etu.mldemonstrationapp.mainservice.dto.ResetPasswordRequest;
-import ru.etu.mldemonstrationapp.mainservice.dto.UserRegistrationRequest;
+import ru.etu.mldemonstrationapp.mainservice.dto.*;
 import ru.etu.mldemonstrationapp.mainservice.entity.User;
 import ru.etu.mldemonstrationapp.mainservice.service.AuthService;
 import ru.etu.mldemonstrationapp.mainservice.service.EmailService;
@@ -31,23 +30,29 @@ public class AuthServiceImpl implements AuthService {
     private EmailService emailService;
 
     @Override
-    public ResponseEntity<LoginResponse> login(LoginRequest loginRequest) {
+    public ResponseEntity<LoginResponse> login(LoginRequest loginRequest){
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 loginRequest.login(),
                 loginRequest.password())
         );
         var userDetails = (CustomUserDetails) authentication.getPrincipal();
+
+        if (!userDetails.user().getEmailConfirm()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Подтвердите почту, перейдя по ссылке в письме");
+        }
+
         String token = jwtService.generateAccessToken(userDetails);
         ResponseCookie cookie = jwtService.generateAccessTokenCookie(token);
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(new LoginResponse(userDetails.user(), token));
     }
 
     @Override
-    public ResponseEntity<LoginResponse> register(UserRegistrationRequest createUserRequest) {
+    public RegisterResponse register(UserRegistrationRequest createUserRequest, String origin) {
         User user = userService.registerUser(createUserRequest);
-        String token = jwtService.generateAccessToken(new CustomUserDetails(user));
-        ResponseCookie cookie = jwtService.generateAccessTokenCookie(token);
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(new LoginResponse(user, token));
+        String token = jwtService.generateEmailConfirmToken(new CustomUserDetails(user));
+
+        emailService.sendMessage(user.getEmail(), "Подтверждение адреса электронной почты", "%s/models?token=%s".formatted(origin, token));
+        return new RegisterResponse(user);
     }
 
     @Override
@@ -56,6 +61,4 @@ public class AuthServiceImpl implements AuthService {
         String token = jwtService.generateResetPasswordToken(new CustomUserDetails(user));
         emailService.sendMessage(user.getEmail(), "Восстановление пароля", "%s/password-reset?token=%s".formatted(origin, token));
     }
-
-
 }

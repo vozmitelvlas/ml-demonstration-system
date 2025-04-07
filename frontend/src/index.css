@@ -124,3 +124,7 @@ input:focus {
 input:disabled{
     opacity: 0.5;
 }
+button:disabled{
+    opacity: 0.5;
+    cursor: unset;
+}
