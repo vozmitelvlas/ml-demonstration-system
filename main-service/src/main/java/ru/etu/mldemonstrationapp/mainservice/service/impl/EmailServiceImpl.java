@@ -14,15 +14,15 @@ import ru.etu.mldemonstrationapp.mainservice.service.EmailService;
 public class EmailServiceImpl implements EmailService {
     @Autowired
     private JavaMailSender mailSender;
-    @Value("${SMTP_USERNAME}")
-    private String from;
+    @Value("${spring.mail.username}")
+    private String username;
 
     @Override
     public void sendMessage(String to, String subject, String text) {
         try {
             var message = new SimpleMailMessage();
             message.setTo(to);
-            message.setFrom(from);
+            message.setFrom(username);
             message.setSubject(subject);
             message.setText(text);
             mailSender.send(message);
