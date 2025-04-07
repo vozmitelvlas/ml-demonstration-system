@@ -1,4 +1,3 @@
-
 plugins {
 	java
 	id("org.springframework.boot") version "3.4.1"
@@ -32,6 +31,7 @@ allprojects {
 		implementation("org.springframework.boot:spring-boot-starter-validation")
 		implementation("org.springframework.boot:spring-boot-starter-mail")
 		developmentOnly("org.springframework.boot:spring-boot-devtools")
+		annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
 		// PostgreSQL
 		runtimeOnly("org.postgresql:postgresql")
@@ -53,6 +53,7 @@ allprojects {
 		annotationProcessor("org.projectlombok:lombok")
 
 		// Test dependencies
+		testImplementation("org.testcontainers:postgresql")
 		testImplementation("org.springframework.boot:spring-boot-starter-test")
 		testImplementation("org.springframework.security:spring-security-test")
 		testRuntimeOnly("org.junit.platform:junit-platform-launcher")

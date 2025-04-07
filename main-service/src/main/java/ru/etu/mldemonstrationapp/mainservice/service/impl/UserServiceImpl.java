@@ -32,8 +32,6 @@ public class UserServiceImpl implements UserService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private OrganizationRepository organizationRepository;
-    @Autowired
-    private JwtService jwtService;
 
     @Override
     public User getUserById(Long id) {

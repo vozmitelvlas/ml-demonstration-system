@@ -74,15 +74,20 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(description = "Confirm email")
+    /**
+     * Confirm the current user's email
+     * @param jwtToken The JWT token containing the user ID.
+     * @return No content with authentication token cookie.
+     */
+    @Operation(description = "Confirm the current user's email")
     @ApiResponse(useReturnTypeSchema = true, responseCode = "204")
     @PostMapping("/profile/email/confirm")
-    public ResponseEntity<Void> setEmailConfirm(@AuthenticationPrincipal JwtToken emailConfirmToken) {
-        User user = userService.getUserByEmail(emailConfirmToken.email());
+    public ResponseEntity<Void> setEmailConfirm(@AuthenticationPrincipal JwtToken jwtToken) {
+        User user = userService.getUserById(jwtToken.userId());
         String token = jwtService.generateAccessToken(new CustomUserDetails(user));
         ResponseCookie cookie = jwtService.generateAccessTokenCookie(token);
 
-        userService.setUserEmailConfirm(emailConfirmToken.userId());
+        userService.setUserEmailConfirm(jwtToken.userId());
 
         return ResponseEntity.noContent().header(HttpHeaders.SET_COOKIE, cookie.toString()).build();
     }

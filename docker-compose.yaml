@@ -24,6 +24,7 @@ services:
       DB_PORT: 5432
       DB_USER: postgres
       DB_PASSWORD: postgres
+      SMTP_USERNAME: ml.demonstation.app@gmail.com
     restart: on-failure
     ports:
       - "8080:8080"

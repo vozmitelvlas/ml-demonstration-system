@@ -28,7 +28,7 @@ public class JwtServiceImpl implements JwtService {
 
     private final Duration accessTokenTtl = Duration.ofDays(1);
     private final Duration resetTokenTtl = Duration.ofMinutes(5);
-    private final Duration confirmTokenTtl = Duration.ofMinutes(5);
+    private final Duration confirmTokenTtl = Duration.ofHours(1);
 
     @Override
     public String generateResetPasswordToken(CustomUserDetails userDetails) {

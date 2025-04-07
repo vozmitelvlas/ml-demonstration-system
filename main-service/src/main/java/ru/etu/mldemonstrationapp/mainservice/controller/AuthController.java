@@ -46,7 +46,8 @@ public class AuthController {
     /**
      * Register in the application.
      * @param createUserRequest Request with a new user details.
-     * @return {@link LoginResponse}
+     * @param request HttpServletRequest to get Origin header to generate a link.
+     * @return {@link RegisterResponse}
      */
     @ApiResponse(useReturnTypeSchema = true, responseCode = "200")
     @PostMapping("/register")

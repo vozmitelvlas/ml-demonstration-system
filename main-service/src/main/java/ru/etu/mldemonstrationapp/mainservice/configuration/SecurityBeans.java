@@ -34,7 +34,6 @@ import ru.etu.mldemonstrationapp.mainservice.repository.UserRepository;
 import java.util.Collections;
 import java.util.List;
 
-@EnableScheduling
 @Configuration
 public class SecurityBeans {
     @Bean
