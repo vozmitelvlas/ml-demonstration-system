@@ -30,8 +30,5 @@ public interface AdminUserService {
     ModelUserLimit updateUserLimit(Long userId, Long modelId, ModelUserLimit limit);
 
     @Transactional
-    void activateUser(Long userId);
-
-    @Transactional
-    void deactivateUser(Long userId);
+    void setAccessRight(Long userId, Boolean isActive);
 }

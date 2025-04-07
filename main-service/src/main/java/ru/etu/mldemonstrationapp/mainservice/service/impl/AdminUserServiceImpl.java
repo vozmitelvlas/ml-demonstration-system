@@ -172,23 +172,12 @@ public class AdminUserServiceImpl implements AdminUserService {
 
     @Transactional
     @Override
-    public void activateUser(Long userId) {
+    public void setAccessRight(Long userId, Boolean isActive){
         User user = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND,
                 "User not found")
         );
-        user.setActive(true);
-        userRepository.save(user);
-    }
-
-    @Transactional
-    @Override
-    public void deactivateUser(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(
-                HttpStatus.NOT_FOUND,
-                "User not found")
-        );
-        user.setActive(false);
+        user.setActive(isActive);
         userRepository.save(user);
     }
 }

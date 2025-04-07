@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
@@ -80,6 +81,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (JwtException | UsernameNotFoundException e) {
             this.authenticationEntryPoint.commence(request, response,
                     new BadCredentialsException("Authorization token is invalid"));
+            return;
+        }
+
+        if (!userDetails.isAccountNonLocked()) {
+            this.authenticationEntryPoint.commence(request, response,
+                    new LockedException("Account is locked. Please contact the administrator."));
             return;
         }
 

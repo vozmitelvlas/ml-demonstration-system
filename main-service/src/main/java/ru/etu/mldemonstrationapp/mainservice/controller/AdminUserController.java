@@ -8,9 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
-import ru.etu.mldemonstrationapp.mainservice.dto.CreateUserRequest;
-import ru.etu.mldemonstrationapp.mainservice.dto.ModelUserLimitResponse;
-import ru.etu.mldemonstrationapp.mainservice.dto.UpdateUserRequest;
+import ru.etu.mldemonstrationapp.mainservice.dto.*;
 import ru.etu.mldemonstrationapp.mainservice.entity.ModelUserLimit;
 import ru.etu.mldemonstrationapp.mainservice.entity.User;
 import ru.etu.mldemonstrationapp.mainservice.service.AdminUserService;
@@ -116,16 +114,11 @@ public class AdminUserController {
         );
     }
 
-    @ApiResponse(responseCode = "200")
-    @PutMapping("activate/{id}")
-    public ResponseEntity<Void> activateUser(@PathVariable Long id) {
-        adminUserService.activateUser(id);
-        return ResponseEntity.noContent().build();
-    }
-    @ApiResponse(responseCode = "200")
-    @PutMapping("deactivate/{id}")
-    public ResponseEntity<Void> deactivateUser(@PathVariable Long id) {
-        adminUserService.deactivateUser(id);
+    @Operation(description = "Set a access right for user")
+    @ApiResponse(responseCode = "204")
+    @PutMapping("/{id}/active")
+    public ResponseEntity<Void> setAccess(@PathVariable Long id, @RequestBody UserAccessRightRequest request) {
+        adminUserService.setAccessRight(id, request.isActive());
         return ResponseEntity.noContent().build();
     }
 }

@@ -127,10 +127,7 @@ export default function CatalogUsers() {
                         : user
                 )
             )
-            if(target.checked)
-                await apiClient(`/api/admin/users/activate/${userId}`, 'PUT')
-            else
-                await apiClient(`/api/admin/users/deactivate/${userId}`, 'PUT')
+            await apiClient(`/api/admin/users/${userId}/active`, 'PUT', {isActive: target.checked})
         } catch (error){
             console.log(error)
         }

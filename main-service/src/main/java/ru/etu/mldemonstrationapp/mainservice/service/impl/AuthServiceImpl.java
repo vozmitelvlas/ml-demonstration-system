@@ -41,10 +41,6 @@ public class AuthServiceImpl implements AuthService {
         var userDetails = (CustomUserDetails) authentication.getPrincipal();
 
 
-        if (!userDetails.user().isActive()) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Вход запрещен, обратитесь к администратору сервиса");
-        }
-
         String token = jwtService.generateAccessToken(userDetails);
         ResponseCookie cookie = jwtService.generateAccessTokenCookie(token);
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(new LoginResponse(userDetails.user(), token));
