@@ -123,7 +123,7 @@ export default function CatalogOrganisations() {
 
                 <Organisations onDeleteOrgClick={onDeleteOrgClick} orgs={orgs}/>
 
-                <NavigateButtons setisOpen={setIsOpen} isOpen={isOpen} isAdminMode={true}/>
+                <NavigateButtons setIsOpen={setIsOpen} isAdminMode={true}/>
 
                 <AddNewOrgModal
                     setAlarm={setAlarm}

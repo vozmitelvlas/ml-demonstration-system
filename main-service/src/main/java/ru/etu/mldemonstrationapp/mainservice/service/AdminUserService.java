@@ -28,4 +28,7 @@ public interface AdminUserService {
 
     @Transactional
     ModelUserLimit updateUserLimit(Long userId, Long modelId, ModelUserLimit limit);
+
+    @Transactional
+    void setAccessRight(Long userId, Boolean isActive);
 }

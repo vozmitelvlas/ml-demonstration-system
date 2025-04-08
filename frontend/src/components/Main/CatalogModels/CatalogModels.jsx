@@ -16,7 +16,7 @@ import {useRequestGetRunTimes, useRequestGetProblemTypes} from "./hooks";
 import {NavigateButtons} from "../Buttons/NavigateButtons.jsx";
 
 export default function CatalogModels({isAdminMode, isConfirmed, setIsConfirmed}) {
-    const [isOpen, setIsOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState(false)
     const [isDeletingModel, setIsDeletingModel] = useState(false)
     const [tmpModelId, setTmpModelId] = useState([])
     const [alarm, setAlarm] = useState(null)
@@ -210,7 +210,7 @@ export default function CatalogModels({isAdminMode, isConfirmed, setIsConfirmed}
 
                 <Models isAdminMode={isAdminMode} models={models} onDeleteModelClick={onDeleteModelClick}/>
 
-                <NavigateButtons setisOpen={setIsOpen} isOpen={isOpen} isAdminMode={isAdminMode}/>
+                <NavigateButtons setIsOpen={setIsOpen} isAdminMode={isAdminMode}/>
 
                 <AddNewModelModal
                     runtimes={runtimes}

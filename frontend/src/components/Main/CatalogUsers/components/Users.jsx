@@ -4,14 +4,14 @@ import editLogo from "../../../../assets/edit.svg";
 import deleteLogo from "../../../../assets/delete.svg";
 import React from "react";
 
-export function Users({users, onDeleteUserClick}) {
+export function Users({users, onDeleteUserClick, onSetActive}) {
     return(
         <>
             <div className="catalog-users">
                 <table className="table-fill">
                     <thead>
                     <tr>
-                        <th className="text-center"></th>
+                        <th className="text-center">Доступ</th>
                         <th className="text-center">
                             <strong>Фамилия</strong>
                         </th>
@@ -38,8 +38,8 @@ export function Users({users, onDeleteUserClick}) {
                     {users.map(user => (
                         <tr key={user.userId}
                             data-id={user.userId}>
-                            <td className="text-center">
-                                <input type="checkbox"/>
+                            <td className="text-center access-checkbox">
+                                <input type="checkbox" checked={user.active} onChange={onSetActive}/>
                             </td>
                             <td className="text-center">{user.lastName}</td>
                             <td className="text-center">{user.firstName}</td>

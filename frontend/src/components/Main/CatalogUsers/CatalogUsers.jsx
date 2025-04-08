@@ -39,7 +39,7 @@ export default function CatalogUsers() {
 
     useEffect(() => {
         apiClient('/api/admin/users').then((res) => {
-            setUsers(res)
+            setUsers(res.sort((a, b) => a.userId - b.userId))
         }).catch(error => {
             console.error(error)
         })
@@ -83,12 +83,13 @@ export default function CatalogUsers() {
             console.error(error)
         }
     }
-    const onSaveUserData = async (newValue) => {
+    const onAddNewUser = async (newValue) => {
         const sendData = {
             ...newValue,
             organizationId: newValue.organization.value,
             roles: newValue["selectRoles"].map(role => role.value),
             emailConfirm: true,
+            active: true,
         }
 
         try {
@@ -113,6 +114,25 @@ export default function CatalogUsers() {
         setAlarm(null)
     }
 
+    const onSetActive = async ({target}) => {
+        try{
+            const tr = event.target.closest("tr")
+            const userId = tr.dataset.id
+
+
+            setUsers(prevUsers =>
+                prevUsers.map(user =>
+                    user.userId === Number(userId)
+                        ? { ...user, active: target.checked }
+                        : user
+                )
+            )
+            await apiClient(`/api/admin/users/${userId}/active`, 'PUT', {isActive: target.checked})
+        } catch (error){
+            console.log(error)
+        }
+    }
+
     return (
         <>
             {isOpen &&
@@ -126,8 +146,8 @@ export default function CatalogUsers() {
                     }}
                     sorts={{
                         "Сортировать": {
-                            options: ["Фамилии (ФИ)", "Логину"],
-                            names: ["FI", "login"]
+                            options: ["Фамилии (ФИ)", "Логину", "Доступу"],
+                            names: ["FI", "login", "access"]
                         },
                     }}></Filter>
             }
@@ -142,14 +162,14 @@ export default function CatalogUsers() {
                 </div>
                 <AlarmMsg logo={logo}>{alarm}</AlarmMsg>
 
-                <Users users={users} onDeleteUserClick={onDeleteUserClick}/>
+                <Users users={users} onDeleteUserClick={onDeleteUserClick} onSetActive={onSetActive}/>
 
-                <NavigateButtons setisOpen={setIsOpen} isOpen={isOpen} isAdminMode={true}/>
+                <NavigateButtons setIsOpen={setIsOpen} isAdminMode={true}/>
             </main>
 
             <AddNewUserModal
                 form={form}
-                submitFunction={onSaveUserData}
+                submitFunction={onAddNewUser}
                 isAddingUser={isAddingUser}
                 logo={logo}
                 alarm={alarm}

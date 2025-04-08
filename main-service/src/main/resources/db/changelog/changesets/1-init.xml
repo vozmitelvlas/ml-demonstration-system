@@ -159,6 +159,9 @@
             </column>
             <column name="patronymic" type="varchar(255)"/>
             <column name="description" type="text"/>
+            <column name="active" type="boolean">
+                <constraints nullable="false"/>
+            </column>
             <column name="email_confirm" type="boolean">
                 <constraints nullable="false"/>
             </column>

@@ -116,7 +116,7 @@ export function AddNewUserModal({isAddingUser, submitFunction, alarm, logo, onCa
                     </div>
                     <div className="add-user__buttons">
                         <Button type="button" onClick={onCancel}>Отмена</Button>
-                        <Button type="submit">Сохранить</Button>
+                        <Button type="submit">Добавить</Button>
                     </div>
                 </form>
             </div>
