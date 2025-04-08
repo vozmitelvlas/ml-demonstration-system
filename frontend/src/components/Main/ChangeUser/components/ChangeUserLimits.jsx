@@ -1,8 +1,8 @@
-import Button from "../Buttons/Button.jsx";
+import Button from "../../Buttons/Button.jsx";
 import React from "react";
 import {useNavigate} from "react-router-dom";
 
-export default function ChangeUserLimits({userLimits, register, handleSubmit, submitFunction, onInputChange}) {
+export function ChangeUserLimits({userLimits, register, handleSubmit, submitFunction, onInputChange}) {
     const navigate = useNavigate()
     return (
         <form onSubmit={handleSubmit(submitFunction)} className="change-content">

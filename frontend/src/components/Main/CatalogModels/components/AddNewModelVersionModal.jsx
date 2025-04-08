@@ -1,9 +1,9 @@
-import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx";
+import {AlarmMsg} from "../../AlarmMsg/AlarmMsg.jsx";
 import {Controller} from "react-hook-form";
 import Select from "react-select";
-import Button from "../Buttons/Button.jsx";
+import Button from "../../Buttons/Button.jsx";
 import React, {useState} from "react";
-import {customStyle, firstStyle, secondStyle} from "../../utils/selectStyles.jsx";
+import {customStyle, firstStyle, secondStyle} from "../../../utils/selectStyles.jsx";
 
 export function AddNewModelVersionModal({isAddingVersion, logo, alarm, onCancel, onAdd, form, allModels}){
     const [style, setStyle] = useState(customStyle)

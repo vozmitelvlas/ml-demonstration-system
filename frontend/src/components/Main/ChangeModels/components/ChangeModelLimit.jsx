@@ -1,8 +1,8 @@
-import Button from "../Buttons/Button.jsx";
+import Button from "../../Buttons/Button.jsx";
 import React from "react";
 import {useNavigate} from "react-router-dom";
 
-export default function ChangeModelLimit({form, submitFunction}) {
+export function ChangeModelLimit({form, submitFunction}) {
     const navigate = useNavigate()
     return(
         <>

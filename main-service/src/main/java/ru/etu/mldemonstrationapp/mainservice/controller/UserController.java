@@ -11,11 +11,9 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import ru.etu.mldemonstrationapp.mainservice.configuration.CustomUserDetails;
 import ru.etu.mldemonstrationapp.mainservice.configuration.JwtToken;
-import ru.etu.mldemonstrationapp.mainservice.dto.NewPasswordRequest;
-import ru.etu.mldemonstrationapp.mainservice.dto.ResetPasswordRequest;
-import ru.etu.mldemonstrationapp.mainservice.dto.UpdatePasswordRequest;
-import ru.etu.mldemonstrationapp.mainservice.dto.UpdateProfileRequest;
+import ru.etu.mldemonstrationapp.mainservice.dto.*;
 import ru.etu.mldemonstrationapp.mainservice.entity.User;
 import ru.etu.mldemonstrationapp.mainservice.service.JwtService;
 import ru.etu.mldemonstrationapp.mainservice.service.UserService;
@@ -74,6 +72,24 @@ public class UserController {
     public ResponseEntity<Void> setNewPassword(@AuthenticationPrincipal JwtToken resetPasswordToken, @Valid @RequestBody NewPasswordRequest newPasswordRequest) {
         userService.setUserPassword(resetPasswordToken.userId(), newPasswordRequest.password());
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Confirm the current user's email
+     * @param jwtToken The JWT token containing the user ID.
+     * @return No content with authentication token cookie.
+     */
+    @Operation(description = "Confirm the current user's email")
+    @ApiResponse(useReturnTypeSchema = true, responseCode = "204")
+    @PostMapping("/profile/email/confirm")
+    public ResponseEntity<Void> setEmailConfirm(@AuthenticationPrincipal JwtToken jwtToken) {
+        User user = userService.getUserById(jwtToken.userId());
+        String token = jwtService.generateAccessToken(new CustomUserDetails(user));
+        ResponseCookie cookie = jwtService.generateAccessTokenCookie(token);
+
+        userService.setUserEmailConfirm(jwtToken.userId());
+
+        return ResponseEntity.noContent().header(HttpHeaders.SET_COOKIE, cookie.toString()).build();
     }
 
     /**

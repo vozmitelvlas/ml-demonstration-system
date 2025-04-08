@@ -45,6 +45,10 @@ public class User implements Serializable {
 
     private String description;
 
+    @Column(nullable = false)
+    private Boolean emailConfirm;
+
+    @Column(nullable = false)
     private boolean active;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)

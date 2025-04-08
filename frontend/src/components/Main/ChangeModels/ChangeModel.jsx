@@ -9,9 +9,8 @@ import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
 import {changeModelDataSchema, limitsSchema} from "../../store/formSchema.jsx";
 import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx"
-import {ChangeModelInfo} from "./ChangeModelInfo.jsx";
-import ChangeModelLimit from "./ChangeModelLimit.jsx";
-import {useRequestGetProblemTypes, useRequestGetRunTimes} from "./hooks/index.js";
+import {ChangeModelInfo, ChangeModelLimit} from "./components/index.js";
+import {useRequestGetProblemTypes, useRequestGetRunTimes} from "../CatalogModels/hooks/index.js";
 
 const modelDataForDisplay = {
     modelId: "",
@@ -19,7 +18,7 @@ const modelDataForDisplay = {
     createdAt: "",
 }
 
-export default function ChangeModel() {
+export default function ChangeModel({isConfirmed}) {
     const [activeBut, setActiveBut] = useState("first")
     const [alarm, setAlarm] = useState(null)
     const {modelId, versionId} = useParams()
@@ -85,8 +84,8 @@ export default function ChangeModel() {
         }
     }, [infoForm.formState.errors, limitForm.formState.errors])
 
-    const {runtimes} = useRequestGetRunTimes()
-    const {problemTypes} = useRequestGetProblemTypes()
+    const {runtimes} = useRequestGetRunTimes(isConfirmed)
+    const {problemTypes} = useRequestGetProblemTypes(isConfirmed)
 
     const onChangeName = () => {
         setLogo(alarmLogo)

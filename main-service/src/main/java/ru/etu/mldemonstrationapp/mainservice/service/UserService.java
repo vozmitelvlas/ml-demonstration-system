@@ -25,4 +25,7 @@ public interface UserService {
 
     @Transactional
     void deleteUser(Long id);
+
+    @Transactional
+    void setUserEmailConfirm(Long id);
 }

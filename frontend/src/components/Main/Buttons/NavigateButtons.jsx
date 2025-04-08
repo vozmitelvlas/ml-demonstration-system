@@ -2,13 +2,13 @@ import Button from "./Button.jsx";
 import React from "react";
 import {useNavigate} from "react-router-dom";
 
-export function NavigateButtons({isAdminMode, setIsOpen, isOpen}){
+export function NavigateButtons({isAdminMode, setIsOpen}){
     const navigate = useNavigate()
     return(
         <>
             <div className="options-buttons">
                 <Button classNames="filter-button" onClick={() => {
-                    setIsOpen(!isOpen)
+                    setIsOpen(prev => !prev)
                 }}>Фильтр</Button>
                 {isAdminMode && (
                     <div className="options-buttons_right-down">

@@ -2,12 +2,12 @@ import React, {useState} from "react";
 import styles from "./SetNewPassword.module.css"
 import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
-import {setNewPasswordSchema} from "../../store/formSchema.jsx";
-import Button from "../Buttons/Button.jsx";
-import alarmLogo from "../../../assets/alarm.svg";
-import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx";
-import apiClient from "../../utils/apiClient.jsx";
-import acceptLogo from "../../../assets/accept.svg"
+import {setNewPasswordSchema} from "../../../store/formSchema.jsx";
+import Button from "../../Buttons/Button.jsx";
+import alarmLogo from "../../../../assets/alarm.svg";
+import {AlarmMsg} from "../../AlarmMsg/AlarmMsg.jsx";
+import apiClient from "../../../utils/apiClient.jsx";
+import acceptLogo from "../../../../assets/accept.svg"
 
 const passwords = {
     oldPassword: "",
@@ -15,7 +15,7 @@ const passwords = {
     repeatNewPassword: ""
 }
 
-export default function SetNewPasswordModal({setPasswordChanging, passwordChanging, setLogo, setAlarm, alarm, logo}) {
+export function SetNewPasswordModal({setPasswordChanging, passwordChanging, setLogo, setAlarm, alarm, logo}) {
     const {
         register,
         handleSubmit,
@@ -31,11 +31,6 @@ export default function SetNewPasswordModal({setPasswordChanging, passwordChangi
     const error = firstErrorKey ? errors[firstErrorKey].message : ''
 
     const sendFormData = async (newValue) => {
-        console.log(newValue, {
-            oldPassword: newValue.oldPassword,
-            newPassword: newValue.newPassword
-        })
-
         try {
             await apiClient(`/api/users/profile/password`, 'PUT', {
                 oldPassword: newValue.oldPassword,

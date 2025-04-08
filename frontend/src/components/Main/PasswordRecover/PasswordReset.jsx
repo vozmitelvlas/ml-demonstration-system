@@ -1,4 +1,4 @@
-import styles from "./SignIn.module.css";
+import styles from "./PasswordRecover.module.css";
 import React, {useEffect, useState} from "react";
 import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
@@ -8,7 +8,7 @@ import {useNavigate} from "react-router-dom";
 
 export default function PasswordReset() {
     const navigate = useNavigate()
-    const [token, setToken] = useState('');
+    const [token, setToken] = useState('')
 
     const {
         handleSubmit,
@@ -36,6 +36,7 @@ export default function PasswordReset() {
     const onResetPassword = async (newValue) => {
         console.log(newValue, token)
         try {
+            await apiClient(`/api/auth/logout`)
             await apiClient('/api/users/profile/password/reset', "POST", {password: newValue.password}, {
                 Authorization: `Bearer ${token}`})
             navigate("/")

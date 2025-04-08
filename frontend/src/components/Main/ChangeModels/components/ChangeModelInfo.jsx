@@ -1,9 +1,9 @@
-import Button from "../Buttons/Button.jsx";
+import Button from "../../Buttons/Button.jsx";
 import React, {useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {Controller} from "react-hook-form";
 import Select from "react-select";
-import {customStyle} from "../../utils/selectStyles.jsx";
+import {customStyle} from "../../../utils/selectStyles.jsx";
 
 export function ChangeModelInfo({runtimes, problemTypes, form, submitFunction, displayData, onChangeName, onBlurName}) {
     const navigate = useNavigate()

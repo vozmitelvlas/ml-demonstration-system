@@ -1,11 +1,11 @@
-import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx";
+import {AlarmMsg} from "../../AlarmMsg/AlarmMsg.jsx";
 import Select from "react-select";
-import Button from "../Buttons/Button.jsx";
+import Button from "../../Buttons/Button.jsx";
 import React, {useState} from "react";
-import {customStyle, setFirstMultiBackColor, setSecondMultiBackColor} from "../../utils/selectStyles.jsx";
+import {customStyle, setFirstMultiBackColor, setSecondMultiBackColor} from "../../../utils/selectStyles.jsx";
 import {Controller} from "react-hook-form";
 
-export default function AddNewModelModal({runtimes, problemTypes, isAddingModel, logo, alarm, onCancel, onAdd, form}) {
+export function AddNewModelModal({runtimes, problemTypes, isAddingModel, logo, alarm, onCancel, onAdd, form}) {
     const [runTimeStyle, setRunTimeStyle] = useState(customStyle)
     const [problemStyle, setProblemStyle] = useState(customStyle)
 

@@ -17,6 +17,7 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.Date;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 @Service
 public class JwtServiceImpl implements JwtService {
@@ -27,6 +28,7 @@ public class JwtServiceImpl implements JwtService {
 
     private final Duration accessTokenTtl = Duration.ofDays(1);
     private final Duration resetTokenTtl = Duration.ofMinutes(5);
+    private final Duration confirmTokenTtl = Duration.ofHours(1);
 
     @Override
     public String generateResetPasswordToken(CustomUserDetails userDetails) {
@@ -44,25 +46,41 @@ public class JwtServiceImpl implements JwtService {
                 .signWith(getSecretKey(), Jwts.SIG.HS256)
                 .compact();
     }
-
+        @Override
+        public String generateAccessToken(CustomUserDetails userDetails) {
+            Instant issuedAt = Instant.now();
+            return Jwts.builder()
+                    .header().type("JWT")
+                    .and()
+                    .id(UUID.randomUUID().toString())
+                    .subject(userDetails.getUsername())
+                    .issuedAt(Date.from(issuedAt))
+                    .expiration(Date.from(issuedAt.plus(accessTokenTtl)))
+                    .claim("user_id", userDetails.user().getUserId())
+                    .claim("email", userDetails.user().getEmail())
+                    .claim("authorities", userDetails
+                            .getAuthorities()
+                            .stream()
+                            .map(GrantedAuthority::getAuthority)
+                            .toList()
+                    )
+                    .claim("email_confirm", userDetails.user().getEmailConfirm())
+                    .signWith(getSecretKey(), Jwts.SIG.HS256)
+                    .compact();
+        }
     @Override
-    public String generateAccessToken(CustomUserDetails userDetails) {
+    public String generateEmailConfirmToken(CustomUserDetails userDetails) {
         Instant issuedAt = Instant.now();
         return Jwts.builder()
                 .header().type("JWT")
                 .and()
                 .id(UUID.randomUUID().toString())
                 .subject(userDetails.getUsername())
-                .issuedAt(Date.from(issuedAt))
-                .expiration(Date.from(issuedAt.plus(accessTokenTtl)))
                 .claim("user_id", userDetails.user().getUserId())
                 .claim("email", userDetails.user().getEmail())
-                .claim("authorities", userDetails
-                        .getAuthorities()
-                        .stream()
-                        .map(GrantedAuthority::getAuthority)
-                        .toList()
-                )
+                .claim("authorities", Collections.singletonList("EMAIL_CONFIRM"))
+                .issuedAt(Date.from(issuedAt))
+                .expiration(Date.from(issuedAt.plus(confirmTokenTtl)))
                 .signWith(getSecretKey(), Jwts.SIG.HS256)
                 .compact();
     }

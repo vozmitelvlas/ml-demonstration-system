@@ -6,13 +6,12 @@ import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
 import {personalCabinetSchema} from "../../store/formSchema.jsx";
 import apiClient from "../../utils/apiClient.jsx";
-import SetNewPasswordModal from "./SetNewPasswordModal.jsx";
+import {SetNewPasswordModal, EditUserDataModal} from "./components/index.js";
 import DeleteModal from "../../utils/DeleteModal.jsx";
 import {useNavigate} from "react-router-dom";
 import alarmLogo from "../../../assets/alarm.svg";
 import acceptLogo from "../../../assets/accept.svg"
 import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx";
-import EditUserDataModal from "./EditUserDataModal.jsx";
 
 export default function PersonalCabinet({userData, setUserData}) {
     const navigate = useNavigate()

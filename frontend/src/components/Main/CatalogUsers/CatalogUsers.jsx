@@ -164,7 +164,7 @@ export default function CatalogUsers() {
 
                 <Users users={users} onDeleteUserClick={onDeleteUserClick} onSetActive={onSetActive}/>
 
-                <NavigateButtons setIsOpen={setIsOpen} isOpen={isOpen} isAdminMode={true}/>
+                <NavigateButtons setIsOpen={setIsOpen} isAdminMode={true}/>
             </main>
 
             <AddNewUserModal

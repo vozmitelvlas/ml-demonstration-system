@@ -8,14 +8,13 @@ import apiClient from "../../utils/apiClient.jsx";
 import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
 import {changeUserDataSchema, limitsSchema} from "../../store/formSchema.jsx";
-import ChangeUserInfo from "./ChangeUserInfo.jsx";
-import ChangeUserLimits from "./ChangeUserLimits.jsx";
+import {ChangeUserInfo, ChangeUserLimits} from "./components/index.js";
 
 const rolesOptions = [
     {value: 'ADMIN', label: 'Администратор'},
     {value: 'ORGANIZATION_HEAD', label: 'Руководитель организации'},
     {value: 'USER', label: 'Пользователь'},
-];
+]
 const userDataForDisplay = {
     login: "",
     email: "",

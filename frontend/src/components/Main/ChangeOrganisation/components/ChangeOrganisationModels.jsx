@@ -1,12 +1,12 @@
 import Select from "react-select";
-import {customStyle} from "../../utils/selectStyles.jsx";
-import deleteLogo from "../../../assets/delete.svg";
-import Button from "../Buttons/Button.jsx";
+import {customStyle} from "../../../utils/selectStyles.jsx";
+import deleteLogo from "../../../../assets/delete.svg";
+import Button from "../../Buttons/Button.jsx";
 import React from "react";
 import {useNavigate} from "react-router-dom";
 import {Controller} from "react-hook-form";
 
-export default function ChangeOrganisationModels({
+export  function ChangeOrganisationModels({
                                                      handleSubmit,
                                                      register,
                                                      limitOptions,

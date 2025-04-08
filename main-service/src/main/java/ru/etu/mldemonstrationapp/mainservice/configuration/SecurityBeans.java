@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -57,6 +58,7 @@ public class SecurityBeans {
                         .requestMatchers("/api/organizations/*/members").hasRole("ORGANIZATION_HEAD")
                         .requestMatchers("/api/organizations/*/limits-type").hasRole("ORGANIZATION_HEAD")
                         .requestMatchers(HttpMethod.POST, "/api/users/profile/password/reset").hasAuthority("PASSWORD_RESET")
+                        .requestMatchers(HttpMethod.POST, "/api/users/profile/email/confirm").hasAuthority("EMAIL_CONFIRM")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/**").hasAnyRole("USER", "ADMIN")
                 )

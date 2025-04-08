@@ -1,5 +1,5 @@
 import styles from "./Filter.module.css"
-import {useEffect, useMemo, useState} from "react";
+import {useMemo, useState} from "react";
 import arrowLogo from "../../../assets/arrow-down.svg"
 import Button from "../Buttons/Button.jsx";
 import closeLogo from "../../../assets/delete.svg";

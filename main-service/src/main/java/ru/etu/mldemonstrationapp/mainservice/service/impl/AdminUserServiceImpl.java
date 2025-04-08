@@ -97,6 +97,7 @@ public class AdminUserServiceImpl implements AdminUserService {
                 dto.patronymic(),
                 dto.description(),
                 dto.active(),
+                dto.emailConfirm(),
                 Collections.emptyList(),
                 organization,
                 findRolesOrThrowConflict(dto.roles()), // Получение и проверка ролей

@@ -1,6 +1,7 @@
 package ru.etu.mldemonstrationapp.mainservice.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
@@ -13,13 +14,15 @@ import ru.etu.mldemonstrationapp.mainservice.service.EmailService;
 public class EmailServiceImpl implements EmailService {
     @Autowired
     private JavaMailSender mailSender;
+    @Value("${spring.mail.username}")
+    private String username;
 
     @Override
     public void sendMessage(String to, String subject, String text) {
         try {
             var message = new SimpleMailMessage();
             message.setTo(to);
-            message.setFrom("ml.demonstation.app@gmail.com");
+            message.setFrom(username);
             message.setSubject(subject);
             message.setText(text);
             mailSender.send(message);

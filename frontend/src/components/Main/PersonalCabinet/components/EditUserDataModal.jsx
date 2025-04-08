@@ -1,9 +1,9 @@
-import styles from "./PesonalCabinet.module.css";
-import Button from "../Buttons/Button.jsx";
+import styles from "../PesonalCabinet.module.css";
+import Button from "../../Buttons/Button.jsx";
 import React from "react";
-import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx";
+import {AlarmMsg} from "../../AlarmMsg/AlarmMsg.jsx";
 
-export default function EditUserDataModal({isEditing, handleSubmit, submitFunction, register, onCancel, logo, alarm}){
+export function EditUserDataModal({isEditing, handleSubmit, submitFunction, register, onCancel, logo, alarm}){
     return (
         <>
             <div className={`edit-modal-overlay ${isEditing ? "" : "edit-modal-overlay_hidden"}`}>

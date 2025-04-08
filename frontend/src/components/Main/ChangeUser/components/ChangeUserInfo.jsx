@@ -1,12 +1,12 @@
-import {getDateFormat} from "../../utils/DateAndTime.jsx";
+import {getDateFormat} from "../../../utils/DateAndTime.jsx";
 import {Controller} from "react-hook-form";
 import Select from "react-select";
-import Button from "../Buttons/Button.jsx";
+import Button from "../../Buttons/Button.jsx";
 import React, {useState} from "react";
 import {useNavigate} from "react-router-dom";
-import {customStyle, setFirstMultiBackColor, setSecondMultiBackColor} from "../../utils/selectStyles.jsx";
+import {customStyle, setFirstMultiBackColor, setSecondMultiBackColor} from "../../../utils/selectStyles.jsx";
 
-export default function ChangeUserInfo({
+export function ChangeUserInfo({
                                            handleSubmit,
                                            submitFunction,
                                            displayData,

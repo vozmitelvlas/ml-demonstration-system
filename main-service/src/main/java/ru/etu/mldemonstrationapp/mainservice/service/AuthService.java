@@ -1,15 +1,12 @@
 package ru.etu.mldemonstrationapp.mainservice.service;
 
 import org.springframework.http.ResponseEntity;
-import ru.etu.mldemonstrationapp.mainservice.dto.LoginRequest;
-import ru.etu.mldemonstrationapp.mainservice.dto.LoginResponse;
-import ru.etu.mldemonstrationapp.mainservice.dto.ResetPasswordRequest;
-import ru.etu.mldemonstrationapp.mainservice.dto.UserRegistrationRequest;
+import ru.etu.mldemonstrationapp.mainservice.dto.*;
 
 public interface AuthService {
     ResponseEntity<LoginResponse> login(LoginRequest loginRequest);
 
-    ResponseEntity<LoginResponse> register(UserRegistrationRequest createUserRequest);
+    RegisterResponse register(UserRegistrationRequest createUserRequest, String origin);
 
     void sendResetPasswordToken(ResetPasswordRequest request, String origin);
 }

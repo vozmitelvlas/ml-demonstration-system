@@ -9,14 +9,13 @@ import {getDateFormat} from "../../utils/DateAndTime.jsx";
 import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
 import {changeOrganisationsSchema, limitsSchema} from "../../store/formSchema.jsx";
-import ChangeOrganisationInfo from "./ChangeOrganisationInfo.jsx";
-import ChangeOrganisationModels from "./ChangeOrganisationModels.jsx";
+import {ChangeOrganisationInfo, ChangeOrganisationModels} from "./components/index.js";
 
 const limitOptions = [
     {value: 'ORGANIZATION_LIMITS', label: 'Лимит организации'},
     {value: 'MODEL_LIMITS', label: 'Лимиты модели'},
     {value: 'USER_LIMITS', label: 'Лимиты пользователя'}
-];
+]
 const orgDataForDisplay = {
     createdAt: "",
 }
@@ -67,10 +66,10 @@ export default function ChangeOrganisation() {
 
         apiClient(`/api/admin/organizations/${orgId}/models`).then(res => {
             const formatOrgModels = res.reduce((acc, model) => {
-                acc[`rps${model.modelId}`] = model.limit.rps.toString();
-                acc[`requestsPerWeek${model.modelId}`] = model.limit.requestsPerWeek.toString();
-                return acc;
-            }, {});
+                acc[`rps${model.modelId}`] = model.limit.rps.toString()
+                acc[`requestsPerWeek${model.modelId}`] = model.limit.requestsPerWeek.toString()
+                return acc
+            }, {})
             const resModelIds = new Set(res.map(model => model.modelId));
 
             setOrgModels(res.sort((a, b) => a.modelId - b.modelId))
@@ -87,7 +86,7 @@ export default function ChangeOrganisation() {
 
     useEffect(() => {
         if (activeBut === "first") {
-            const firstErrorKey1 = Object.keys(firstForm.formState.errors)[0];
+            const firstErrorKey1 = Object.keys(firstForm.formState.errors)[0]
             if (firstErrorKey1) {
                 setLogo(alarmLogo)
                 setAlarm(firstForm.formState.errors[firstErrorKey1].message)
@@ -99,7 +98,7 @@ export default function ChangeOrganisation() {
                 setAlarm(secondForm.formState.errors[firstErrorKey2].message)
             }
         }
-    }, [firstForm.formState.errors, secondForm.formState.errors]);
+    }, [firstForm.formState.errors, secondForm.formState.errors])
 
     const onSelectLimit = (newValue) => {
         setLimitsType(newValue)
@@ -167,7 +166,7 @@ export default function ChangeOrganisation() {
                 const trueChunk = chunk.map(([key, value]) => {
                     const [newKey, lastChar] = key.match(/^(.*)(.)$/).slice(1)
                     modelId = lastChar
-                    return [newKey, value];
+                    return [newKey, value]
                 });
                 if (orgModels.find(model => model.modelId === Number(modelId))) {
                     const chunkAsObject = Object.fromEntries(trueChunk);
