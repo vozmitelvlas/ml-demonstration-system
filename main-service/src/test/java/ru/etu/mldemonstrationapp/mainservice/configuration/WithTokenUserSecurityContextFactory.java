@@ -22,6 +22,7 @@ public class WithTokenUserSecurityContextFactory implements WithSecurityContextF
                 user.username(),
                 user.userId(),
                 user.email(),
+                true,
                 Arrays.asList(user.authorities()),
                 Instant.now(),
                 Instant.now().plus(5, ChronoUnit.MINUTES)

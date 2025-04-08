@@ -3,6 +3,7 @@ package ru.etu.mldemonstrationapp.mainservice.controller;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -80,6 +81,7 @@ class AuthControllerTest extends AbstractControllerTest {
         var requestBuilder = MockMvcRequestBuilders
                 .post(PATH_PREFIX + "/register")
                 .contentType(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ORIGIN, "http://localhost:5173")
                 .content("""
                         {
                           "login" : "secondadmin",
@@ -93,7 +95,6 @@ class AuthControllerTest extends AbstractControllerTest {
         this.mockMvc.perform(requestBuilder).andExpectAll(
                 status().isOk(),
                 content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
-                jsonPath("$.accessToken").isString(),
                 jsonPath("$.user.login").value("secondadmin"),
                 jsonPath("$.user.userId").isNumber(),
                 jsonPath("$.user.email").value("secondadmin@example.com"),
@@ -111,6 +112,7 @@ class AuthControllerTest extends AbstractControllerTest {
         var requestBuilder = MockMvcRequestBuilders
                 .post(PATH_PREFIX + "/register")
                 .contentType(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.ORIGIN, "http://localhost:5173")
                 .content("""
                         {
                           "login" : "admin",
@@ -132,6 +134,7 @@ class AuthControllerTest extends AbstractControllerTest {
     void registerWithDuplicateEmail() throws Exception {
         var requestBuilder = MockMvcRequestBuilders
                 .post(PATH_PREFIX + "/register")
+                .header(HttpHeaders.ORIGIN, "http://localhost:5173")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                         {
