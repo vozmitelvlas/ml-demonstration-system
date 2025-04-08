@@ -8,6 +8,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.etu.mldemonstrationapp.mainservice.configuration.WithMockTokenAdmin;
 import ru.etu.mldemonstrationapp.mainservice.configuration.WithMockTokenUser;
+import ru.etu.mldemonstrationapp.mainservice.service.JwtService;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -195,6 +196,21 @@ class UserControllerTest extends AbstractControllerTest {
                         {"password" : "password123"}
                         """);
         mockMvc.perform(requestBuilder).andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockTokenUser(username = "unconfirmed-user", userId = 4L, email = "test@example.com", authorities = "EMAIL_CONFIRM")
+    void confirmEmailWithEmailConfirmToken() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post(PATH_PREFIX + "/email/confirm")).andExpectAll(
+                status().isNoContent(),
+                cookie().exists(JwtService.AUTH_TOKEN_COOKIE_NAME)
+        );
+    }
+
+    @Test
+    @WithMockTokenUser(username = "unconfirmed-user", userId = 4L, email = "test@example.com")
+    void confirmEmailWithoutEmailConfirmToken() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post(PATH_PREFIX + "/email/confirm")).andExpect(status().isForbidden());
     }
 
     @Test
