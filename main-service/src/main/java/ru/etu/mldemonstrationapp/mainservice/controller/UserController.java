@@ -7,16 +7,21 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import ru.etu.mldemonstrationapp.mainservice.components.RateLimiterComponent;
 import ru.etu.mldemonstrationapp.mainservice.configuration.CustomUserDetails;
 import ru.etu.mldemonstrationapp.mainservice.configuration.JwtToken;
 import ru.etu.mldemonstrationapp.mainservice.dto.*;
+import ru.etu.mldemonstrationapp.mainservice.entity.ModelVersion;
 import ru.etu.mldemonstrationapp.mainservice.entity.User;
 import ru.etu.mldemonstrationapp.mainservice.service.JwtService;
 import ru.etu.mldemonstrationapp.mainservice.service.UserService;
+
+import java.util.List;
 
 /**
  * Controller for handling user-related requests.
@@ -30,6 +35,8 @@ public class UserController {
     private UserService userService;
     @Autowired
     private JwtService jwtService;
+    @Autowired
+    private RateLimiterComponent rateLimiterComponent;
 
     /**
      * Get the current user's profile.
@@ -120,5 +127,15 @@ public class UserController {
         userService.deleteUser(jwtToken.userId());
         ResponseCookie authCookie = jwtService.getEmptyTokenCookie();
         return ResponseEntity.noContent().header(HttpHeaders.SET_COOKIE, authCookie.toString()).build();
+    }
+    @ApiResponse(responseCode = "200")
+    @GetMapping("/{modelId}/user/{userId}")
+    public ResponseEntity<Void> TestRps(@PathVariable Long modelId, @PathVariable Long userId) {
+
+        if (!rateLimiterComponent.tryAcquire(userId, modelId)){
+            return new ResponseEntity<>(HttpStatus.TOO_MANY_REQUESTS);
+        }
+
+        return ResponseEntity.noContent().build();
     }
 }

@@ -19,7 +19,14 @@ export default function ModelData({isAdmin}) {
             console.log(error)
         })
 
-    }, [activeBut, isAdmin]);
+    }, [activeBut, isAdmin])
+
+    const onTestRPSLimit = () => {
+        console.log("sending")
+        for (let i = 0; i < 5; i++) {
+            apiClient(`/api/users/${modelId}/user/${3}`)
+        }
+    }
 
     return (
         <div className="change-container">
@@ -74,7 +81,9 @@ export default function ModelData({isAdmin}) {
                         </table>
                     </div>
                     <div className={styles.backButton}>
-                        <Button onClick={() => {navigate("/models")}}>Назад</Button>
+                        <Button onClick={() => {
+                            navigate("/models")
+                        }}>Назад</Button>
                     </div>
                 </div>
             )}
@@ -91,10 +100,12 @@ export default function ModelData({isAdmin}) {
                             </div>
                         </div>
 
-                        <button className={styles.sendButton}>Отправить</button>
+                        <button className={styles.sendButton} onClick={onTestRPSLimit}>Отправить1</button>
                     </div>
                     <div className={styles.backButton}>
-                        <Button onClick={() => {navigate("/models")}}>Назад</Button>
+                        <Button onClick={() => {
+                            navigate("/models")
+                        }}>Назад</Button>
                     </div>
                 </div>
             )}
