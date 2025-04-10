@@ -22,11 +22,11 @@ export default function ModelData({isAdmin}) {
     }, [activeBut, isAdmin])
 
     const onTestRPSLimit = () => {
-        console.log("sending")
-        for (let i = 0; i < 5; i++) {
-            apiClient(`/api/users/${modelId}/user/${3}`)
+        console.log("sending");
+        for (let i = 0; i < 6; i++) {
+            apiClient(`/api/users/${modelId}/user/${3}`);
         }
-    }
+    };
 
     return (
         <div className="change-container">

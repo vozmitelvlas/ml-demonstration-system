@@ -47,7 +47,8 @@ allprojects {
 		// Swagger
 		implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0")
 
-		implementation("com.revinate:guava-rate-limiter:19.1")
+		// Bucket4j core library
+		implementation("com.bucket4j:bucket4j_jdk17-core:8.14.0")
 
 
 		// Lombok
