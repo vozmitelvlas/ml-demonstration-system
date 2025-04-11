@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.etu.mldemonstrationapp.mainservice.configuration.WithMockTokenAdmin;
+import ru.etu.mldemonstrationapp.mainservice.configuration.WithMockTokenUser;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -16,7 +17,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Sql(scripts = {"/sql/test-data.sql"})
 public class AdminModelControllerTest extends AbstractControllerTest {
     private static final String PATH_PREFIX = "/api/admin/models";
-
 
     @Test
     @WithMockTokenAdmin
@@ -114,7 +114,7 @@ public class AdminModelControllerTest extends AbstractControllerTest {
     @WithMockTokenAdmin
     void registerModelDuplicateName() throws Exception {
         var requestBuilder = MockMvcRequestBuilders
-                .post("/api/admin/models")
+                .post(PATH_PREFIX)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                         {
@@ -184,7 +184,7 @@ public class AdminModelControllerTest extends AbstractControllerTest {
     @WithMockTokenAdmin
     void updateModelVersionNotFound() throws Exception {
         var requestBuilder = MockMvcRequestBuilders
-                .put("/api/admin/models/1/versions/999")
+                .put(PATH_PREFIX + "/1/versions/999")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                         {
@@ -228,6 +228,13 @@ public class AdminModelControllerTest extends AbstractControllerTest {
     void deleteModelVersion() throws Exception {
         var requestBuilder = MockMvcRequestBuilders.delete(PATH_PREFIX + "/1/versions/1");
         this.mockMvc.perform(requestBuilder).andExpect(status().isNoContent());
+    }
+
+    @Test
+    @WithMockTokenUser
+    void deleteModelVersionAsUser() throws Exception {
+        var requestBuilder = MockMvcRequestBuilders.delete(PATH_PREFIX + "/1/versions/1");
+        this.mockMvc.perform(requestBuilder).andExpect(status().isForbidden());
     }
 
 }

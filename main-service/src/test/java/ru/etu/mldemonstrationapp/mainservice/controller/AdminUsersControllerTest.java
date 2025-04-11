@@ -8,13 +8,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.etu.mldemonstrationapp.mainservice.configuration.WithMockTokenAdmin;
-
+import ru.etu.mldemonstrationapp.mainservice.configuration.WithMockTokenUser;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @Transactional
 @Sql(scripts = {"/sql/test-data.sql"})
-class AdminUserControllerTest extends AbstractControllerTest {
+public class AdminUsersControllerTest extends AbstractControllerTest{
 
     private static final String PATH_PREFIX = "/api/admin/users";
 
@@ -22,7 +22,6 @@ class AdminUserControllerTest extends AbstractControllerTest {
     @WithMockTokenAdmin
     void getUsers() throws Exception {
         var requestBuilder = MockMvcRequestBuilders.get(PATH_PREFIX);
-        System.out.println();
         this.mockMvc.perform(requestBuilder).andExpectAll(
                 status().isOk(),
                 content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
@@ -299,5 +298,13 @@ class AdminUserControllerTest extends AbstractControllerTest {
         this.mockMvc.perform(requestBuilder)
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON));
+    }
+
+    @Test
+    @WithMockTokenUser
+    void getUsersAsUser() throws Exception {
+        var requestBuilder = MockMvcRequestBuilders.get(PATH_PREFIX);
+        System.out.println();
+        this.mockMvc.perform(requestBuilder).andExpectAll(status().isForbidden());
     }
 }
