@@ -123,7 +123,7 @@ class AudioProcessor:
 
 # Пример использования
 if __name__ == "__main__":
-    mp3_file = "Sound_1.mp3"
+    mp3_file = "./audio/Sound_1.mp3"
     model_path = "./model_repository/wav2vec2/1/model.onnx"  # Укажите путь к вашей модели ONNX
 
     processor = AudioProcessor(mp3_file=mp3_file, model_path=model_path)

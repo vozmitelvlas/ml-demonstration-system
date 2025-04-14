@@ -91,13 +91,12 @@ class Wav2Vec2ModelExporter:
         config_content = f"""
 name: "{self.model_name_dir}"
 platform: "onnxruntime_onnx"
-max_batch_size: 0
+max_batch_size: 8
 input [
   {{
     name: "input"
     data_type: TYPE_FP32
     dims: [-1]
-    allow_ragged_batch: true
   }}
 ]
 output [
@@ -109,7 +108,7 @@ output [
 ]
 instance_group [
   {{
-    kind: KIND_GPU
+    kind: KIND_CPU
     count: 1
   }}
 ]
