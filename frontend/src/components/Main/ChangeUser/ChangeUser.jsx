@@ -70,8 +70,12 @@ export default function ChangeUser() {
                 roles: newUserData["selectRoles"].map(role => role.value)
             }
         }
-        dispatch(updateUserDataAsAdminAction(payload)).then(() =>
-            dispatch(setAcceptMessageAction('Изменения сохранены'))
+        dispatch(updateUserDataAsAdminAction(payload)).then(() => {
+                dispatch(getUserLimitsAction(userId)).then(() =>
+                    secondForm.reset(formatUserLimits)
+                )
+                dispatch(setAcceptMessageAction('Изменения сохранены'))
+            }
         )
     }
 

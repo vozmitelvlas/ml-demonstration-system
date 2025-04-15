@@ -4,21 +4,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
-import ru.etu.mldemonstrationapp.mainservice.components.RateLimiterComponent;
 import ru.etu.mldemonstrationapp.mainservice.configuration.JwtToken;
-import ru.etu.mldemonstrationapp.mainservice.entity.Model;
-import ru.etu.mldemonstrationapp.mainservice.entity.ModelProblemType;
-import ru.etu.mldemonstrationapp.mainservice.entity.ModelRuntime;
-import ru.etu.mldemonstrationapp.mainservice.entity.ModelVersion;
-import ru.etu.mldemonstrationapp.mainservice.exception.RpsLimitException;
+import ru.etu.mldemonstrationapp.mainservice.entity.*;
 import ru.etu.mldemonstrationapp.mainservice.service.ModelService;
 
 import java.util.Arrays;
@@ -30,8 +23,6 @@ import java.util.List;
 public class ModelController {
     @Autowired
     private ModelService modelService;
-    @Autowired
-    private RateLimiterComponent rateLimiterComponent;
     /**
      * Get all models available to the current user.
      *
@@ -114,12 +105,8 @@ public class ModelController {
     @Operation(description = "Get model result")
     @ApiResponse(responseCode = "200")
     @GetMapping("/{modelId}/user/{userId}")
-    public ResponseEntity<Void> TestRps(@PathVariable Long modelId, @PathVariable Long userId) {
-
-        if (!rateLimiterComponent.tryAcquire(userId, modelId)){
-            throw new RpsLimitException("Превышен лимит запросов в секунду. Доступ временно ограничен.");
-        }
-
+    public ResponseEntity<Void> runTheModel(@PathVariable Long modelId, @PathVariable Long userId) {
+        modelService.runTheModel(userId, modelId);
         return ResponseEntity.noContent().build();
     }
 }

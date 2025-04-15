@@ -34,4 +34,4 @@ INSERT INTO models_users_limits (model_id, user_id, limit_id) VALUES (1, 2, 3), 
 
 INSERT INTO models_organizations_limits (model_id, organization_id, limit_id) VALUES (1, 2, 6), (1, 4, 7), (2, 4, 8);
 
-INSERT INTO user_rpw (user_id, model_id, current_requests) VALUES (2, 1, 0);
+INSERT INTO user_rpw (user_id, model_id, current_requests) VALUES (2, 1, 0), (3, 1, 0), (3, 2, 0);

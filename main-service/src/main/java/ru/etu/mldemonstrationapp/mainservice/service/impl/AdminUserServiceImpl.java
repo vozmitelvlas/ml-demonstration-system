@@ -11,17 +11,8 @@ import org.springframework.web.server.ResponseStatusException;
 import ru.etu.mldemonstrationapp.mainservice.dto.CreateUserRequest;
 import ru.etu.mldemonstrationapp.mainservice.dto.ModelUserLimitResponse;
 import ru.etu.mldemonstrationapp.mainservice.dto.UpdateUserRequest;
-import ru.etu.mldemonstrationapp.mainservice.entity.Limit;
-import ru.etu.mldemonstrationapp.mainservice.repository.LimitRepository;
-import ru.etu.mldemonstrationapp.mainservice.entity.Model;
-import ru.etu.mldemonstrationapp.mainservice.repository.ModelRepository;
-import ru.etu.mldemonstrationapp.mainservice.entity.ModelOrganizationLimit;
-import ru.etu.mldemonstrationapp.mainservice.entity.Organization;
-import ru.etu.mldemonstrationapp.mainservice.repository.OrganizationRepository;
-import ru.etu.mldemonstrationapp.mainservice.entity.ModelUserLimit;
-import ru.etu.mldemonstrationapp.mainservice.entity.Role;
-import ru.etu.mldemonstrationapp.mainservice.entity.User;
-import ru.etu.mldemonstrationapp.mainservice.repository.UserRepository;
+import ru.etu.mldemonstrationapp.mainservice.entity.*;
+import ru.etu.mldemonstrationapp.mainservice.repository.*;
 import ru.etu.mldemonstrationapp.mainservice.service.AdminUserService;
 
 import java.time.Instant;
@@ -43,6 +34,8 @@ public class AdminUserServiceImpl implements AdminUserService {
     private UserRepository userRepository;
     @Autowired
     private OrganizationRepository organizationRepository;
+    @Autowired
+    private UserRpwRepository userRpwRepository;
 
     @Override
     public List<User> getUsers() {
@@ -127,10 +120,33 @@ public class AdminUserServiceImpl implements AdminUserService {
                             HttpStatus.CONFLICT,
                             "Organization with id %s does not exist".formatted(dto.organizationId())
                     ));
-            user.setOrganization(organization);
+
+            userRpwRepository.deleteAllByUser(user);
 
             // Delete all user limits due to changing of available models list
             limitRepository.deleteAllByIdInBatch(user.getLimits().stream().map(Limit::getLimitId).toList());
+
+
+            List<Model> models = modelRepository.findAllByOrganization(organization);
+            for (Model model : models) {
+                // Create new user limits due to changing of available models list
+                ModelUserLimit newLimit = new ModelUserLimit();
+                newLimit.setUser(user);
+                newLimit.setModel(model);
+                newLimit.setRps(model.getLimit().getRps());
+                newLimit.setRequestsPerWeek(model.getLimit().getRequestsPerWeek());
+
+                limitRepository.save(newLimit);
+
+                // Create row in user_rpw
+                UserRpw userRpw = new UserRpw();
+                userRpw.setUser(user);
+                userRpw.setModel(model);
+                userRpw.setCurrentRequests(0);
+                userRpwRepository.save(userRpw);
+            }
+
+            user.setOrganization(organization);
         }
 
         // Обновление ролей
@@ -184,8 +200,6 @@ public class AdminUserServiceImpl implements AdminUserService {
         userRepository.save(user);
     }
 
-
-
     @Override
     public Map<String, Integer> getLimitsByType(Long userId, Long modelId) {
         User user = userRepository.findById(userId)
@@ -206,7 +220,7 @@ public class AdminUserServiceImpl implements AdminUserService {
         Optional<ModelUserLimit> optionalLimit = limitRepository.findByUserIdAndModelId(userId, modelId);
 
         if (optionalLimit.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No limits found for userId: " + userId + " and modelId: " + modelId);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No user limits found for userId: " + userId + " and modelId: " + modelId);
         }
 
         ModelUserLimit limit = optionalLimit.get();
@@ -228,7 +242,7 @@ public class AdminUserServiceImpl implements AdminUserService {
         Limit limit = model.getLimit();
 
         if (limit == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No limits found for model with ID " + modelId);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No model limits found for model with ID " + modelId);
         }
 
         return Map.of(
@@ -247,7 +261,7 @@ public class AdminUserServiceImpl implements AdminUserService {
         Optional<ModelOrganizationLimit> optionalLimit = limitRepository.findByOrganizationIdAndModelId(organizationId, modelId);
 
         if (optionalLimit.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No limits found for organizationId: " + organizationId + " and modelId: " + modelId);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No org limits found for organizationId: " + organizationId + " and modelId: " + modelId);
         }
 
         ModelOrganizationLimit limit = optionalLimit.get();

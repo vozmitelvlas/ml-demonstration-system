@@ -2,25 +2,23 @@ package ru.etu.mldemonstrationapp.mainservice.components;
 
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
-import io.github.bucket4j.BucketConfiguration;
 import io.github.bucket4j.Refill;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.etu.mldemonstrationapp.mainservice.dto.ModelUserLimitResponse;
-import ru.etu.mldemonstrationapp.mainservice.service.AdminUserService;
+import ru.etu.mldemonstrationapp.mainservice.entity.UserRpw;
+import ru.etu.mldemonstrationapp.mainservice.repository.UserRpwRepository;
 import ru.etu.mldemonstrationapp.mainservice.utils.UserModalCompositeKey;
 
 import java.time.Duration;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class RateLimiterComponent {
-
     private final Map<UserModalCompositeKey, BucketConfig> bucketConfigs = new ConcurrentHashMap<>();
-
     @Autowired
-    private AdminUserService adminUserService;
+    UserRpwRepository userRpwRepository;
 
     private static class BucketConfig {
         int rps;
@@ -32,9 +30,26 @@ public class RateLimiterComponent {
         }
     }
 
-    public boolean tryAcquire(Long userId, Long modelId) {
-        Map<String, Integer> limits = adminUserService.getLimitsByType(userId, modelId);
-        System.out.println("Requests Per Week: " + limits.get("requestsPerWeek"));
+    public boolean checkRpwLimit(Map<String, Integer> limits, Long userId, Long modelId){
+        System.out.println("RPW: " + limits.get("requestsPerWeek"));
+        System.out.println("RPS: " + limits.get("rps"));
+
+        Optional<UserRpw> userRpwOptional = userRpwRepository.findByUserUserIdAndModelModelId(userId, modelId);
+        if(userRpwOptional.isPresent()){
+            UserRpw userRpw = userRpwOptional.get();
+            if (userRpwOptional.get().getCurrentRequests() < limits.get("requestsPerWeek")){
+                userRpw.setCurrentRequests(userRpw.getCurrentRequests() + 1);
+
+                userRpwRepository.save(userRpw);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean checkRpsLimit(Map<String, Integer> limits, Long userId, Long modelId) {
+        System.out.println("RPW: " + limits.get("requestsPerWeek"));
+        System.out.println("RPS: " + limits.get("rps"));
 
         int currentRps = limits.get("rps");
         UserModalCompositeKey key = new UserModalCompositeKey(userId, modelId);
@@ -46,8 +61,7 @@ public class RateLimiterComponent {
             return existingConfig;
         });
 
-        boolean result = config.bucket.tryConsume(1);
-        return result;
+        return config.bucket.tryConsume(1);
     }
 
     private Bucket createBucket(int rps) {

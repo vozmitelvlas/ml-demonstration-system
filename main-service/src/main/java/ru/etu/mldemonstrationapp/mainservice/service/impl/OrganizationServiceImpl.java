@@ -8,10 +8,7 @@ import org.springframework.web.server.ResponseStatusException;
 import ru.etu.mldemonstrationapp.mainservice.dto.CreateOrganizationRequest;
 import ru.etu.mldemonstrationapp.mainservice.dto.UpdateOrganizationRequest;
 import ru.etu.mldemonstrationapp.mainservice.entity.*;
-import ru.etu.mldemonstrationapp.mainservice.repository.LimitRepository;
-import ru.etu.mldemonstrationapp.mainservice.repository.ModelRepository;
-import ru.etu.mldemonstrationapp.mainservice.repository.OrganizationRepository;
-import ru.etu.mldemonstrationapp.mainservice.repository.UserRepository;
+import ru.etu.mldemonstrationapp.mainservice.repository.*;
 import ru.etu.mldemonstrationapp.mainservice.service.OrganizationService;
 
 import java.time.Instant;
@@ -29,6 +26,8 @@ public class OrganizationServiceImpl implements OrganizationService {
     private UserRepository userRepository;
     @Autowired
     private ModelRepository modelRepository;
+    @Autowired
+    private UserRpwRepository userRpwRepository;
 
     @Override
     public Organization getOrganization(Long id) {
@@ -129,6 +128,27 @@ public class OrganizationServiceImpl implements OrganizationService {
         limit.setOrganization(organization);
         limit.setModel(model);
 
+
+
+        for (User user : organization.getMembers()) {
+            // Create new user limits due to changing of available models list
+            ModelUserLimit newLimit = new ModelUserLimit();
+            newLimit.setUser(user);
+            newLimit.setModel(model);
+            newLimit.setRps(model.getLimit().getRps());
+            newLimit.setRequestsPerWeek(model.getLimit().getRequestsPerWeek());
+
+            limitRepository.save(newLimit);
+
+            // Create row in user_rpw
+            System.out.println(user.getEmail());
+            UserRpw userRpw = new UserRpw();
+            userRpw.setUser(user);
+            userRpw.setModel(model);
+            userRpw.setCurrentRequests(0);
+            userRpwRepository.save(userRpw);
+        }
+
         return limitRepository.save(limit);
     }
 
@@ -158,6 +178,10 @@ public class OrganizationServiceImpl implements OrganizationService {
                         .map(Limit::getLimitId));
 
         limitRepository.deleteAllByIdInBatch((Stream.concat(organizationModelLimits, userModelLimits).toList()));
+
+        List<UserRpw> userRpwToDelete = userRpwRepository.findByOrganizationAndModel(organizationId, modelId);
+        userRpwRepository.deleteAllInBatch(userRpwToDelete);
+
         organizationRepository.save(organization);
     }
 }

@@ -34,10 +34,13 @@ export default function ModelData() {
 
     const onTestRPSLimit = () => {
         const payload = {modelId, userId}
-        dispatch(getModelResultAction(payload)).catch(error => {
-            if (error.status === 429) {
+        dispatch(getModelResultAction(payload)).then(() =>
+            dispatch(resetMessageStateAction)
+        ).catch(error => {
+            if (error.status === 429)
                 dispatch(setRejectMessageAction(error.detail))
-            }
+            else if (error.status === 404)
+                dispatch(setRejectMessageAction(error.detail))
         })
     }
 
