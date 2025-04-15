@@ -141,7 +141,6 @@ public class OrganizationServiceImpl implements OrganizationService {
             limitRepository.save(newLimit);
 
             // Create row in user_rpw
-            System.out.println(user.getEmail());
             UserRpw userRpw = new UserRpw();
             userRpw.setUser(user);
             userRpw.setModel(model);

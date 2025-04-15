@@ -31,9 +31,6 @@ public class RateLimiterComponent {
     }
 
     public boolean checkRpwLimit(Map<String, Integer> limits, Long userId, Long modelId){
-        System.out.println("RPW: " + limits.get("requestsPerWeek"));
-        System.out.println("RPS: " + limits.get("rps"));
-
         Optional<UserRpw> userRpwOptional = userRpwRepository.findByUserUserIdAndModelModelId(userId, modelId);
         if(userRpwOptional.isPresent()){
             UserRpw userRpw = userRpwOptional.get();
@@ -48,9 +45,6 @@ public class RateLimiterComponent {
     }
 
     public boolean checkRpsLimit(Map<String, Integer> limits, Long userId, Long modelId) {
-        System.out.println("RPW: " + limits.get("requestsPerWeek"));
-        System.out.println("RPS: " + limits.get("rps"));
-
         int currentRps = limits.get("rps");
         UserModalCompositeKey key = new UserModalCompositeKey(userId, modelId);
         BucketConfig config = bucketConfigs.compute(key, (k, existingConfig) -> {

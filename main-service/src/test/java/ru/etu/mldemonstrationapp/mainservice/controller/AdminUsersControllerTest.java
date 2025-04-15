@@ -304,7 +304,6 @@ public class AdminUsersControllerTest extends AbstractControllerTest{
     @WithMockTokenUser
     void getUsersAsUser() throws Exception {
         var requestBuilder = MockMvcRequestBuilders.get(PATH_PREFIX);
-        System.out.println();
         this.mockMvc.perform(requestBuilder).andExpectAll(status().isForbidden());
     }
 }
