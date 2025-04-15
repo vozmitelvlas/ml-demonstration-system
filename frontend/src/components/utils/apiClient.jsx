@@ -31,7 +31,7 @@ const apiClient = async (endpoint, method = 'GET', body = null, customHeaders = 
             return null
         }
 
-        return response.json()
+        return await response.json()
     } catch (error) {
         console.error('Произошла ошибка при выполнении запроса:', error.message)
         throw error

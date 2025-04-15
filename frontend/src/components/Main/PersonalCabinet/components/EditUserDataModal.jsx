@@ -2,14 +2,18 @@ import styles from "../PesonalCabinet.module.css";
 import Button from "../../Buttons/Button.jsx";
 import React from "react";
 import {AlarmMsg} from "../../AlarmMsg/AlarmMsg.jsx";
+import {useSelector} from "react-redux";
+import {selectMessageState} from "../../../../selectors/message-selector.js";
 
-export function EditUserDataModal({isEditing, handleSubmit, submitFunction, register, onCancel, logo, alarm}){
+export function EditUserDataModal({isEditing, handleSubmit, submitFunction, register, onCancel}){
+    const {message, logo} = useSelector(selectMessageState)
+
     return (
         <>
             <div className={`edit-modal-overlay ${isEditing ? "" : "edit-modal-overlay_hidden"}`}>
                 <form onSubmit={handleSubmit(submitFunction)} className={styles.container}>
                     <h3>Редактирование данных</h3>
-                    <AlarmMsg logo={logo}>{alarm}</AlarmMsg>
+                    <AlarmMsg logo={logo}>{message}</AlarmMsg>
                     <table className="change-container__table naked-input data-input">
                         <tbody>
                         <tr>

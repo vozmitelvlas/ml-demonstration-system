@@ -1,13 +1,34 @@
 import {AlarmMsg} from "../../AlarmMsg/AlarmMsg.jsx";
 import Select from "react-select";
 import Button from "../../Buttons/Button.jsx";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {customStyle, setFirstMultiBackColor, setSecondMultiBackColor} from "../../../utils/selectStyles.jsx";
 import {Controller} from "react-hook-form";
+import {useDispatch, useSelector} from "react-redux";
+import {selectProblemTypes, selectRunTimes} from "../../../../selectors/model-selectors.js";
+import {resetMessageStateAction} from "../../../../actions/message-actions.js";
+import {selectMessageState} from "../../../../selectors/message-selector.js";
+import {getProblemTypesAction, getRunTimesAction} from "../../../../actions/model-actions.js";
 
-export function AddNewModelModal({runtimes, problemTypes, isAddingModel, logo, alarm, onCancel, onAdd, form}) {
+export function AddNewModelModal({isAddingModel, onAdd, form, setIsAddingModel, isConfirmed}) {
+    const dispatch = useDispatch()
+    const runtimes = useSelector(selectRunTimes)
+    const problemTypes = useSelector(selectProblemTypes)
+    const {message, logo} = useSelector(selectMessageState)
     const [runTimeStyle, setRunTimeStyle] = useState(customStyle)
     const [problemStyle, setProblemStyle] = useState(customStyle)
+
+    useEffect(() => {
+        if(isConfirmed){
+            dispatch(getRunTimesAction)
+            dispatch(getProblemTypesAction)
+        }
+    }, [isConfirmed])
+
+    const onCancel = () => {
+        setIsAddingModel(!isAddingModel)
+        dispatch(resetMessageStateAction)
+    }
 
     return (
         <>
@@ -16,7 +37,7 @@ export function AddNewModelModal({runtimes, problemTypes, isAddingModel, logo, a
                     <div className="add-modal__title">
                         <h3>Новая модель</h3>
                     </div>
-                    <AlarmMsg logo={logo}>{alarm}</AlarmMsg>
+                    <AlarmMsg logo={logo}>{message}</AlarmMsg>
                     <div className="add-modal__table">
                         <table className="change-container__table naked-input data-input">
                             <tbody>

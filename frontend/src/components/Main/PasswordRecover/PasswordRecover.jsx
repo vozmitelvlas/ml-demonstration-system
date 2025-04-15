@@ -1,44 +1,36 @@
 import React, {useState} from "react";
 import styles from "./PasswordRecover.module.css"
-import apiClient from "../../utils/apiClient.jsx";
 import {useForm} from "react-hook-form";
+import {useDispatch, useSelector} from "react-redux";
+import {selectMessageState} from "../../../selectors/message-selector.js";
+import {resetMessageStateAction, setAcceptMessageAction} from "../../../actions/message-actions.js";
+import {sendPasswordTokenOnEmailAction} from "../../../actions/auth-actions.js";
 
 export default function PasswordRecover() {
-    const [alarm, setAlarm] = useState("")
+    const dispatch = useDispatch()
+    const {message} = useSelector(selectMessageState)
     const [isLoading, setIsLoading] = useState(false)
-    const {
-        handleSubmit,
-        register,
-        setError,
-        formState: {errors},
-        reset,
-    } = useForm({
+    const passwordForm = useForm({
         defaultValues: {
             email: ""
         }
     })
 
-    const firstErrorKey = Object.keys(errors)[0];
-    const error = firstErrorKey ? errors[firstErrorKey].message : ''
+    const firstErrorKey = Object.keys(passwordForm.formState.errors)[0];
+    const error = firstErrorKey ? passwordForm.formState.errors[firstErrorKey].message : ''
 
     const sendOnEmail = async (formData) => {
-        try {
-            setIsLoading(true)
-            await apiClient(`/api/auth/password-reset`, 'POST', formData)
+        setIsLoading(true)
 
-            reset()
-            setAlarm("Письмо успешно отправлено")
-        } catch (error) {
+        dispatch(sendPasswordTokenOnEmailAction(formData)).then(() => {
+            passwordForm.reset()
+            dispatch(setAcceptMessageAction("Письмо успешно отправлено"))
+        }).catch((error) => {
             if (error.status === 404)
-                setError('form', {
-                    type: 'email',
-                    message: error.detail
-                })
-            else
-                console.log(error)
-        } finally {
+                passwordForm.setError('form', {type: 'email', message: error.detail})
+        }).finally(() =>
             setIsLoading(false)
-        }
+        )
     }
 
     return (
@@ -47,7 +39,7 @@ export default function PasswordRecover() {
                 <div className={styles.loader}></div>
             ) : (
                 <div className={styles.signInUp}>
-                    <form onSubmit={handleSubmit(sendOnEmail)} className={styles.container}>
+                    <form onSubmit={passwordForm.handleSubmit(sendOnEmail)} className={styles.container}>
                         <div className={`${styles.inData} naked-input`}>
                             <h2>Восстановление пароля</h2>
                             <div className={styles.row}>
@@ -57,14 +49,14 @@ export default function PasswordRecover() {
                                         <input
                                             type="email"
                                             placeholder="example@mail.ru"
-                                            {...register("email")}
-                                            onFocus={() => setAlarm("")}
+                                            {...passwordForm.register("email")}
+                                            onFocus={() => dispatch(resetMessageStateAction)}
                                             required/>
                                     </div>
                                 </div>
                             </div>
                             {error && <span>{error}</span>}
-                            {alarm && <span className={styles.emailAlarm}>{alarm}</span>}
+                            {message && <span className={styles.emailAlarm}>{message}</span>}
                             <div className={styles.row}>
                                 <div className={styles.button}>
                                     <div>
@@ -75,7 +67,7 @@ export default function PasswordRecover() {
                         </div>
                     </form>
                 </div>
-                )}
+            )}
         </>
 
     )

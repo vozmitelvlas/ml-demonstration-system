@@ -1,64 +1,41 @@
-import React, {useState} from "react";
+import React from "react";
 import styles from "./SetNewPassword.module.css"
-import {useForm} from "react-hook-form";
-import {yupResolver} from "@hookform/resolvers/yup";
-import {setNewPasswordSchema} from "../../../store/formSchema.jsx";
 import Button from "../../Buttons/Button.jsx";
-import alarmLogo from "../../../../assets/alarm.svg";
-import {AlarmMsg} from "../../AlarmMsg/AlarmMsg.jsx";
-import apiClient from "../../../utils/apiClient.jsx";
-import acceptLogo from "../../../../assets/accept.svg"
+import {useDispatch} from "react-redux";
+import {updateUserPasswordAction} from "../../../../actions/user-actions.js";
+import {setAcceptMessageAction} from "../../../../actions/message-actions.js";
 
-const passwords = {
-    oldPassword: "",
-    newPassword: "",
-    repeatNewPassword: ""
-}
 
-export function SetNewPasswordModal({setPasswordChanging, passwordChanging, setLogo, setAlarm, alarm, logo}) {
-    const {
-        register,
-        handleSubmit,
-        formState: {errors},
-        reset,
-        setError
-    } = useForm({
-        defaultValues: passwords,
-        resolver: yupResolver(setNewPasswordSchema)
-    })
+export function SetNewPasswordModal({setPasswordChanging, passwordChanging, passwordForm}) {
+    const dispatch = useDispatch()
 
-    const firstErrorKey = Object.keys(errors)[0];
-    const error = firstErrorKey ? errors[firstErrorKey].message : ''
+    const firstErrorKey = Object.keys(passwordForm.formState.errors)[0];
+    const error = firstErrorKey ? passwordForm.formState.errors[firstErrorKey].message : ''
 
     const sendFormData = async (newValue) => {
-        try {
-            await apiClient(`/api/users/profile/password`, 'PUT', {
-                oldPassword: newValue.oldPassword,
-                newPassword: newValue.newPassword
-            })
+        const {repeatNewPassword, ...formData} = newValue
+        dispatch(updateUserPasswordAction(formData)).then(() => {
             setPasswordChanging(!passwordChanging)
-            setAlarm("Пароль успешно изменен")
-            setLogo(acceptLogo)
-        } catch (error) {
-            if (error.status === 401) {
-                setError('form', {type: 'server', message: error.detail})
-            } else {
-                console.log(error)
-            }
-        }
+            dispatch(setAcceptMessageAction("Пароль успешно изменен"))
+        }).catch(error => {
+            if (error.status === 401)
+                passwordForm.setError('form', {type: 'server', message: error.detail})
+        })
     }
 
     return (
         <>
             <div className={`edit-modal-overlay ${passwordChanging ? "" : "edit-modal-overlay_hidden"}`}>
-                <form onSubmit={handleSubmit(sendFormData)} className={styles.container}>
+                <form onSubmit={passwordForm.handleSubmit(sendFormData)} className={styles.container}>
                     <div className={`${styles.data} naked-input`}>
                         <h3>Установка нового пароля</h3>
                         <div className={styles.row}>
                             <div className={styles.inputDiv}>
                                 <label>Укажите текущий пароль<span> *</span></label>
                                 <div>
-                                    <input type="password" placeholder="******" {...register("oldPassword")}
+                                    <input type="password"
+                                           placeholder="******"
+                                           {...passwordForm.register("oldPassword")}
                                            required/>
                                 </div>
                             </div>
@@ -68,7 +45,9 @@ export function SetNewPasswordModal({setPasswordChanging, passwordChanging, setL
                             <div className={styles.inputDiv}>
                                 <label>Введите новый пароль<span> *</span></label>
                                 <div>
-                                    <input type="password" placeholder="******" {...register("newPassword")}
+                                    <input type="password"
+                                           placeholder="******"
+                                           {...passwordForm.register("newPassword")}
                                            required/>
                                 </div>
                             </div>
@@ -77,7 +56,9 @@ export function SetNewPasswordModal({setPasswordChanging, passwordChanging, setL
                             <div className={styles.inputDiv}>
                                 <label>Повторите новый пароль<span> *</span></label>
                                 <div>
-                                    <input type="password" placeholder="******" {...register("repeatNewPassword")}
+                                    <input type="password"
+                                           placeholder="******"
+                                           {...passwordForm.register("repeatNewPassword")}
                                            required/>
                                 </div>
                             </div>
@@ -87,10 +68,7 @@ export function SetNewPasswordModal({setPasswordChanging, passwordChanging, setL
 
                         <div className={styles.row}>
                             <div className={styles.buttons}>
-                                <Button type="button" onClick={() => {
-                                    setPasswordChanging(false)
-                                    reset(passwords)
-                                }}>Отмена</Button>
+                                <Button type="button" onClick={() => setPasswordChanging(false)}>Отмена</Button>
                                 <Button type="submit">Установить</Button>
                             </div>
                         </div>

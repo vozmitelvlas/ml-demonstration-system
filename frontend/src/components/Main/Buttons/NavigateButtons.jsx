@@ -1,8 +1,11 @@
 import Button from "./Button.jsx";
 import React from "react";
 import {useNavigate} from "react-router-dom";
+import {useSelector} from "react-redux";
+import {selectUserRoles} from "../../../selectors/user-selector.js";
 
-export function NavigateButtons({isAdminMode, setIsOpen}){
+export function NavigateButtons({setIsOpen}){
+    const {isAdminMode} = useSelector(selectUserRoles)
     const navigate = useNavigate()
     return(
         <>

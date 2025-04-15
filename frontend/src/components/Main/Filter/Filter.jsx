@@ -6,39 +6,31 @@ import closeLogo from "../../../assets/delete.svg";
 
 export default function Filter({setIsOpen, selects = {}, sorts = {}}) {
 
-    const [isVisible, setIsVisible] = useState({});
+    const [isVisible, setIsVisible] = useState({})
     const [filterValues, setFilterValues] = useState(useMemo(() => {
-        const initialFilterValues = {};
+        const initialFilterValues = {}
 
         for (let filter in selects) {
             selects[filter].names.forEach(name => {
-                initialFilterValues[name] = false;
-            });
+                initialFilterValues[name] = false
+            })
         }
 
-        return initialFilterValues;
-    }, []));
-    const [selectedRadio, setSelectedRadio] = useState("");
+        return initialFilterValues
+    }, []))
+    const [selectedRadio, setSelectedRadio] = useState("")
 
     const handleClick = (name, event) => {
-        const newIsVisible = {...isVisible};
-        newIsVisible[name] = !newIsVisible[name];
-        setIsVisible(newIsVisible);
-        const svgIcon = event.target.matches('img') ? event.target : event.target.querySelector('img');
-        svgIcon.classList.toggle(styles.rotated);
+        const newIsVisible = {...isVisible}
+        newIsVisible[name] = !newIsVisible[name]
+        setIsVisible(newIsVisible)
+        const svgIcon = event.target.matches('img') ? event.target : event.target.querySelector('img')
+        svgIcon.classList.toggle(styles.rotated)
 
-    };
-    const handleRadioChange = (name) => {
-        console.log(name)
-        setSelectedRadio(name);
-    };
+    }
+    const handleRadioChange = (name) => setSelectedRadio(name)
 
     const handleOptions =  (event) => {
-        console.log({
-            ...filterValues,
-            [event.target.name]: event.target.checked
-        })
-
         setFilterValues({
             ...filterValues,
             [event.target.name]: event.target.checked
@@ -113,7 +105,6 @@ export default function Filter({setIsOpen, selects = {}, sorts = {}}) {
                     <Button>Применить</Button>
                 </div>
             </div>
-
         </div>
-    );
-};
+    )
+}

@@ -1,20 +1,17 @@
 import styles from "../SignInUp.module.css"
-import React, {useEffect, useState} from "react";
+import React from "react";
 import {useNavigate} from "react-router-dom";
-import apiClient from "../../../utils/apiClient.jsx";
 import {useForm} from 'react-hook-form';
 import {yupResolver} from '@hookform/resolvers/yup';
 import {signInSchema} from "../../../store/formSchema.jsx";
+import {loginUserAction} from "../../../../actions/auth-actions.js";
+import {useDispatch} from "react-redux";
+import {resetMessageStateAction} from "../../../../actions/message-actions.js";
 
-export default function SignIn({setUserData, setIsAdmin, setMainOrg, setIsAdminMode}) {
+export default function SignIn() {
     const navigate = useNavigate()
-    const [alarm, setAlarm] = useState("")
-    const {
-        register,
-        handleSubmit,
-        formState: {errors},
-        setError
-    } = useForm({
+    const dispatch = useDispatch()
+    const signInForm = useForm({
         defaultValues: {
             login: "",
             password: "",
@@ -22,41 +19,31 @@ export default function SignIn({setUserData, setIsAdmin, setMainOrg, setIsAdminM
         resolver: yupResolver(signInSchema)
     })
 
+    const onInputFocus = () => dispatch(resetMessageStateAction)
 
-    const onInputFocus = () => {
-        setAlarm("")
-    }
+    const firstErrorKey = Object.keys(signInForm.formState.errors)[0]
+    const error = firstErrorKey ? signInForm.formState.errors[firstErrorKey].message : ''
 
-    const firstErrorKey = Object.keys(errors)[0];
-    const error = firstErrorKey ? errors[firstErrorKey].message : ''
-
-    const sendFormData = async (formData) => {
-        try {
-            const {user} = await apiClient('/api/auth/login', 'POST', formData)
-
-            setUserData(user)
-            setIsAdmin(user.roles.includes("ADMIN"))
-            setMainOrg(user.roles.includes("ORGANIZATION_HEAD"))
+    const sendFormData = (formData) => {
+        dispatch(loginUserAction(formData)).then(() =>
             navigate("/models")
-        } catch (error) {
-            setError('form', {type: 'server', message: error.detail})
-            console.log(error)
-        }
+        ).catch(error =>
+            signInForm.setError('form', {type: 'server', message: error.detail})
+        )
     }
 
     return (
         <div className={styles.signInUp}>
-            <form onSubmit={handleSubmit(sendFormData)} className={styles.container}>
+            <form onSubmit={signInForm.handleSubmit(sendFormData)} className={styles.container}>
                 <div className={`${styles.inData} naked-input`}>
                     <h2>Вход в ML models</h2>
-                    {alarm && <span className={styles.emailAlarm}>{alarm}</span>}
                     <div className={styles.row}>
                         <div className={styles.inputDiv}>
                             <div>
                                 <input
                                     type="text"
                                     placeholder="Логин"
-                                    {...register("login")}
+                                    {...signInForm.register("login")}
                                     onFocus={onInputFocus}
                                     required/>
                             </div>
@@ -68,7 +55,7 @@ export default function SignIn({setUserData, setIsAdmin, setMainOrg, setIsAdminM
                                 <input
                                     type="password"
                                     placeholder="Пароль"
-                                    {...register("password")}
+                                    {...signInForm.register("password")}
                                     onFocus={onInputFocus}
                                     required/>
                             </div>

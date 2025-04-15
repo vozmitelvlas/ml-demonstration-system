@@ -5,29 +5,27 @@ import "../Table.css"
 import React, {useEffect, useState} from "react";
 import Filter from "../Filter/Filter.jsx";
 import DeleteModal from "../../utils/DeleteModal.jsx";
-import apiClient from "../../utils/apiClient.jsx";
 import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx";
-import alarmLogo from "../../../assets/alarm.svg"
-import acceptLogo from "../../../assets/accept.svg"
 import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
 import {newOrgSchema} from "../../store/formSchema.jsx";
 import {NavigateButtons} from "../Buttons/NavigateButtons.jsx";
 import {AddNewOrgModal, Organisations} from "./components/index.js";
+import {useDispatch, useSelector} from "react-redux";
+import {addNewOrgAction, deleteOrgAction, getOrganisationsAction} from "../../../actions/admin-org-actions.js";
+import {
+    resetMessageStateAction, setAcceptMessageAction, setRejectMessageAction
+} from "../../../actions/message-actions.js";
+import {selectMessageState} from "../../../selectors/message-selector.js";
 
 export default function CatalogOrganisations() {
+    const dispatch = useDispatch()
+    const {message, logo} = useSelector(selectMessageState)
     const [isOpen, setIsOpen] = useState(false)
     const [isDeletingModel, setIsDeletingModel] = useState(false)
     const [tmpOrgId, setTmpOrgId] = useState("")
-    const [alarm, setAlarm] = useState(null)
-    const [logo, setLogo] = useState(alarmLogo)
     const [isAddingOrg, setIsAddingOrg] = useState(false)
-    const {
-        handleSubmit,
-        register,
-        setError,
-        formState: {errors}
-    } = useForm({
+    const orgForm = useForm({
         resolver: yupResolver(newOrgSchema),
         defaultValues: {
             name: "",
@@ -35,66 +33,50 @@ export default function CatalogOrganisations() {
         }
     })
 
-
-    const [orgs, setOrgs] = useState([])
     useEffect(() => {
-        apiClient("/api/admin/organizations").then(res => {
-            setOrgs(res)
-        }).catch(error => {
-            console.log(error)
-        })
+        dispatch(resetMessageStateAction)
+        dispatch(getOrganisationsAction)
     }, [])
 
-    const firstErrorKey = Object.keys(errors)[0];
+    const firstErrorKey = Object.keys(orgForm.formState.errors)[0]
     useEffect(() => {
-        if (firstErrorKey) {
-            setLogo(alarmLogo)
-            setAlarm(errors[firstErrorKey].message)
-        }
+        if (firstErrorKey)
+            dispatch(setRejectMessageAction(orgForm.formState.errors[firstErrorKey].message))
     }, [firstErrorKey])
 
-    const onCloseDeleteModal = () => {
-        setIsDeletingModel(false)
-    }
+    const onCloseDeleteModal = () => setIsDeletingModel(false)
+
     const onDeleteOrgClick = (event) => {
         const tr = event.target.closest("tr")
         setTmpOrgId(tr.dataset.id)
         setIsDeletingModel(true)
-        setAlarm(null)
+        dispatch(resetMessageStateAction)
     }
 
-    const onAddNewOrg = async (newValue) => {
-        try {
-            const res = await apiClient("/api/admin/organizations", 'POST', newValue)
-            setOrgs([...orgs, res])
-
+    const onAddNewOrg = (newValue) => {
+        dispatch(addNewOrgAction(newValue)).then(() => {
+            dispatch(setAcceptMessageAction("Организация успешно создана"))
             setIsAddingOrg(!isAddingOrg)
-            setLogo(acceptLogo)
-            setAlarm("Организация успешно создана")
-        } catch (error) {
-            if (error.status === 409) {
-                setError('form', {type: 'server', message: error.detail})
-            } else {
-                console.log(error)
-            }
-        }
+            orgForm.reset()
+        }).catch(error => {
+            if (error.status === 409)
+                orgForm.setError('form', {type: 'server', message: error.detail})
+        })
     }
 
-    const onConfirmDeletingOrg = async () => {
-        try {
-            await apiClient(`/api/admin/organizations/${tmpOrgId}`, 'DELETE')
-            setOrgs(orgs.filter(org => org.organizationId !== Number(tmpOrgId)))
-            setLogo(acceptLogo)
-            setAlarm("Организация успешно удалена")
-        } catch (error) {
-            if (error.status === 409) {
-                setLogo(alarmLogo)
-                setAlarm("Организация не пуста")
-            } else {
-                console.log(error)
-            }
-        }
-        setIsDeletingModel(false)
+    const onConfirmDeletingOrg = () => {
+        dispatch(deleteOrgAction(tmpOrgId)).then(() =>
+            dispatch(setAcceptMessageAction("Организация успешно удалена"))
+        ).catch(error => {
+            if (error.status === 409)
+                dispatch(setRejectMessageAction(error.detail))
+        }).finally(() =>
+            setIsDeletingModel(false)
+        )
+    }
+    const onAddOrgButton = () => {
+        setIsAddingOrg(!isAddingOrg)
+        dispatch(resetMessageStateAction)
     }
 
     return (
@@ -110,36 +92,29 @@ export default function CatalogOrganisations() {
                     }}></Filter>
             }
             <main>
-                <CatalogHeader title={"Каталог организаций"} searchFields={["Название организации"]}></CatalogHeader>
+                <CatalogHeader title={"Каталог организаций"} searchFields={["Название организации"]}/>
 
                 <div className="options-buttons_up">
-                    <Button onClick={() => {
-                        setIsAddingOrg(!isAddingOrg)
-                        setAlarm(null)
-                    }}>Добавить организацию</Button>
+                    <Button onClick={onAddOrgButton}>Добавить организацию</Button>
                 </div>
 
-                <AlarmMsg logo={logo}>{alarm}</AlarmMsg>
+                <AlarmMsg logo={logo}>{message}</AlarmMsg>
 
-                <Organisations onDeleteOrgClick={onDeleteOrgClick} orgs={orgs}/>
+                <Organisations onDeleteOrgClick={onDeleteOrgClick}/>
 
-                <NavigateButtons setIsOpen={setIsOpen} isAdminMode={true}/>
+                <NavigateButtons setIsOpen={setIsOpen}/>
 
                 <AddNewOrgModal
-                    setAlarm={setAlarm}
                     onAddNewOrg={onAddNewOrg}
-                    alarm={alarm}
-                    logo={logo}
-                    register={register}
                     isAddingOrg={isAddingOrg}
                     setIsAddingOrg={setIsAddingOrg}
-                    handleSubmit={handleSubmit}/>
+                    form={orgForm}
+                />
 
                 <DeleteModal
                     open={isDeletingModel}
                     onNo={onCloseDeleteModal}
-                    onYes={onConfirmDeletingOrg}>
-                </DeleteModal>
+                    onYes={onConfirmDeletingOrg}/>
             </main>
         </>
     )

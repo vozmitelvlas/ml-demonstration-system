@@ -5,18 +5,26 @@ import exit from "../../assets/exit.svg";
 import menu from "../../assets/menu.svg";
 import styles from "./Header.module.css";
 import icon from "../../assets/icon.svg"
-import apiClient from "../utils/apiClient.jsx";
 import {useEffect, useState} from "react";
+import {useDispatch, useSelector} from "react-redux";
+import {selectDirectorOrgId, selectUserData, selectUserRoles} from "../../selectors/user-selector.js";
+import {setAdminModeAction} from "../../actions/user-actions.js";
+import {logOutAction} from "../../actions/auth-actions.js";
 
-export default function Header({login, isAdminMode, setIsAdminMode, isAdmin, isMainOrg, orgId}) {
+export default function Header() {
     const navigate = useNavigate()
     const [tmpTime, setTmpTime] = useState(new Date())
+    const {isAdmin, isDirector, isAdminMode} = useSelector(selectUserRoles)
+    const dispatch = useDispatch()
+    const orgId = useSelector(selectDirectorOrgId)
+    const {login} = useSelector(selectUserData)
+
 
     useEffect(() => {
         const timer = setInterval(() => {
             const tmpMinute = new Date().getMinutes()
 
-            if(tmpMinute !== tmpTime.getMinutes())
+            if (tmpMinute !== tmpTime.getMinutes())
                 setTmpTime(new Date())
         }, 1000)
 
@@ -24,21 +32,18 @@ export default function Header({login, isAdminMode, setIsAdminMode, isAdmin, isM
     }, [])
 
     const toggleAdminMode = () => {
-        setIsAdminMode(!isAdminMode)
         sessionStorage.setItem("isAdminMode", !isAdminMode)
+        dispatch(setAdminModeAction(!isAdminMode))
         navigate('/models')
     }
 
     const onExitClick = async () => {
-        try {
-            sessionStorage.clear()
-            setIsAdminMode(false)
-
-            await apiClient(`/api/auth/logout`)
+        sessionStorage.clear()
+        dispatch(setAdminModeAction(false))
+        dispatch(logOutAction).then(() => {
             navigate("/")
-        } catch (error) {
-            console.log(error)
-        }
+        })
+
     }
 
     return (
@@ -72,13 +77,14 @@ export default function Header({login, isAdminMode, setIsAdminMode, isAdmin, isM
                         <a onClick={() => {
                             navigate("/models")
                         }}>Каталог моделей</a>
-                        {isMainOrg && (
+                        {isDirector && (
                             <a onClick={() => {
                                 navigate(`/organisation/${orgId}`)
                             }}>Моя организация</a>
                         )}
                         {isAdmin && (
-                            <a name="admin-button" onClick={toggleAdminMode}>{isAdminMode ? "Режим пользователя" : "Режим администратора"}</a>
+                            <a name="admin-button"
+                               onClick={toggleAdminMode}>{isAdminMode ? "Режим пользователя" : "Режим администратора"}</a>
                         )}
                         {isAdminMode && (
                             <a>Мониторинг</a>

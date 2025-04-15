@@ -2,29 +2,28 @@ import React, {useEffect, useState} from "react";
 import "../ChangeData.css"
 import DataHeader from "../Headers/DataHeader/DataHeader.jsx";
 import {useParams} from "react-router-dom";
-import acceptLogo from "../../../assets/accept.svg"
-import alarmLogo from "../../../assets/alarm.svg"
-import apiClient from "../../utils/apiClient.jsx";
 import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
 import {changeModelDataSchema, limitsSchema} from "../../store/formSchema.jsx";
 import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx"
 import {ChangeModelInfo, ChangeModelLimit} from "./components/index.js";
-import {useRequestGetProblemTypes, useRequestGetRunTimes} from "../CatalogModels/hooks/index.js";
+import {useDispatch, useSelector} from "react-redux";
+import {
+    getModelVersionDataAsAdminAction,
+    updateModelData,
+    updateModelLimit
+} from "../../../actions/admin-model-actions.js";
+import {
+    resetMessageStateAction,
+    setAcceptMessageAction,
+    setRejectMessageAction
+} from "../../../actions/message-actions.js";
+import {selectMessageState} from "../../../selectors/message-selector.js";
+import {useErrorHookForm} from "../../../hooks/error-hooks.js";
 
-const modelDataForDisplay = {
-    modelId: "",
-    status: "ok",
-    createdAt: "",
-}
-
-export default function ChangeModel({isConfirmed}) {
+export default function ChangeModel() {
     const [activeBut, setActiveBut] = useState("first")
-    const [alarm, setAlarm] = useState(null)
     const {modelId, versionId} = useParams()
-    const [logo, setLogo] = useState(alarmLogo)
-    const [modelData, setModelData] = useState({})
-    const [displayData, setDisplayData] = useState(modelDataForDisplay)
     const infoForm = useForm({
         resolver: yupResolver(changeModelDataSchema)
     })
@@ -36,86 +35,52 @@ export default function ChangeModel({isConfirmed}) {
         }
     })
 
+    const dispatch = useDispatch()
+    const {message, logo} = useSelector(selectMessageState)
+
     useEffect(() => {
-        apiClient(`/api/admin/models/${modelId}/versions/${versionId}`).then(res => {
-            const dataForEdit = {
-                modelName: res.modelName,
-                versionName: res.versionName,
-                description: res.description,
-                uri: res.uri,
-                runtime: {value: res.runtime.name, label: res.runtime.value},
-                problemType: {value: res.problemType.name, label: res.problemType.value}
-            }
-            const dataForDisplay = {
-                modelId: res.modelId,
-                status: "ok",
-                createdAt: res.createdAt,
-            }
-            const limitData = {
-                rps: res.limit.rps,
-                requestsPerWeek: res.limit.requestsPerWeek
-            }
-
-            setModelData(res)
-            setDisplayData(dataForDisplay)
-
-            infoForm.reset(dataForEdit)
-            limitForm.reset(limitData)
-        }).catch(error => {
-            console.log(error)
-        })
-
-        setAlarm(null)
+        const payload = {modelId, versionId}
+        if (activeBut === "first")
+            dispatch(getModelVersionDataAsAdminAction(payload)).then(res => {
+                infoForm.reset({
+                    ...res,
+                    runtime: {value: res.runtime.name, label: res.runtime.value},
+                    problemType: {value: res.problemType.name, label: res.problemType.value}
+                })
+                limitForm.reset({
+                    ...res.limit
+                })
+            })
+        dispatch(resetMessageStateAction)
     }, [activeBut])
 
-    useEffect(() => {
-        if (activeBut === "first") {
-            const firstErrorKey1 = Object.keys(infoForm.formState.errors)[0];
-            if (firstErrorKey1) {
-                setLogo(alarmLogo)
-                setAlarm(infoForm.formState.errors[firstErrorKey1].message)
-            }
-        } else if (activeBut === "second") {
-            const firstErrorKey2 = Object.keys(limitForm.formState.errors)[0];
-            if (firstErrorKey2 !== undefined) {
-                setLogo(alarmLogo)
-                setAlarm(limitForm.formState.errors[firstErrorKey2].message)
-            }
-        }
-    }, [infoForm.formState.errors, limitForm.formState.errors])
+    useErrorHookForm(activeBut, infoForm, limitForm)
 
-    const {runtimes} = useRequestGetRunTimes(isConfirmed)
-    const {problemTypes} = useRequestGetProblemTypes(isConfirmed)
+    const onChangeName = () => dispatch(setRejectMessageAction('Названия других версий данной модели также изменятся'))
 
-    const onChangeName = () => {
-        setLogo(alarmLogo)
-        setAlarm('Названия других версий данной модели также изменятся')
-    }
-    const onBlurName = () => {
-        setAlarm(null)
-    }
-    const onSaveModelData = async (newModelData) => {
-        const formatValues = {
-            ...newModelData,
-            problemType: newModelData.problemType.value,
-            runtime: newModelData.runtime.value
+    const onBlurName = () => dispatch(resetMessageStateAction)
+    const onSaveModelData = (newModelData) => {
+        const payload = {
+            modelId,
+            versionId,
+            body: {
+                ...newModelData,
+                problemType: newModelData.problemType.value,
+                runtime: newModelData.runtime.value
+            }
         }
-        try {
-            await apiClient(`/api/admin/models/${modelId}/versions/${versionId}`, 'PUT', formatValues)
-            setLogo(acceptLogo)
-            setAlarm('Изменения сохранены')
-        } catch (error) {
-            console.error(error);
-        }
+        dispatch(updateModelData(payload)).then(() =>
+            dispatch(setAcceptMessageAction('Изменения сохранены'))
+        )
     }
-    const onSaveModelLimit = async (newValue) => {
-        try{
-            await apiClient(`/api/admin/models/${modelId}/limit`, 'PUT', newValue)
-            setLogo(acceptLogo)
-            setAlarm("Лимиты успешно сохранены")
-        } catch (error){
-            console.log(error)
+    const onSaveModelLimit = (newValue) => {
+        const payload = {
+            modelId,
+            body: newValue
         }
+        dispatch(updateModelLimit(payload)).then(() =>
+            dispatch(setAcceptMessageAction("Лимиты успешно сохранены"))
+        )
     }
 
     return (
@@ -128,25 +93,19 @@ export default function ChangeModel({isConfirmed}) {
                 Изменение данных модели
             </DataHeader>
 
-            <AlarmMsg logo={logo}>{alarm}</AlarmMsg>
+            <AlarmMsg logo={logo}>{message}</AlarmMsg>
 
             {activeBut === "first" && (
                 <ChangeModelInfo
-                    runtimes={runtimes}
-                    problemTypes={problemTypes}
                     onChangeName={onChangeName}
                     onBlurName={onBlurName}
                     form={infoForm}
                     submitFunction={onSaveModelData}
-                    displayData={displayData}
-                ></ChangeModelInfo>
+                />
             )}
 
             {activeBut === "second" && (
-                <ChangeModelLimit
-                    form={limitForm}
-                    submitFunction={onSaveModelLimit}
-                ></ChangeModelLimit>
+                <ChangeModelLimit form={limitForm} submitFunction={onSaveModelLimit}/>
             )}
         </div>
     )

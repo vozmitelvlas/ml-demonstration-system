@@ -1,11 +1,14 @@
 import Button from "../../Buttons/Button.jsx";
 import React from "react";
 import {useNavigate} from "react-router-dom";
+import {useSelector} from "react-redux";
+import {selectUserLimits} from "../../../../selectors/user-selector.js";
 
-export function ChangeUserLimits({userLimits, register, handleSubmit, submitFunction, onInputChange}) {
+export function ChangeUserLimits({form, submitFunction, onInputChange}) {
     const navigate = useNavigate()
+    const userLimits = useSelector(selectUserLimits)
     return (
-        <form onSubmit={handleSubmit(submitFunction)} className="change-content">
+        <form onSubmit={form.handleSubmit(submitFunction)} className="change-content">
             <div className="user-models">
                 <h2>Доступные пользователю модели</h2>
                 <table className="table-fill naked-input limits-input">
@@ -31,16 +34,16 @@ export function ChangeUserLimits({userLimits, register, handleSubmit, submitFunc
                             <td className="text-center">{model.modelId}</td>
                             <td className="text-center">{model.modelName}</td>
                             <td className="text-center">
-                                <input type="text" {...register(`rps${model.modelId}`)} onChange={e => {
-                                    onInputChange(e);
-                                    register(`rps${model.modelId}`).onChange(e).then(r => {
+                                <input type="text" {...form.register(`rps${model.modelId}`)} onChange={e => {
+                                    onInputChange();
+                                    form.register(`rps${model.modelId}`).onChange(e).then(r => {
                                     });
                                 }}/>
                             </td>
                             <td className="text-center">
-                                <input type="text" {...register(`requestsPerWeek${model.modelId}`)} onChange={e => {
-                                    onInputChange(e);
-                                    register(`requestsPerWeek${model.modelId}`).onChange(e).then(r => {
+                                <input type="text" {...form.register(`requestsPerWeek${model.modelId}`)} onChange={e => {
+                                    onInputChange();
+                                    form.register(`requestsPerWeek${model.modelId}`).onChange(e).then(r => {
                                     });
                                 }}/>
                             </td>

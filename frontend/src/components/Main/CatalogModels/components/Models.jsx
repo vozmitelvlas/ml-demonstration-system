@@ -5,8 +5,14 @@ import copyLogo from "../../../../assets/copy.svg";
 import editLogo from "../../../../assets/edit.svg";
 import deleteLogo from "../../../../assets/delete.svg";
 import React from "react";
+import {useSelector} from "react-redux";
+import {selectUserRoles} from "../../../../selectors/user-selector.js";
+import {selectModelVersions} from "../../../../selectors/model-selectors.js";
 
-export function Models({models, isAdminMode, onDeleteModelClick}){
+export function Models({onDeleteModelClick}){
+    const {isAdminMode} = useSelector(selectUserRoles)
+    const modelVersions = useSelector(selectModelVersions)
+
     return(
         <>
             <div className="catalog-models">
@@ -29,7 +35,7 @@ export function Models({models, isAdminMode, onDeleteModelClick}){
                     </tr>
                     </thead>
                     <tbody>
-                    {models.map(model => (
+                    {modelVersions.map(model => (
                         <tr key={`${model.modelId}${model.modelVersionId}`}
                             data-id={`${model.modelId} ${model.modelVersionId}`}>
 

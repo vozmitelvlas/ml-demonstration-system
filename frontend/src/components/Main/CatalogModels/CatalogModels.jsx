@@ -1,30 +1,40 @@
 import CatalogHeader from "../Headers/CatalogHeader/CatalogHeader.jsx";
-import acceptLogo from "../../../assets/accept.svg"
 import "../ModalWindow.css"
 import "../select.css"
 import React, {useEffect, useState} from "react";
 import Filter from "../Filter/Filter.jsx";
 import DeleteModal from "../../utils/DeleteModal.jsx";
-import apiClient from "../../utils/apiClient.jsx"
-import alarmLogo from "../../../assets/alarm.svg"
 import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx";
 import {useForm} from "react-hook-form";
 import {AddNewModelVersionModal, TopButtons, Models, AddNewModelModal} from "./components/index.js";
 import {yupResolver} from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import {useRequestGetRunTimes, useRequestGetProblemTypes} from "./hooks";
 import {NavigateButtons} from "../Buttons/NavigateButtons.jsx";
+import {useDispatch, useSelector} from "react-redux";
+import {selectUserRoles} from "../../../selectors/user-selector.js";
+import {getModelVersionsAsUserAction,} from "../../../actions/model-actions.js";
+import {
+    addModelAction, addModelVersionAction,
+    deleteModelAction, getFormatModelsAction, getModelVersionsAsAdminAction
+} from "../../../actions/admin-model-actions.js";
+import {logOutAction} from "../../../actions/auth-actions.js";
+import {sendEmailConfirmationWithToken} from "../../../actions/user-actions.js";
+import {selectMessageState} from "../../../selectors/message-selector.js";
+import {
+    resetMessageStateAction,
+    setAcceptMessageAction,
+    setRejectMessageAction
+} from "../../../actions/message-actions.js";
 
-export default function CatalogModels({isAdminMode, isConfirmed, setIsConfirmed}) {
+export default function CatalogModels({isConfirmed, setIsConfirmed}) {
+    const dispatch = useDispatch()
+    const {message, logo} = useSelector(selectMessageState)
+    const {isAdminMode} = useSelector(selectUserRoles)
     const [isOpen, setIsOpen] = useState(false)
     const [isDeletingModel, setIsDeletingModel] = useState(false)
     const [tmpModelId, setTmpModelId] = useState([])
-    const [alarm, setAlarm] = useState(null)
-    const [logo, setLogo] = useState(alarmLogo)
     const [isAddingModel, setIsAddingModel] = useState(false)
     const [isAddingVersion, setIsAddingVersion] = useState(false)
-    const [formatModels, setFormatModels] = useState([])
-    const [models, setModels] = useState([])
     const modelForm = useForm({
         resolver: yupResolver(yup.object()),
         defaultValues: {
@@ -45,135 +55,92 @@ export default function CatalogModels({isAdminMode, isConfirmed, setIsConfirmed}
         }
     })
 
-
     useEffect(() => {
+        let tokenFromUrl = ""
+
         async function fetchData() {
             const urlParams = new URLSearchParams(window.location.search)
-            const tokenFromUrl = urlParams.get('token')
+            tokenFromUrl = urlParams.get('token')
             if (tokenFromUrl && !isConfirmed) {
-                console.log(tokenFromUrl)
-                await apiClient(`/api/auth/logout`)
-                await apiClient('/api/users/profile/email/confirm', "POST", null, {
-                    Authorization: `Bearer ${tokenFromUrl}`
-                })
-                setAlarm("Адрес электронной почты подтвержден")
-                setLogo(acceptLogo)
+                await dispatch(logOutAction)
+                await dispatch(sendEmailConfirmationWithToken(tokenFromUrl))
+                dispatch(setAcceptMessageAction("Адрес электронной почты подтвержден"))
             }
             setIsConfirmed(true)
         }
 
         fetchData().then(r => {
         })
+        if (!tokenFromUrl)
+            dispatch(resetMessageStateAction)
     }, [])
 
     useEffect(() => {
         if (isConfirmed) {
-            const url = isAdminMode ? '/api/admin/models/versions' : '/api/models/versions'
-            apiClient(url).then((res => {
-                setModels(res)
-            })).catch((error) => {
-                console.log(error)
-            })
+            isAdminMode ? dispatch(getModelVersionsAsAdminAction) : dispatch(getModelVersionsAsUserAction)
         }
     }, [isAdminMode, isConfirmed])
 
+    const firstErrorKey1 = Object.keys(modelForm.formState.errors)[0]
+    const firstErrorKey2 = Object.keys(versionForm.formState.errors)[0]
     useEffect(() => {
-        if (isAddingVersion && isConfirmed) {
-            apiClient('/api/admin/models')
-                .then((res) => {
-                    setFormatModels(
-                        res.map((model) => ({
-                            value: model.modelId,
-                            label: model.name,
-                        }))
-                    )
-                })
-                .catch((error) => {
-                    console.log(error)
-                })
-        }
-    }, [isAddingVersion, isConfirmed])
-
-    const {runtimes} = useRequestGetRunTimes(isConfirmed)
-    const {problemTypes} = useRequestGetProblemTypes(isConfirmed)
-
-    const firstErrorKey1 = Object.keys(modelForm.formState.errors)[0];
-    useEffect(() => {
-        if (firstErrorKey1) {
-            setLogo(alarmLogo)
-            setAlarm(modelForm.formState.errors[firstErrorKey1].message)
-        }
-    }, [firstErrorKey1])
-    const firstErrorKey2 = Object.keys(versionForm.formState.errors)[0];
-    useEffect(() => {
+        if (firstErrorKey1)
+            dispatch(setRejectMessageAction(modelForm.formState.errors[firstErrorKey1].message))
         if (firstErrorKey2) {
-            setLogo(alarmLogo)
-            setAlarm(versionForm.formState.errors[firstErrorKey2].message)
+            dispatch(setRejectMessageAction(versionForm.formState.errors[firstErrorKey2].message))
         }
-    }, [firstErrorKey2])
+    }, [firstErrorKey1, firstErrorKey2])
 
-    const closeDeleteModal = () => {
-        setIsDeletingModel(false)
-    }
+    const closeDeleteModal = () => setIsDeletingModel(false)
     const onDeleteModelClick = (event) => {
         const tr = event.target.closest("tr")
         setTmpModelId(tr.dataset.id.split(" "))
         setIsDeletingModel(true)
-        setAlarm(null)
+        dispatch(resetMessageStateAction)
     }
     const onConfirmDeletingModel = async () => {
-        try {
-            await apiClient(`/api/admin/models/${tmpModelId[0]}/versions/${tmpModelId[1]}`, 'DELETE')
-            setModels(models.filter(model => model.modelVersionId !== Number(tmpModelId[1])))
-            setLogo(acceptLogo)
-            setAlarm("Модель успешно удалена")
-            setIsDeletingModel(false)
-        } catch (serverError) {
-            console.error(serverError)
+        const payload = {
+            modelId: tmpModelId[0],
+            versionId: tmpModelId[1]
         }
+        dispatch(deleteModelAction(payload)).then(() => {
+            setIsDeletingModel(false)
+            dispatch(getFormatModelsAction)
+            dispatch(setAcceptMessageAction("Модель успешно удалена"))
+        })
     }
-    const onConfirmAddingModel = async (newValue) => {
-        const formatValues = {
+    const onConfirmAddingModel = (newValue) => {
+        const payload = {
             ...newValue,
             problemType: newValue.problemType.value,
             runtime: newValue.runtime.value
         }
-
-        try {
-            const res = await apiClient(`/api/admin/models`, 'POST', formatValues)
-            setModels([...models, res])
-            setIsAddingModel(false)
+        dispatch(addModelAction(payload)).then(() => {
+            setIsAddingModel(!isAddingModel)
             modelForm.reset()
-            setAlarm("Модель успешно добавлена")
-            setLogo(acceptLogo)
-        } catch (error) {
-            if (error.status === 409) {
+            dispatch(setAcceptMessageAction("Модель успешно добавлена"))
+        }).catch(error => {
+            if (error.status === 409)
                 modelForm.setError('form', {type: 'server', message: error.detail})
-            } else if (error.status === 400) {
+            else if (error.status === 400)
                 modelForm.setError('form', {type: 'server', message: error.errors})
-            } else {
-                console.log(error)
-            }
-        }
+        })
     }
     const onConfirmAddingVersion = async (newValue) => {
-        try {
-            const {selectModel, ...formatValues} = newValue
-            const modelId = selectModel.value
-
-            const res = await apiClient(`/api/admin/models/${modelId}/versions`, 'POST', formatValues)
-
-            setModels([...models, res])
+        const {selectModel, ...formatValues} = newValue
+        const modelId = selectModel.value
+        const payload = {
+            modelId,
+            body: formatValues
+        }
+        dispatch(addModelVersionAction(payload)).then(() => {
             setIsAddingVersion(!isAddingVersion)
             versionForm.reset()
-            setAlarm("Версия успешно добавлена")
-            setLogo(acceptLogo)
-        } catch (error) {
+            dispatch(setAcceptMessageAction("Версия модели успешно добавлена"))
+        }).catch(error => {
             if (error.status === 409)
                 versionForm.setError('version', {type: 'server', message: error.detail})
-            else
-                console.log(error)
-        }
+        })
     }
 
     return (
@@ -196,54 +163,37 @@ export default function CatalogModels({isAdminMode, isConfirmed, setIsConfirmed}
                             options: ["Последние добавленные", "Давно добавленные"],
                             names: ["latestAdded", "oldestAdded"]
                         },
-                    }}></Filter>
+                    }}/>
             }
             <main>
-                <CatalogHeader title={"Каталог моделей"}
-                               searchFields={["Название модели", "Тип модели"]}></CatalogHeader>
+                <CatalogHeader title={"Каталог моделей"} searchFields={["Название модели", "Тип модели"]}/>
 
-                <TopButtons isAdminMode={isAdminMode} setIsAddingModel={setIsAddingModel}
-                                setIsAddingVersion={setIsAddingVersion} setAlarm={setAlarm}/>
+                <TopButtons setIsAddingModel={setIsAddingModel} setIsAddingVersion={setIsAddingVersion}/>
 
-                <AlarmMsg logo={logo}>{alarm}</AlarmMsg>
+                <AlarmMsg logo={logo}>{message}</AlarmMsg>
 
+                <Models onDeleteModelClick={onDeleteModelClick}/>
 
-                <Models isAdminMode={isAdminMode} models={models} onDeleteModelClick={onDeleteModelClick}/>
-
-                <NavigateButtons setIsOpen={setIsOpen} isAdminMode={isAdminMode}/>
+                <NavigateButtons setIsOpen={setIsOpen}/>
 
                 <AddNewModelModal
-                    runtimes={runtimes}
-                    problemTypes={problemTypes}
-                    logo={logo}
-                    alarm={alarm}
                     isAddingModel={isAddingModel}
                     onAdd={onConfirmAddingModel}
-                    onCancel={() => {
-                        setIsAddingModel(false)
-                        setAlarm(null)
-                    }}
                     form={modelForm}
-                ></AddNewModelModal>
+                    setIsAddingModel={setIsAddingModel}
+                    isConfirmed={isConfirmed}/>
 
                 <AddNewModelVersionModal
-                    logo={logo}
-                    alarm={alarm}
                     isAddingVersion={isAddingVersion}
+                    setIsAddingVersion={setIsAddingVersion}
                     onAdd={onConfirmAddingVersion}
-                    onCancel={() => {
-                        setIsAddingVersion(false)
-                        setAlarm(null)
-                    }}
                     form={versionForm}
-                    allModels={formatModels}
-                ></AddNewModelVersionModal>
+                    isConfirmed={isConfirmed}/>
 
                 <DeleteModal
                     open={isDeletingModel}
                     onNo={closeDeleteModal}
-                    onYes={onConfirmDeletingModel}>
-                </DeleteModal>
+                    onYes={onConfirmDeletingModel}/>
             </main>
         </>
     )

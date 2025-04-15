@@ -3,30 +3,44 @@ import Button from "../Buttons/Button.jsx";
 import React, {useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import styles from "./ModelData.module.css"
-import apiClient from "../../utils/apiClient.jsx";
+import {useDispatch, useSelector} from "react-redux";
+import {selectUserData, selectUserRoles} from "../../../selectors/user-selector.js";
+import {selectModelVersionData} from "../../../selectors/model-selectors.js";
+import {getModelVersionDataAsAdminAction} from "../../../actions/admin-model-actions.js";
+import {getModelResultAction, getModelVersionDataAsUserAction} from "../../../actions/model-actions.js";
+import {resetMessageStateAction, setRejectMessageAction} from "../../../actions/message-actions.js";
+import {selectMessageState} from "../../../selectors/message-selector.js";
+import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx";
 
 
-export default function ModelData({isAdmin}) {
+export default function ModelData() {
     const navigate = useNavigate()
+    const dispatch = useDispatch()
     const {modelId, versionId} = useParams()
+    const {userId} = useSelector(selectUserData)
+    const {isAdmin} = useSelector(selectUserRoles)
+    const {message, logo} = useSelector(selectMessageState)
+    const modelVersionData = useSelector(selectModelVersionData)
     const [activeBut, setActiveBut] = useState("first")
-    const [modelData, setModelData] = useState({})
 
     useEffect(() => {
-        apiClient(isAdmin ? `/api/admin/models/${modelId}/versions/${versionId}` : `/api/models/versions/${versionId}`).then(res => {
-            setModelData(res)
-        }).catch(error => {
-            console.log(error)
-        })
-
+        const payload = {modelId, versionId}
+        dispatch(resetMessageStateAction)
+        if (isAdmin)
+            dispatch(getModelVersionDataAsAdminAction(payload))
+        else
+            dispatch(getModelVersionDataAsUserAction(payload))
     }, [activeBut, isAdmin])
 
     const onTestRPSLimit = () => {
-        console.log("sending");
-        for (let i = 0; i < 6; i++) {
-            apiClient(`/api/users/${modelId}/user/${3}`);
-        }
-    };
+        const payload = {modelId, userId}
+        dispatch(getModelResultAction(payload)).catch(error => {
+            if (error.status === 429) {
+                console.log("asdasd", error)
+                dispatch(setRejectMessageAction(error.detail))
+            }
+        })
+    }
 
     return (
         <div className="change-container">
@@ -35,8 +49,9 @@ export default function ModelData({isAdmin}) {
                         setActiveBut={setActiveBut}
                         buttons={["ИНФОРМАЦИЯ", "ВИЗУАЛИЗАЦИЯ"]}
                         names={["first", "second"]}>
-                {modelData.modelName}
+                {modelVersionData.modelName}
             </DataHeader>
+            <AlarmMsg logo={logo}>{message}</AlarmMsg>
 
             {activeBut === "first" && (
                 <div className="change-content">
@@ -45,15 +60,15 @@ export default function ModelData({isAdmin}) {
                             <tbody>
                             <tr>
                                 <td>ID</td>
-                                <td className="text-center">{modelData.modelId}</td>
+                                <td className="text-center">{modelVersionData.modelId}</td>
                             </tr>
                             <tr>
                                 <td>Название</td>
-                                <td className="text-center">{modelData.modelName}</td>
+                                <td className="text-center">{modelVersionData.modelName}</td>
                             </tr>
                             <tr>
                                 <td>Версия</td>
-                                <td className="text-center">{modelData.versionName}</td>
+                                <td className="text-center">{modelVersionData.versionName}</td>
                             </tr>
                             <tr>
                                 <td>Статус</td>
@@ -61,20 +76,20 @@ export default function ModelData({isAdmin}) {
                             </tr>
                             <tr>
                                 <td>RunTime</td>
-                                <td className="text-center">{modelData.runtime?.value}</td>
+                                <td className="text-center">{modelVersionData.runtime?.value}</td>
                             </tr>
                             <tr>
                                 <td>Тип задачи</td>
-                                <td className="text-center">{modelData.problemType?.value}</td>
+                                <td className="text-center">{modelVersionData.problemType?.value}</td>
                             </tr>
                             <tr>
                                 <td>URI модели</td>
-                                <td className="text-center">{modelData.uri}</td>
+                                <td className="text-center">{modelVersionData.uri}</td>
                             </tr>
                             <tr>
                                 <td>Описание</td>
                                 <td>
-                                    <textarea value={modelData.description} disabled></textarea>
+                                    <textarea value={modelVersionData.description} disabled></textarea>
                                 </td>
                             </tr>
                             </tbody>
@@ -90,7 +105,7 @@ export default function ModelData({isAdmin}) {
 
             {activeBut === "second" && (
                 <div className="change-content">
-                    <div className="to-center">
+                    <div className="download">
                         <div className={styles.upload}>
                             <div className={styles.uploadContainer}>
                                 <i className="fa fa-cloud-upload"></i>

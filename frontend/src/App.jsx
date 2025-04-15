@@ -15,64 +15,46 @@ import ModelData from "./components/Main/ModelData/ModelData.jsx";
 import SignUp from "./components/Main/SignInUp/SignUp/SignUp.jsx";
 import PasswordRecover from "./components/Main/PasswordRecover/PasswordRecover.jsx";
 import MyOrganisations from "./components/Main/MyOrganisations/MyOrganisations.jsx";
-import apiClient from "./components/utils/apiClient.jsx";
 import PasswordReset from "./components/Main/PasswordRecover/PasswordReset.jsx";
+import {useDispatch, useSelector} from "react-redux";
+import {getUserProfileAction} from "./actions/user-actions.js";
+import {selectUserData, selectUserRoles} from "./selectors/user-selector.js";
 
 
 function App() {
     const location = useLocation()
-    const [isAdminMode, setIsAdminMode] = useState(false)
     const excludedPaths = ['/', '/signup', '/password', "/password-reset"]
-    const [isAdmin, setIsAdmin] = useState(false)
-    const [isMainOrg, setMainOrg] = useState(false)
-    const [userData, setUserData] = useState(null)
     const [isConfirmed, setIsConfirmed] = useState(false)
+    const dispatch = useDispatch()
+    const {isAdminMode} = useSelector(selectUserRoles)
+    const user = useSelector(selectUserData)
 
     useEffect(() => {
-        if (userData === null && !excludedPaths.includes(location.pathname)) {
-            apiClient(`/api/users/profile`)
-                .then((res) => {
-                    setUserData(res)
-                    setIsAdmin(res.roles.includes("ADMIN"))
-                    setMainOrg(res.roles.includes("ORGANIZATION_HEAD"))
-                    setIsAdminMode(JSON.parse(sessionStorage.getItem("isAdminMode")))
-                })
-                .catch(error => {
-                    console.error(error)
-                })
-        }
+        if (user.userId === undefined && !excludedPaths.includes(location.pathname))
+            dispatch(getUserProfileAction)
     }, [])
 
     return (
         <div className={isAdminMode ? styles.adminMain : styles.main}>
             {
                 !excludedPaths.includes(location.pathname) &&
-                <Header
-                    login={userData?.login}
-                    isMainOrg={isMainOrg}
-                    isAdmin={isAdmin}
-                    isAdminMode={isAdminMode}
-                    setIsAdminMode={setIsAdminMode}
-                    orgId={userData?.organization?.organizationId}
-                />
+                <Header/>
             }
             <div className={styles.mainContent}>
                 <Routes>
-                    <Route path="/"
-                           element={<SignIn setUserData={setUserData} setIsAdmin={setIsAdmin} setMainOrg={setMainOrg}
-                                            setIsAdminMode={setIsAdminMode}/>}/>
-                    <Route path="/signup"
-                           element={<SignUp setUserData={setUserData} setIsConfirmed={setIsConfirmed}/>}/>
+                    <Route path="/" element={<SignIn/>}/>
+                    <Route path="/signup" element={<SignUp setIsConfirmed={setIsConfirmed}/>}/>
                     <Route path="/password" element={<PasswordRecover/>}/>
                     <Route path="/password-reset" element={<PasswordReset/>}/>
 
-                    <Route path="/profile" element={<PersonalCabinet userData={userData} setUserData={setUserData}/>}/>
+                    <Route path="/profile" element={<PersonalCabinet/>}/>
                     <Route path="/models"
                            element={<CatalogModels isAdminMode={isAdminMode} setIsConfirmed={setIsConfirmed}
                                                    isConfirmed={isConfirmed}/>}/>
 
-                    <Route path="/models/:modelId/versions/:versionId/edit" element={<ChangeModel isConfirmed={isConfirmed}/>}/>
-                    <Route path="/models/:modelId/versions/:versionId/data" element={<ModelData isAdmin={isAdmin}/>}/>
+                    <Route path="/models/:modelId/versions/:versionId/edit"
+                           element={<ChangeModel isConfirmed={isConfirmed}/>}/>
+                    <Route path="/models/:modelId/versions/:versionId/data" element={<ModelData/>}/>
 
                     <Route path="/users" element={<CatalogUsers/>}/>
                     <Route path="/users/:userId/edit" element={<ChangeUser/>}/>

@@ -4,11 +4,16 @@ import {useNavigate} from "react-router-dom";
 import {Controller} from "react-hook-form";
 import Select from "react-select";
 import {customStyle} from "../../../utils/selectStyles.jsx";
+import {useSelector} from "react-redux";
+import {selectProblemTypes, selectRunTimes} from "../../../../selectors/model-selectors.js";
 
-export function ChangeModelInfo({runtimes, problemTypes, form, submitFunction, displayData, onChangeName, onBlurName}) {
+export function ChangeModelInfo({form, submitFunction, onChangeName, onBlurName}) {
     const navigate = useNavigate()
     const [runTimeStyle, setRunTimeStyle] = useState(customStyle)
     const [problemStyle, setProblemStyle] = useState(customStyle)
+
+    const problemTypes = useSelector(selectProblemTypes)
+    const runtimes = useSelector(selectRunTimes)
 
     return (
         <>
@@ -19,13 +24,13 @@ export function ChangeModelInfo({runtimes, problemTypes, form, submitFunction, d
                         <tr>
                             <td>ID</td>
                             <td className="text-center">
-                                <input type="text" value={displayData.modelId} disabled/>
+                                <input type="text" {...form.register("modelId")} disabled/>
                             </td>
                         </tr>
                         <tr>
                             <td>Статус</td>
                             <td className="text-center">
-                                <input type="text" value={displayData.status} disabled/>
+                                <input type="text" {...form.register("status")} disabled/>
                             </td>
                         </tr>
                         <tr>

@@ -4,105 +4,86 @@ import Button from "../Buttons/Button.jsx";
 import user_logo from "../../../assets/user2.svg";
 import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
-import {personalCabinetSchema} from "../../store/formSchema.jsx";
-import apiClient from "../../utils/apiClient.jsx";
-import {SetNewPasswordModal, EditUserDataModal} from "./components/index.js";
+import {personalCabinetSchema, setNewPasswordSchema} from "../../store/formSchema.jsx";
+import {SetNewPasswordModal, EditUserDataModal, UserData} from "./components";
 import DeleteModal from "../../utils/DeleteModal.jsx";
 import {useNavigate} from "react-router-dom";
-import alarmLogo from "../../../assets/alarm.svg";
-import acceptLogo from "../../../assets/accept.svg"
-import {AlarmMsg} from "../AlarmMsg/AlarmMsg.jsx";
+import {useDispatch, useSelector} from "react-redux";
+import {selectUserData} from "../../../selectors/user-selector.js";
+import {deleteUserAsUserAction, getUserProfileAction, updateUserDataAsUserAction} from "../../../actions/user-actions.js";
+import {
+    resetMessageStateAction,
+    setAcceptMessageAction,
+    setRejectMessageAction
+} from "../../../actions/message-actions.js";
 
-export default function PersonalCabinet({userData, setUserData}) {
+const passwordFormData = {
+    oldPassword: "",
+    newPassword: "",
+    repeatNewPassword: ""
+}
+const userFormData = (userData) => ({
+    login: userData.login,
+    email: userData.email,
+    lastName: userData.lastName,
+    firstName: userData.firstName,
+    patronymic: userData.patronymic,
+    description: userData.description,
+})
+
+export default function PersonalCabinet() {
     const navigate = useNavigate()
-    const [isEditing, setIsEditing] = useState(false);
+    const dispatch = useDispatch()
+    const userData = useSelector(selectUserData)
+    const [isEditing, setIsEditing] = useState(false)
     const [passwordChanging, setPasswordChanging] = useState(false)
     const [isDeletingProfile, setIsDeletingProfile] = useState(false)
-    const [alarm, setAlarm] = useState(null)
-    const [logo, setLogo] = useState(alarmLogo)
-
-    const dataForEdit = {
-        login: userData?.login,
-        email: userData?.email,
-        lastName: userData?.lastName,
-        firstName: userData?.firstName,
-        patronymic: userData?.patronymic,
-        description: userData?.description,
-    }
-
-    const {
-        register,
-        handleSubmit,
-        formState: {errors},
-        reset,
-    } = useForm({
-        resolver: yupResolver(personalCabinetSchema),
-        defaultValues: dataForEdit
+    const userForm = useForm({
+        resolver: yupResolver(personalCabinetSchema)
+    })
+    const passwordForm = useForm({
+        resolver: yupResolver(setNewPasswordSchema)
     })
 
     useEffect(() => {
-        const firstErrorKey = Object.keys(errors)[0];
+        dispatch(getUserProfileAction)
+        dispatch(resetMessageStateAction)
+
+        const firstErrorKey = Object.keys(userForm.formState.errors)[0];
         if (firstErrorKey) {
-            setLogo(alarmLogo)
-            setAlarm(errors[firstErrorKey].message)
+            dispatch(setRejectMessageAction(userForm.formState.errors[firstErrorKey].message))
         }
-    }, [errors]);
+    }, [userForm.formState.errors])
 
     const openCloseDeleteModal = () => {
-        setAlarm(null)
+        dispatch(resetMessageStateAction)
         setIsDeletingProfile(!isDeletingProfile)
     }
 
     const openClosePasswordModal = () => {
-        setAlarm(null)
+        if(!passwordChanging)
+            passwordForm.reset(passwordFormData)
+        dispatch(resetMessageStateAction)
         setPasswordChanging(!passwordChanging)
     }
 
     const openCloseEditModal = () => {
-        reset(dataForEdit)
-        setAlarm(null)
+        if (!isEditing)
+            userForm.reset(userFormData(userData))
+        dispatch(resetMessageStateAction)
         setIsEditing(!isEditing)
     }
-    useEffect(() => {
-        if (!userData) {
-            apiClient(`/api/users/profile`).then((res) => {
-                setUserData(res)
-                reset({
-                    login: res.login,
-                    email: res.email,
-                    lastName: res.lastName,
-                    firstName: res.firstName,
-                    patronymic: res.patronymic,
-                    description: res.description
-                })
-            }).catch(error => {
-                console.error(error)
-            })
-        }
-    }, []);
 
-    const onSaveUserData = async (newUserData) => {
-        try {
-            const res = await apiClient(`/api/users/profile`, 'PUT', {
-                ...newUserData,
-                roles: userData.roles
-            })
-            setUserData(res)
+    const onSaveUserData = (newUserData) => {
+        dispatch(updateUserDataAsUserAction(newUserData)).then(() => {
             setIsEditing(!isEditing)
-
-            setLogo(acceptLogo)
-            setAlarm("Изменения успешно сохранены")
-        } catch (error) {
-            console.log(error)
-        }
+            dispatch(setAcceptMessageAction("Изменения успешно сохранены"))
+        })
     }
-    const onConfirmDeleteProfile = async () => {
-        try {
-            await apiClient(`/api/users/profile`, 'DELETE')
+    const onConfirmDeleteProfile = () => {
+        dispatch(deleteUserAsUserAction()).then(() =>
             navigate("/")
-        } catch (error) {
-            console.log(error)
-        }
+        )
     }
 
     return (
@@ -114,69 +95,24 @@ export default function PersonalCabinet({userData, setUserData}) {
                 <Button onClick={openCloseDeleteModal}>Удалить профиль</Button>
             </div>
 
-            <div className={styles.userData}>
-                <AlarmMsg logo={logo}>{alarm}</AlarmMsg>
-                <table className={styles.table}>
-                    <tbody>
-                    <tr>
-                        <td>Логин</td>
-                        <td>{userData?.login}</td>
-                    </tr>
-                    <tr>
-                        <td>Фамилия</td>
-                        <td>{userData?.lastName}</td>
-                    </tr>
-                    <tr>
-                        <td>Имя</td>
-                        <td>{userData?.firstName}</td>
-                    </tr>
-                    <tr>
-                        <td>Отчество</td>
-                        <td>{userData?.patronymic}</td>
-                    </tr>
-                    <tr>
-                        <td>E-mail</td>
-                        <td>{userData?.email}</td>
-                    </tr>
-
-                    <tr>
-                        <td>Описание</td>
-                        <td>
-                            <textarea
-                                id={styles.description}
-                                value={userData?.description ? userData?.description : ""}
-                                disabled
-                            ></textarea>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
+            <UserData />
 
             <EditUserDataModal
                 isEditing={isEditing}
                 submitFunction={onSaveUserData}
-                handleSubmit={handleSubmit}
+                handleSubmit={userForm.handleSubmit}
                 onCancel={openCloseEditModal}
-                register={register}
-                logo={logo}
-                alarm={alarm}
-            ></EditUserDataModal>
+                register={userForm.register}/>
 
             <SetNewPasswordModal
                 passwordChanging={passwordChanging}
                 setPasswordChanging={setPasswordChanging}
-                setLogo={setLogo}
-                setAlarm={setAlarm}
-                logo={logo}
-                alarm={alarm}
-            ></SetNewPasswordModal>
+                passwordForm={passwordForm}/>
 
             <DeleteModal
                 open={isDeletingProfile}
                 onNo={openCloseDeleteModal}
-                onYes={onConfirmDeleteProfile}>
-            </DeleteModal>
+                onYes={onConfirmDeleteProfile}/>
         </div>
     );
 };
