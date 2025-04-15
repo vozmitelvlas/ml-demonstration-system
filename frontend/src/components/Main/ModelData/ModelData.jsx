@@ -36,7 +36,6 @@ export default function ModelData() {
         const payload = {modelId, userId}
         dispatch(getModelResultAction(payload)).catch(error => {
             if (error.status === 429) {
-                console.log("asdasd", error)
                 dispatch(setRejectMessageAction(error.detail))
             }
         })

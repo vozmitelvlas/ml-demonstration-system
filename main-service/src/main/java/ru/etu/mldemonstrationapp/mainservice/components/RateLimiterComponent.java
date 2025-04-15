@@ -33,31 +33,21 @@ public class RateLimiterComponent {
     }
 
     public boolean tryAcquire(Long userId, Long modelId) {
-        long timestamp = System.currentTimeMillis();
-        System.out.println("Request received at: " + timestamp);
-        var responses = adminUserService.getAllUserLimits(userId);
-        ModelUserLimitResponse modelUserLimitResponse = responses.stream()
-                .filter(lim -> lim.modelId().equals(modelId))
-                .findFirst()
-                .orElse(null);
+        Map<String, Integer> limits = adminUserService.getLimitsByType(userId, modelId);
+        System.out.println("Requests Per Week: " + limits.get("requestsPerWeek"));
 
-        if (modelUserLimitResponse != null) {
-            int currentRps = modelUserLimitResponse.limit().getRps();
-            System.out.println("rps - " + currentRps);
-            UserModalCompositeKey key = new UserModalCompositeKey(userId, modelId);
-            BucketConfig config = bucketConfigs.compute(key, (k, existingConfig) -> {
-                if (existingConfig == null || existingConfig.rps != currentRps) {
-                    Bucket newBucket = createBucket(currentRps);
-                    return new BucketConfig(currentRps, newBucket);
-                }
-                return existingConfig;
-            });
+        int currentRps = limits.get("rps");
+        UserModalCompositeKey key = new UserModalCompositeKey(userId, modelId);
+        BucketConfig config = bucketConfigs.compute(key, (k, existingConfig) -> {
+            if (existingConfig == null || existingConfig.rps != currentRps) {
+                Bucket newBucket = createBucket(currentRps);
+                return new BucketConfig(currentRps, newBucket);
+            }
+            return existingConfig;
+        });
 
-            boolean result = config.bucket.tryConsume(1);
-            System.out.println("Try acquire for user: " + userId + ", model: " + modelId + ": " + result);
-            return result;
-        }
-        return true;
+        boolean result = config.bucket.tryConsume(1);
+        return result;
     }
 
     private Bucket createBucket(int rps) {

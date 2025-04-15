@@ -9,6 +9,7 @@ import ru.etu.mldemonstrationapp.mainservice.entity.ModelUserLimit;
 import ru.etu.mldemonstrationapp.mainservice.entity.User;
 
 import java.util.List;
+import java.util.Map;
 
 public interface AdminUserService {
     List<User> getUsers();
@@ -31,4 +32,13 @@ public interface AdminUserService {
 
     @Transactional
     void setAccessRight(Long userId, Boolean isActive);
+
+    Map<String, Integer> getUserLimits(Long userId, Long modelId);
+
+    Map<String, Integer> getLimitsByType(Long userId, Long modelId);
+
+    Map<String, Integer> getModelLimits(Long modelId);
+
+    Map<String, Integer> getOrganizationLimits(Long userId, Long modelId);
+
 }

@@ -27,6 +27,8 @@ import ru.etu.mldemonstrationapp.mainservice.service.AdminUserService;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -180,5 +182,78 @@ public class AdminUserServiceImpl implements AdminUserService {
         );
         user.setActive(isActive);
         userRepository.save(user);
+    }
+
+
+
+    @Override
+    public Map<String, Integer> getLimitsByType(Long userId, Long modelId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with id %s not found".formatted(userId)));
+
+        String limitsType = String.valueOf(user.getOrganization().getLimitsType());
+
+        return switch (limitsType) {
+            case "MODEL_LIMITS" -> getModelLimits(modelId);
+            case "USER_LIMITS" -> getUserLimits(userId, modelId);
+            case "ORGANIZATION_LIMITS" -> getOrganizationLimits(userId, modelId);
+            default -> throw new IllegalArgumentException("Unknown limits type: " + limitsType);
+        };
+    }
+
+    @Override
+    public Map<String, Integer> getUserLimits(Long userId, Long modelId) {
+        Optional<ModelUserLimit> optionalLimit = limitRepository.findByUserIdAndModelId(userId, modelId);
+
+        if (optionalLimit.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No limits found for userId: " + userId + " and modelId: " + modelId);
+        }
+
+        ModelUserLimit limit = optionalLimit.get();
+        return Map.of(
+                "rps", limit.getRps(),
+                "requestsPerWeek", limit.getRequestsPerWeek()
+        );
+    }
+
+    @Override
+    public Map<String, Integer> getModelLimits(Long modelId) {
+        Optional<Model> modelOptional = modelRepository.findById(modelId);
+
+        if (modelOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Model with ID " + modelId + " not found.");
+        }
+
+        Model model = modelOptional.get();
+        Limit limit = model.getLimit();
+
+        if (limit == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No limits found for model with ID " + modelId);
+        }
+
+        return Map.of(
+                "rps", limit.getRps(),
+                "requestsPerWeek", limit.getRequestsPerWeek()
+        );
+    }
+
+    @Override
+    public Map<String, Integer> getOrganizationLimits(Long userId, Long modelId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with id %s not found".formatted(userId)));
+
+        Long organizationId = user.getOrganization().getOrganizationId();
+
+        Optional<ModelOrganizationLimit> optionalLimit = limitRepository.findByOrganizationIdAndModelId(organizationId, modelId);
+
+        if (optionalLimit.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No limits found for organizationId: " + organizationId + " and modelId: " + modelId);
+        }
+
+        ModelOrganizationLimit limit = optionalLimit.get();
+        return Map.of(
+                "rps", limit.getRps(),
+                "requestsPerWeek", limit.getRequestsPerWeek()
+        );
     }
 }
