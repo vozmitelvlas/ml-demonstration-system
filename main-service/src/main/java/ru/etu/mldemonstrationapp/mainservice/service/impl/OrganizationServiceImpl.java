@@ -10,6 +10,7 @@ import ru.etu.mldemonstrationapp.mainservice.dto.UpdateOrganizationRequest;
 import ru.etu.mldemonstrationapp.mainservice.entity.*;
 import ru.etu.mldemonstrationapp.mainservice.repository.*;
 import ru.etu.mldemonstrationapp.mainservice.service.OrganizationService;
+import ru.etu.mldemonstrationapp.mainservice.service.UserService;
 
 import java.time.Instant;
 import java.util.Collections;
@@ -28,6 +29,10 @@ public class OrganizationServiceImpl implements OrganizationService {
     private ModelRepository modelRepository;
     @Autowired
     private UserRpwRepository userRpwRepository;
+    @Autowired
+    private UserRpwServiceImpl userRpwService;
+    @Autowired
+    private UserService userService;
 
     @Override
     public Organization getOrganization(Long id) {
@@ -128,27 +133,12 @@ public class OrganizationServiceImpl implements OrganizationService {
         limit.setOrganization(organization);
         limit.setModel(model);
 
+        ModelOrganizationLimit modelOrganizationLimit = limitRepository.save(limit);
 
+        userService.createAndSaveUserLimits(organization, modelOrganizationLimit);
+        userRpwService.createAndSaveRpwForOrgMembers(organization, model);
 
-        for (User user : organization.getMembers()) {
-            // Create new user limits due to changing of available models list
-            ModelUserLimit newLimit = new ModelUserLimit();
-            newLimit.setUser(user);
-            newLimit.setModel(model);
-            newLimit.setRps(model.getLimit().getRps());
-            newLimit.setRequestsPerWeek(model.getLimit().getRequestsPerWeek());
-
-            limitRepository.save(newLimit);
-
-            // Create row in user_rpw
-            UserRpw userRpw = new UserRpw();
-            userRpw.setUser(user);
-            userRpw.setModel(model);
-            userRpw.setCurrentRequests(0);
-            userRpwRepository.save(userRpw);
-        }
-
-        return limitRepository.save(limit);
+        return modelOrganizationLimit;
     }
 
     @Transactional
@@ -178,7 +168,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
         limitRepository.deleteAllByIdInBatch((Stream.concat(organizationModelLimits, userModelLimits).toList()));
 
-        List<UserRpw> userRpwToDelete = userRpwRepository.findByOrganizationAndModel(organizationId, modelId);
+        List<UserRpw> userRpwToDelete = userRpwRepository.findAllByOrganizationAndModel(organizationId, modelId);
         userRpwRepository.deleteAllInBatch(userRpwToDelete);
 
         organizationRepository.save(organization);

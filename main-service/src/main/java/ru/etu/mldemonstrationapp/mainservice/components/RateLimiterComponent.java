@@ -5,6 +5,7 @@ import io.github.bucket4j.Bucket;
 import io.github.bucket4j.Refill;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.etu.mldemonstrationapp.mainservice.entity.Limit;
 import ru.etu.mldemonstrationapp.mainservice.entity.UserRpw;
 import ru.etu.mldemonstrationapp.mainservice.repository.UserRpwRepository;
 import ru.etu.mldemonstrationapp.mainservice.utils.UserModalCompositeKey;
@@ -30,11 +31,11 @@ public class RateLimiterComponent {
         }
     }
 
-    public boolean checkRpwLimit(Map<String, Integer> limits, Long userId, Long modelId){
+    public boolean checkRpwLimit(Limit limits, Long userId, Long modelId){
         Optional<UserRpw> userRpwOptional = userRpwRepository.findByUserUserIdAndModelModelId(userId, modelId);
         if(userRpwOptional.isPresent()){
             UserRpw userRpw = userRpwOptional.get();
-            if (userRpwOptional.get().getCurrentRequests() < limits.get("requestsPerWeek")){
+            if (userRpwOptional.get().getCurrentRequests() < limits.getRequestsPerWeek()){
                 userRpw.setCurrentRequests(userRpw.getCurrentRequests() + 1);
 
                 userRpwRepository.save(userRpw);
@@ -44,8 +45,8 @@ public class RateLimiterComponent {
         return false;
     }
 
-    public boolean checkRpsLimit(Map<String, Integer> limits, Long userId, Long modelId) {
-        int currentRps = limits.get("rps");
+    public boolean checkRpsLimit(Limit limits, Long userId, Long modelId) {
+        int currentRps = limits.getRps();
         UserModalCompositeKey key = new UserModalCompositeKey(userId, modelId);
         BucketConfig config = bucketConfigs.compute(key, (k, existingConfig) -> {
             if (existingConfig == null || existingConfig.rps != currentRps) {

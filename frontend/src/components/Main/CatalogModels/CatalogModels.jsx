@@ -18,7 +18,7 @@ import {
     deleteModelAction, getFormatModelsAction, getModelVersionsAsAdminAction
 } from "../../../actions/admin-model-actions.js";
 import {logOutAction} from "../../../actions/auth-actions.js";
-import {sendEmailConfirmationWithToken} from "../../../actions/user-actions.js";
+import {getUserProfileAction, sendEmailConfirmationWithToken} from "../../../actions/user-actions.js";
 import {selectMessageState} from "../../../selectors/message-selector.js";
 import {
     resetMessageStateAction,
@@ -64,6 +64,7 @@ export default function CatalogModels({isConfirmed, setIsConfirmed}) {
             if (tokenFromUrl && !isConfirmed) {
                 await dispatch(logOutAction)
                 await dispatch(sendEmailConfirmationWithToken(tokenFromUrl))
+                await dispatch(getUserProfileAction)
                 dispatch(setAcceptMessageAction("Адрес электронной почты подтвержден"))
             }
             setIsConfirmed(true)

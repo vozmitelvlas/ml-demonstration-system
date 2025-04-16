@@ -3,12 +3,12 @@ import React from "react";
 import {useNavigate} from "react-router-dom";
 
 
-export function ChangeOrganisationInfo({submitFunction, form}) {
+export function ChangeOrganisationInfo({submitFunction, form, onInputFocus}) {
     const navigate = useNavigate()
     const toOrgs = () => navigate("/organisations")
 
     return (
-        <form onSubmit={form.handleSubmit(submitFunction)} className="change-content">
+        <form onSubmit={form.handleSubmit(submitFunction)} className="change-content" onFocus={onInputFocus}>
             <div>
                 <table className="change-container__table naked-input data-input">
                     <tbody>

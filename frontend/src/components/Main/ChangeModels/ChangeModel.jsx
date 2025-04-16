@@ -82,6 +82,10 @@ export default function ChangeModel() {
             dispatch(setAcceptMessageAction("Лимиты успешно сохранены"))
         )
     }
+    const onInputFocus = (event) => {
+        if (event.target.tagName === "INPUT")
+            dispatch(resetMessageStateAction)
+    }
 
     return (
         <div className="change-container">
@@ -101,11 +105,12 @@ export default function ChangeModel() {
                     onBlurName={onBlurName}
                     form={infoForm}
                     submitFunction={onSaveModelData}
+                    onInputFocus={onInputFocus}
                 />
             )}
 
             {activeBut === "second" && (
-                <ChangeModelLimit form={limitForm} submitFunction={onSaveModelLimit}/>
+                <ChangeModelLimit form={limitForm} submitFunction={onSaveModelLimit} onInputFocus={onInputFocus}/>
             )}
         </div>
     )

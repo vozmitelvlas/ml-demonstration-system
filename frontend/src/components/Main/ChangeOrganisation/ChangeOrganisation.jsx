@@ -155,6 +155,11 @@ export default function ChangeOrganisation() {
         dispatch(setAcceptMessageAction("Изменения сохранены"))
     }
 
+    const onInputFocus = (event) => {
+        if (event.target.tagName === "INPUT")
+            dispatch(resetMessageStateAction)
+    }
+
     return (
         <div className="change-container">
             <DataHeader
@@ -168,7 +173,7 @@ export default function ChangeOrganisation() {
             <AlarmMsg logo={logo}>{message}</AlarmMsg>
 
             {activeBut === "first" && (
-                <ChangeOrganisationInfo form={firstForm} submitFunction={onSaveOrgData}/>
+                <ChangeOrganisationInfo form={firstForm} submitFunction={onSaveOrgData} onInputFocus={onInputFocus}/>
             )}
 
             {activeBut === "second" && (
@@ -178,7 +183,9 @@ export default function ChangeOrganisation() {
                     submitFunction={onSaveModelLimits}
                     limitOptions={limitOptions}
                     onSelectModels={onSelectModels}
-                    onSelectLimit={onSelectLimit}/>
+                    onSelectLimit={onSelectLimit}
+                    onInputFocus={onInputFocus}
+                />
             )}
         </div>
     )

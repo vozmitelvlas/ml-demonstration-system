@@ -12,8 +12,8 @@ import java.util.Optional;
 
 public interface UserRpwRepository extends JpaRepository<UserRpw, Long> {
 
-    @Modifying
-    @Query("DELETE FROM UserRpw ur WHERE ur.user = :user")
+
+
     void deleteAllByUser(@Param("user") User user);
     @Query("""
             SELECT ur FROM UserRpw ur
@@ -22,7 +22,7 @@ public interface UserRpwRepository extends JpaRepository<UserRpw, Long> {
             WHERE u.organization.organizationId = :organizationId
               AND m.modelId = :modelId
             """)
-    List<UserRpw> findByOrganizationAndModel(@Param("organizationId") Long organizationId, @Param("modelId") Long modelId);
+    List<UserRpw> findAllByOrganizationAndModel(@Param("organizationId") Long organizationId, @Param("modelId") Long modelId);
 
     Optional<UserRpw> findByUserUserIdAndModelModelId(Long userId, Long modelId);
 

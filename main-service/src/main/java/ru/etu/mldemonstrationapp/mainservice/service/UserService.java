@@ -4,7 +4,9 @@ import jakarta.transaction.Transactional;
 import ru.etu.mldemonstrationapp.mainservice.dto.UpdatePasswordRequest;
 import ru.etu.mldemonstrationapp.mainservice.dto.UpdateProfileRequest;
 import ru.etu.mldemonstrationapp.mainservice.dto.UserRegistrationRequest;
-import ru.etu.mldemonstrationapp.mainservice.entity.User;
+import ru.etu.mldemonstrationapp.mainservice.entity.*;
+
+import java.util.List;
 
 public interface UserService {
     User getUserById(Long id);
@@ -28,4 +30,10 @@ public interface UserService {
 
     @Transactional
     void setUserEmailConfirm(Long id);
+
+    @Transactional
+    List<ModelUserLimit> createAndSaveUserLimits(Organization organization, ModelOrganizationLimit limit);
+
+    @Transactional
+    List<ModelUserLimit> createAndSaveUserLimits(User user, List<Model> models);
 }

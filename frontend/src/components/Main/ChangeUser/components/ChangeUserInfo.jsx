@@ -4,10 +4,12 @@ import Button from "../../Buttons/Button.jsx";
 import React, {useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {customStyle, setFirstMultiBackColor, setSecondMultiBackColor} from "../../../utils/selectStyles.jsx";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {selectFormatOgs} from "../../../../selectors/org-selector.js";
+import {resetMessageStateAction} from "../../../../actions/message-actions.js";
 
-export function ChangeUserInfo({submitFunction, form, rolesOptions}) {
+export function ChangeUserInfo({submitFunction, form, rolesOptions, onInputFocus}) {
+    const dispatch = useDispatch()
     const navigate = useNavigate()
     const [orgSelectStyle, setOrgSelectStyle] = useState(customStyle)
     const [rolesSelectStyle, setRolesSelectStyle] = useState(customStyle)
@@ -15,7 +17,7 @@ export function ChangeUserInfo({submitFunction, form, rolesOptions}) {
     const toUsers = () => navigate("/users")
 
     return (
-        <form onSubmit={form.handleSubmit(submitFunction)} className="change-content">
+        <form onSubmit={form.handleSubmit(submitFunction)} className="change-content" onFocus={onInputFocus}>
             <div>
                 <table className="change-container__table naked-input data-input">
                     <tbody>

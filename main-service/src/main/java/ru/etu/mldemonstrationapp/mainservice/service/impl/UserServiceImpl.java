@@ -11,17 +11,18 @@ import org.springframework.web.server.ResponseStatusException;
 import ru.etu.mldemonstrationapp.mainservice.dto.UpdatePasswordRequest;
 import ru.etu.mldemonstrationapp.mainservice.dto.UpdateProfileRequest;
 import ru.etu.mldemonstrationapp.mainservice.dto.UserRegistrationRequest;
-import ru.etu.mldemonstrationapp.mainservice.entity.Organization;
-import ru.etu.mldemonstrationapp.mainservice.entity.Role;
-import ru.etu.mldemonstrationapp.mainservice.entity.User;
+import ru.etu.mldemonstrationapp.mainservice.entity.*;
+import ru.etu.mldemonstrationapp.mainservice.repository.LimitRepository;
+import ru.etu.mldemonstrationapp.mainservice.repository.ModelRepository;
 import ru.etu.mldemonstrationapp.mainservice.repository.OrganizationRepository;
 import ru.etu.mldemonstrationapp.mainservice.repository.UserRepository;
-import ru.etu.mldemonstrationapp.mainservice.service.JwtService;
 import ru.etu.mldemonstrationapp.mainservice.service.UserService;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,6 +33,8 @@ public class UserServiceImpl implements UserService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private OrganizationRepository organizationRepository;
+    @Autowired
+    private LimitRepository limitRepository;
 
     @Override
     public User getUserById(Long id) {
@@ -131,10 +134,51 @@ public class UserServiceImpl implements UserService {
         user.setEmailConfirm(true);
         userRepository.save(user);
     }
+
     @Transactional
     @Scheduled(fixedDelay = 1, timeUnit = TimeUnit.HOURS)
-    public void deleteUnconfirmedUsers(){
+    public void deleteUnconfirmedUsers() {
         userRepository.deleteAllByEmailConfirm(false);
     }
 
+    @Transactional
+    @Override
+    public List<ModelUserLimit> createAndSaveUserLimits(Organization organization, ModelOrganizationLimit limit) {
+        List<ModelUserLimit> newUserLimits = organization.getMembers().stream()
+                .map(user ->  {
+                    ModelUserLimit userLimit = new ModelUserLimit();
+                    userLimit.setUser(user);
+                    userLimit.setModel(limit.getModel());
+                    userLimit.setRps(limit.getRps());
+                    userLimit.setRequestsPerWeek(limit.getRequestsPerWeek());
+                    return userLimit;
+                })
+                .toList();
+        return limitRepository.saveAll(newUserLimits);
+    }
+
+    @Transactional
+    @Override
+    public List<ModelUserLimit> createAndSaveUserLimits(User user, List<Model> models) {
+        Map<Long, Model> modelMap = models.stream()
+                .collect(Collectors.toMap(Model::getModelId, Function.identity()));
+
+        List<ModelUserLimit> newUserLimits = user.getOrganization().getModelsLimits().stream()
+                .map(orgLimit -> {
+                    Model model = modelMap.get(orgLimit.modelId());
+                    if (model == null) {
+                        throw new IllegalArgumentException("Model with ID " + orgLimit.modelId() + " not found");
+                        }
+
+                    ModelUserLimit userLimit = new ModelUserLimit();
+                    userLimit.setUser(user);
+                    userLimit.setModel(model);
+                    userLimit.setRps(orgLimit.limit().getRps());
+                    userLimit.setRequestsPerWeek(orgLimit.limit().getRequestsPerWeek());
+                    return userLimit;
+                })
+                .toList();
+
+        return limitRepository.saveAll(newUserLimits);
+    }
 }

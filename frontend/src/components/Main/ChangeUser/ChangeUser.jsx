@@ -14,9 +14,7 @@ import {
 } from "../../../actions/admin-user-actions.js";
 import {getDateFormat} from "../../utils/DateAndTime.jsx";
 import {selectFormatUserLimits} from "../../../selectors/user-selector.js";
-import {
-    resetMessageStateAction, setAcceptMessageAction, setRejectMessageAction
-} from "../../../actions/message-actions.js";
+import {resetMessageStateAction, setAcceptMessageAction,} from "../../../actions/message-actions.js";
 import {selectMessageState} from "../../../selectors/message-selector.js";
 import {useErrorHookForm} from "../../../hooks/error-hooks.js";
 
@@ -59,8 +57,6 @@ export default function ChangeUser() {
 
     useErrorHookForm(activeBut, firstForm, secondForm)
 
-    const onInputChange = () => dispatch(resetMessageStateAction)
-
     const onSaveUserData = (newUserData) => {
         const payload = {
             userId,
@@ -101,6 +97,12 @@ export default function ChangeUser() {
         dispatch(setAcceptMessageAction("Изменения сохранены"))
     }
 
+
+    const onInputFocus = (event) => {
+        if (event.target.tagName === "INPUT")
+            dispatch(resetMessageStateAction)
+    }
+
     return (
         <div className="change-container">
 
@@ -118,13 +120,14 @@ export default function ChangeUser() {
                     form={firstForm}
                     submitFunction={onSaveUserData}
                     rolesOptions={rolesOptions}
+                    onInputFocus={onInputFocus}
                 />
             )}
             {activeBut === "second" && (
                 <ChangeUserLimits
                     form={secondForm}
                     submitFunction={onSaveUserLimit}
-                    onInputChange={onInputChange}
+                    onInputFocus={onInputFocus}
                 />
             )}
         </div>

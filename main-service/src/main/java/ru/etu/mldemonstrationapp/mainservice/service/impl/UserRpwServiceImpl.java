@@ -4,7 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.etu.mldemonstrationapp.mainservice.entity.Model;
+import ru.etu.mldemonstrationapp.mainservice.entity.Organization;
+import ru.etu.mldemonstrationapp.mainservice.entity.User;
+import ru.etu.mldemonstrationapp.mainservice.entity.UserRpw;
 import ru.etu.mldemonstrationapp.mainservice.repository.UserRpwRepository;
+
+import java.util.List;
 
 @Service
 public class UserRpwServiceImpl {
@@ -15,5 +21,33 @@ public class UserRpwServiceImpl {
     @Transactional
     public void resetCurrentRequestsWeekly() {
         userRpwRepository.updateCurrentRequestsToZero();
+    }
+
+    public void createAndSaveRpwForOrgMembers(Organization organization, Model model) {
+        List<UserRpw> newUserRpws = organization.getMembers().stream()
+                .map(user -> {
+                    UserRpw userRpw = new UserRpw();
+                    userRpw.setUser(user);
+                    userRpw.setModel(model);
+                    userRpw.setCurrentRequests(0);
+                    return userRpw;
+                })
+                .toList();
+
+        userRpwRepository.saveAll(newUserRpws);
+    }
+
+    public void createAndSaveModelsRpwForUser(User user, List<Model> models) {
+        List<UserRpw> newUserRpws = models.stream()
+                .map(model -> {
+                    UserRpw userRpw = new UserRpw();
+                    userRpw.setUser(user);
+                    userRpw.setModel(model);
+                    userRpw.setCurrentRequests(0);
+                    return userRpw;
+                })
+                .toList();
+
+        userRpwRepository.saveAll(newUserRpws);
     }
 }

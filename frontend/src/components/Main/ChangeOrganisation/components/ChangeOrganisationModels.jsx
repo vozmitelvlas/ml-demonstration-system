@@ -14,14 +14,15 @@ export function ChangeOrganisationModels({
                                              orgModels,
                                              submitFunction,
                                              onSelectModels,
-                                             onSelectLimit
+                                             onSelectLimit,
+                                             onInputFocus
                                          }) {
     const navigate = useNavigate()
     const toOrgs = () => navigate("/organisations")
     const formatModels = useSelector(selectFormatModels)
 
     return (
-        <form onSubmit={form.handleSubmit(submitFunction)} className="change-content">
+        <form onSubmit={form.handleSubmit(submitFunction)} className="change-content" onFocus={onInputFocus}>
             <div className="change-orgs-content">
                 <div className="select-container">
                     <div>

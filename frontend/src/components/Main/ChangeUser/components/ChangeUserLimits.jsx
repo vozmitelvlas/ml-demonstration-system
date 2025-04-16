@@ -4,11 +4,11 @@ import {useNavigate} from "react-router-dom";
 import {useSelector} from "react-redux";
 import {selectUserLimits} from "../../../../selectors/user-selector.js";
 
-export function ChangeUserLimits({form, submitFunction, onInputChange}) {
+export function ChangeUserLimits({form, submitFunction, onInputFocus}) {
     const navigate = useNavigate()
     const userLimits = useSelector(selectUserLimits)
     return (
-        <form onSubmit={form.handleSubmit(submitFunction)} className="change-content">
+        <form onSubmit={form.handleSubmit(submitFunction)} className="change-content" onFocus={onInputFocus}>
             <div className="user-models">
                 <h2>Доступные пользователю модели</h2>
                 <table className="table-fill naked-input limits-input">
@@ -34,18 +34,10 @@ export function ChangeUserLimits({form, submitFunction, onInputChange}) {
                             <td className="text-center">{model.modelId}</td>
                             <td className="text-center">{model.modelName}</td>
                             <td className="text-center">
-                                <input type="text" {...form.register(`rps${model.modelId}`)} onChange={e => {
-                                    onInputChange();
-                                    form.register(`rps${model.modelId}`).onChange(e).then(r => {
-                                    });
-                                }}/>
+                                <input type="text" {...form.register(`rps${model.modelId}`)}/>
                             </td>
                             <td className="text-center">
-                                <input type="text" {...form.register(`requestsPerWeek${model.modelId}`)} onChange={e => {
-                                    onInputChange();
-                                    form.register(`requestsPerWeek${model.modelId}`).onChange(e).then(r => {
-                                    });
-                                }}/>
+                                <input type="text" {...form.register(`requestsPerWeek${model.modelId}`)}/>
                             </td>
                         </tr>
                     ))}
