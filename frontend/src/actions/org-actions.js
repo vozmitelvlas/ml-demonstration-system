@@ -1,4 +1,4 @@
-import apiClient from "../components/utils/apiClient.jsx";
+import apiClient from "../utils/apiClient.jsx";
 
 export const getOrgDataAction = (payload) => async (dispatch) =>
     apiClient(`/api/organizations/${payload}`).then((res) => {

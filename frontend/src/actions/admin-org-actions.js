@@ -1,4 +1,4 @@
-import apiClient from "../components/utils/apiClient.jsx";
+import apiClient from "../utils/apiClient.jsx";
 
 export const getFormatOrganisationsAction = (dispatch) => {
     apiClient(`/api/admin/organizations`).then(res => {

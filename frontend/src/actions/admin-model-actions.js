@@ -1,4 +1,4 @@
-import apiClient from "../components/utils/apiClient.jsx";
+import apiClient from "../utils/apiClient.jsx";
 
 export const getModelVersionDataAsAdminAction = (payload) => (dispatch) =>
     apiClient(`/api/admin/models/${payload.modelId}/versions/${payload.versionId}`).then((res) => {
