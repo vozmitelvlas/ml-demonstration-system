@@ -60,7 +60,10 @@ public class RateLimiterComponent {
     }
 
     private Bucket createBucket(int rps) {
-        Bandwidth limit = Bandwidth.classic(rps, Refill.intervally(rps, Duration.ofSeconds(1)));
+        Bandwidth limit = Bandwidth.builder()
+                .capacity(rps)
+                .refillIntervally(rps, Duration.ofSeconds(1))
+                .build();
         return Bucket.builder()
                 .addLimit(limit)
                 .build();

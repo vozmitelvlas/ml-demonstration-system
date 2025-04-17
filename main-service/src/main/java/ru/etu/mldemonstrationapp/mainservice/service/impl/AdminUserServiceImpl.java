@@ -14,11 +14,12 @@ import ru.etu.mldemonstrationapp.mainservice.dto.UpdateUserRequest;
 import ru.etu.mldemonstrationapp.mainservice.entity.*;
 import ru.etu.mldemonstrationapp.mainservice.repository.*;
 import ru.etu.mldemonstrationapp.mainservice.service.AdminUserService;
+import ru.etu.mldemonstrationapp.mainservice.service.UserRpwService;
+import ru.etu.mldemonstrationapp.mainservice.service.UserService;
 
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -36,9 +37,9 @@ public class AdminUserServiceImpl implements AdminUserService {
     @Autowired
     private UserRpwRepository userRpwRepository;
     @Autowired
-    private UserServiceImpl userService;
+    private UserService userService;
     @Autowired
-    private UserRpwServiceImpl userRpwService;
+    private UserRpwService userRpwService;
 
     @Override
     public List<User> getUsers() {
@@ -56,16 +57,9 @@ public class AdminUserServiceImpl implements AdminUserService {
     public List<ModelUserLimitResponse> getAllUserLimits(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with id %s not found".formatted(userId)));
 
-        var limits = limitRepository.findLimitsForUser(user);
-        return limits.stream().map(result -> {
-            var organizationLimit = (ModelOrganizationLimit) result[0];
-            var userLimit = (ModelUserLimit) result[1];
-            return ModelUserLimitResponse.fromLimitAndModel(
-                    userLimit == null ? organizationLimit : userLimit,
-                    organizationLimit.getModel()
-            );
-
-        }).toList();
+        return user.getLimits().stream().map(limit -> ModelUserLimitResponse.fromLimitAndModel(
+                limit, limit.getModel()
+        )).toList();
     }
 
     @Transactional
@@ -133,7 +127,7 @@ public class AdminUserServiceImpl implements AdminUserService {
 
             user.setOrganization(organization);
 
-            userService.createAndSaveUserLimits(user, models);
+            userService.createAndSaveUserLimitsForOrgModels(user);
             userRpwService.createAndSaveModelsRpwForUser(user, models);
         }
 
@@ -148,7 +142,6 @@ public class AdminUserServiceImpl implements AdminUserService {
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
-
 
     @Transactional
     @Override
@@ -193,14 +186,12 @@ public class AdminUserServiceImpl implements AdminUserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with id %s not found".formatted(userId)));
 
-        String limitsType = String.valueOf(user.getOrganization().getLimitsType());
-
-        if (Objects.equals(limitsType, "USER_LIMITS")) {
-            return Objects.requireNonNull(getAllUserLimits(userId).stream()
-                            .filter(lim -> lim.modelId().equals(modelId))
-                            .findFirst()
-                            .orElseThrow(null))
-                    .limit();
+        OrganizationLimitsType limitsType = user.getOrganization().getLimitsType();
+        if (limitsType == OrganizationLimitsType.USER_LIMITS) {
+            return user.getLimits().stream()
+                    .filter(lim -> lim.getModel().getModelId().equals(modelId))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("Limit for model ID " + modelId + " not found"));
         }
 
         return user.getOrganization().getModelsLimits().stream()
@@ -208,9 +199,9 @@ public class AdminUserServiceImpl implements AdminUserService {
                 .findFirst()
                 .map(limit -> {
                     ModelOrganizationLimit orgLimit = (ModelOrganizationLimit) limit.limit();
-                    if (Objects.equals(limitsType, "ORGANIZATION_LIMITS")) {
+                    if (limitsType == OrganizationLimitsType.ORGANIZATION_LIMITS) {
                         return orgLimit;
-                    } else if (Objects.equals(limitsType, "MODEL_LIMITS")) {
+                    } else if (limitsType == OrganizationLimitsType.MODEL_LIMITS) {
                         return orgLimit.getModel().getLimit();
                     } else {
                         throw new IllegalArgumentException("Unknown limits type: " + limitsType);

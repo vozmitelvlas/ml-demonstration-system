@@ -9,11 +9,12 @@ import ru.etu.mldemonstrationapp.mainservice.entity.Organization;
 import ru.etu.mldemonstrationapp.mainservice.entity.User;
 import ru.etu.mldemonstrationapp.mainservice.entity.UserRpw;
 import ru.etu.mldemonstrationapp.mainservice.repository.UserRpwRepository;
+import ru.etu.mldemonstrationapp.mainservice.service.UserRpwService;
 
 import java.util.List;
 
 @Service
-public class UserRpwServiceImpl {
+public class UserRpwServiceImpl implements UserRpwService {
     @Autowired
     private UserRpwRepository userRpwRepository;
 
@@ -22,7 +23,7 @@ public class UserRpwServiceImpl {
     public void resetCurrentRequestsWeekly() {
         userRpwRepository.updateCurrentRequestsToZero();
     }
-
+    @Transactional
     public void createAndSaveRpwForOrgMembers(Organization organization, Model model) {
         List<UserRpw> newUserRpws = organization.getMembers().stream()
                 .map(user -> {
@@ -36,7 +37,7 @@ public class UserRpwServiceImpl {
 
         userRpwRepository.saveAll(newUserRpws);
     }
-
+    @Transactional
     public void createAndSaveModelsRpwForUser(User user, List<Model> models) {
         List<UserRpw> newUserRpws = models.stream()
                 .map(model -> {

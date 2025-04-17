@@ -12,15 +12,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import ru.etu.mldemonstrationapp.mainservice.configuration.CustomUserDetails;
 import ru.etu.mldemonstrationapp.mainservice.dto.*;
-import ru.etu.mldemonstrationapp.mainservice.entity.Model;
 import ru.etu.mldemonstrationapp.mainservice.entity.User;
-import ru.etu.mldemonstrationapp.mainservice.repository.ModelRepository;
 import ru.etu.mldemonstrationapp.mainservice.service.AuthService;
 import ru.etu.mldemonstrationapp.mainservice.service.EmailService;
 import ru.etu.mldemonstrationapp.mainservice.service.JwtService;
 import ru.etu.mldemonstrationapp.mainservice.service.UserService;
-
-import java.util.List;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -32,10 +28,7 @@ public class AuthServiceImpl implements AuthService {
     private AuthenticationManager authenticationManager;
     @Autowired
     private EmailService emailService;
-    @Autowired
-    private ModelRepository modelRepository;
-    @Autowired
-    private UserRpwServiceImpl userRpwService;
+
 
     @Override
     public ResponseEntity<LoginResponse> login(LoginRequest loginRequest){
@@ -57,11 +50,6 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public RegisterResponse register(UserRegistrationRequest createUserRequest, String origin) {
         User user = userService.registerUser(createUserRequest);
-
-        //set users limits and rps
-        List<Model> models = modelRepository.findAllByOrganization(user.getOrganization());
-        userService.createAndSaveUserLimits(user, models);
-        userRpwService.createAndSaveModelsRpwForUser(user, models);
 
         // send confirm message
         String token = jwtService.generateEmailConfirmToken(new CustomUserDetails(user));

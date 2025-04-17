@@ -10,6 +10,7 @@ import ru.etu.mldemonstrationapp.mainservice.dto.UpdateOrganizationRequest;
 import ru.etu.mldemonstrationapp.mainservice.entity.*;
 import ru.etu.mldemonstrationapp.mainservice.repository.*;
 import ru.etu.mldemonstrationapp.mainservice.service.OrganizationService;
+import ru.etu.mldemonstrationapp.mainservice.service.UserRpwService;
 import ru.etu.mldemonstrationapp.mainservice.service.UserService;
 
 import java.time.Instant;
@@ -30,7 +31,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Autowired
     private UserRpwRepository userRpwRepository;
     @Autowired
-    private UserRpwServiceImpl userRpwService;
+    private UserRpwService userRpwService;
     @Autowired
     private UserService userService;
 
@@ -135,7 +136,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
         ModelOrganizationLimit modelOrganizationLimit = limitRepository.save(limit);
 
-        userService.createAndSaveUserLimits(organization, modelOrganizationLimit);
+        userService.createAndSaveUserLimitsForOrgMembers(organization, modelOrganizationLimit);
         userRpwService.createAndSaveRpwForOrgMembers(organization, model);
 
         return modelOrganizationLimit;

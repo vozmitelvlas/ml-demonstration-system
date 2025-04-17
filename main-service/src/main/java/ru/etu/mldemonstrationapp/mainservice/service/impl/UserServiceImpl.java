@@ -16,14 +16,12 @@ import ru.etu.mldemonstrationapp.mainservice.repository.LimitRepository;
 import ru.etu.mldemonstrationapp.mainservice.repository.ModelRepository;
 import ru.etu.mldemonstrationapp.mainservice.repository.OrganizationRepository;
 import ru.etu.mldemonstrationapp.mainservice.repository.UserRepository;
+import ru.etu.mldemonstrationapp.mainservice.service.UserRpwService;
 import ru.etu.mldemonstrationapp.mainservice.service.UserService;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -35,6 +33,10 @@ public class UserServiceImpl implements UserService {
     private OrganizationRepository organizationRepository;
     @Autowired
     private LimitRepository limitRepository;
+    @Autowired
+    private ModelRepository modelRepository;
+    @Autowired
+    private UserRpwService userRpwService;
 
     @Override
     public User getUserById(Long id) {
@@ -80,7 +82,14 @@ public class UserServiceImpl implements UserService {
 
         user.setEmailConfirm(false);
 
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+
+        //set users limits and rpw
+        List<Model> models = modelRepository.findAllByOrganization(savedUser.getOrganization());
+        createAndSaveUserLimitsForOrgModels(savedUser);
+        userRpwService.createAndSaveModelsRpwForUser(savedUser, models);
+
+        return savedUser;
     }
 
     @Transactional
@@ -143,7 +152,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public List<ModelUserLimit> createAndSaveUserLimits(Organization organization, ModelOrganizationLimit limit) {
+    public void createAndSaveUserLimitsForOrgMembers(Organization organization, ModelOrganizationLimit limit) {
         List<ModelUserLimit> newUserLimits = organization.getMembers().stream()
                 .map(user ->  {
                     ModelUserLimit userLimit = new ModelUserLimit();
@@ -154,31 +163,23 @@ public class UserServiceImpl implements UserService {
                     return userLimit;
                 })
                 .toList();
-        return limitRepository.saveAll(newUserLimits);
+        limitRepository.saveAll(newUserLimits);
     }
 
     @Transactional
     @Override
-    public List<ModelUserLimit> createAndSaveUserLimits(User user, List<Model> models) {
-        Map<Long, Model> modelMap = models.stream()
-                .collect(Collectors.toMap(Model::getModelId, Function.identity()));
-
-        List<ModelUserLimit> newUserLimits = user.getOrganization().getModelsLimits().stream()
+    public void createAndSaveUserLimitsForOrgModels(User user) {
+        List<ModelUserLimit> newUserLimits = user.getOrganization().getLimits().stream()
                 .map(orgLimit -> {
-                    Model model = modelMap.get(orgLimit.modelId());
-                    if (model == null) {
-                        throw new IllegalArgumentException("Model with ID " + orgLimit.modelId() + " not found");
-                        }
-
                     ModelUserLimit userLimit = new ModelUserLimit();
                     userLimit.setUser(user);
-                    userLimit.setModel(model);
-                    userLimit.setRps(orgLimit.limit().getRps());
-                    userLimit.setRequestsPerWeek(orgLimit.limit().getRequestsPerWeek());
+                    userLimit.setModel(orgLimit.getModel());
+                    userLimit.setRps(orgLimit.getRps());
+                    userLimit.setRequestsPerWeek(orgLimit.getRequestsPerWeek());
                     return userLimit;
                 })
                 .toList();
 
-        return limitRepository.saveAll(newUserLimits);
+        limitRepository.saveAll(newUserLimits);
     }
 }
