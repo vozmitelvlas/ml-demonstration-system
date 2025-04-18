@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import ru.etu.mldemonstrationapp.mainservice.dto.CreateUserRequest;
 import ru.etu.mldemonstrationapp.mainservice.dto.ModelUserLimitResponse;
 import ru.etu.mldemonstrationapp.mainservice.dto.UpdateUserRequest;
+import ru.etu.mldemonstrationapp.mainservice.entity.Limit;
 import ru.etu.mldemonstrationapp.mainservice.entity.ModelUserLimit;
 import ru.etu.mldemonstrationapp.mainservice.entity.User;
 
@@ -31,4 +32,7 @@ public interface AdminUserService {
 
     @Transactional
     void setAccessRight(Long userId, Boolean isActive);
+
+    Limit getLimitsByType(Long userId, Long modelId);
+
 }

@@ -11,18 +11,11 @@ import org.springframework.web.server.ResponseStatusException;
 import ru.etu.mldemonstrationapp.mainservice.dto.CreateUserRequest;
 import ru.etu.mldemonstrationapp.mainservice.dto.ModelUserLimitResponse;
 import ru.etu.mldemonstrationapp.mainservice.dto.UpdateUserRequest;
-import ru.etu.mldemonstrationapp.mainservice.entity.Limit;
-import ru.etu.mldemonstrationapp.mainservice.repository.LimitRepository;
-import ru.etu.mldemonstrationapp.mainservice.entity.Model;
-import ru.etu.mldemonstrationapp.mainservice.repository.ModelRepository;
-import ru.etu.mldemonstrationapp.mainservice.entity.ModelOrganizationLimit;
-import ru.etu.mldemonstrationapp.mainservice.entity.Organization;
-import ru.etu.mldemonstrationapp.mainservice.repository.OrganizationRepository;
-import ru.etu.mldemonstrationapp.mainservice.entity.ModelUserLimit;
-import ru.etu.mldemonstrationapp.mainservice.entity.Role;
-import ru.etu.mldemonstrationapp.mainservice.entity.User;
-import ru.etu.mldemonstrationapp.mainservice.repository.UserRepository;
+import ru.etu.mldemonstrationapp.mainservice.entity.*;
+import ru.etu.mldemonstrationapp.mainservice.repository.*;
 import ru.etu.mldemonstrationapp.mainservice.service.AdminUserService;
+import ru.etu.mldemonstrationapp.mainservice.service.UserRpwService;
+import ru.etu.mldemonstrationapp.mainservice.service.UserService;
 
 import java.time.Instant;
 import java.util.Collections;
@@ -41,6 +34,12 @@ public class AdminUserServiceImpl implements AdminUserService {
     private UserRepository userRepository;
     @Autowired
     private OrganizationRepository organizationRepository;
+    @Autowired
+    private UserRpwRepository userRpwRepository;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private UserRpwService userRpwService;
 
     @Override
     public List<User> getUsers() {
@@ -58,16 +57,9 @@ public class AdminUserServiceImpl implements AdminUserService {
     public List<ModelUserLimitResponse> getAllUserLimits(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with id %s not found".formatted(userId)));
 
-        var limits = limitRepository.findLimitsForUser(user);
-        return limits.stream().map(result -> {
-            var organizationLimit = (ModelOrganizationLimit) result[0];
-            var userLimit = (ModelUserLimit) result[1];
-            return ModelUserLimitResponse.fromLimitAndModel(
-                    userLimit == null ? organizationLimit : userLimit,
-                    organizationLimit.getModel()
-            );
-
-        }).toList();
+        return user.getLimits().stream().map(limit -> ModelUserLimitResponse.fromLimitAndModel(
+                limit, limit.getModel()
+        )).toList();
     }
 
     @Transactional
@@ -125,10 +117,18 @@ public class AdminUserServiceImpl implements AdminUserService {
                             HttpStatus.CONFLICT,
                             "Organization with id %s does not exist".formatted(dto.organizationId())
                     ));
-            user.setOrganization(organization);
+
+            userRpwRepository.deleteAllByUser(user);
 
             // Delete all user limits due to changing of available models list
             limitRepository.deleteAllByIdInBatch(user.getLimits().stream().map(Limit::getLimitId).toList());
+
+            List<Model> models = modelRepository.findAllByOrganization(organization);
+
+            user.setOrganization(organization);
+
+            userService.createAndSaveUserLimitsForOrgModels(user);
+            userRpwService.createAndSaveModelsRpwForUser(user, models);
         }
 
         // Обновление ролей
@@ -142,7 +142,6 @@ public class AdminUserServiceImpl implements AdminUserService {
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
-
 
     @Transactional
     @Override
@@ -173,12 +172,41 @@ public class AdminUserServiceImpl implements AdminUserService {
 
     @Transactional
     @Override
-    public void setAccessRight(Long userId, Boolean isActive){
+    public void setAccessRight(Long userId, Boolean isActive) {
         User user = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND,
                 "User not found")
         );
         user.setActive(isActive);
         userRepository.save(user);
+    }
+
+    @Override
+    public Limit getLimitsByType(Long userId, Long modelId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with id %s not found".formatted(userId)));
+
+        OrganizationLimitsType limitsType = user.getOrganization().getLimitsType();
+        if (limitsType == OrganizationLimitsType.USER_LIMITS) {
+            return user.getLimits().stream()
+                    .filter(lim -> lim.getModel().getModelId().equals(modelId))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("Limit for model ID " + modelId + " not found"));
+        }
+
+        return user.getOrganization().getModelsLimits().stream()
+                .filter(lim -> lim.modelId().equals(modelId))
+                .findFirst()
+                .map(limit -> {
+                    ModelOrganizationLimit orgLimit = (ModelOrganizationLimit) limit.limit();
+                    if (limitsType == OrganizationLimitsType.ORGANIZATION_LIMITS) {
+                        return orgLimit;
+                    } else if (limitsType == OrganizationLimitsType.MODEL_LIMITS) {
+                        return orgLimit.getModel().getLimit();
+                    } else {
+                        throw new IllegalArgumentException("Unknown limits type: " + limitsType);
+                    }
+                })
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Limit for modelId " + modelId + " not found"));
     }
 }
