@@ -14,17 +14,17 @@ public class UserRpw {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long user_rpw_id;
+    private Long userRpwId;
 
     @OneToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @OneToOne
-    @JoinColumn(name = "model_id")
+    @JoinColumn(name = "model_id", nullable = false)
     private Model model;
 
-    @Column(name = "current_requests")
+    @Column(name = "current_requests", nullable = false)
     private Integer currentRequests;
 
 
