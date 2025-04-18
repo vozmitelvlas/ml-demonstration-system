@@ -66,7 +66,7 @@ public class UserServiceImpl implements UserService {
 
         // Default organization
         Organization organization = organizationRepository.findById(1L)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT, "Default organization with id 1 does not exist"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Default organization with id 1 does not exist"));
 
         User user = new User();
         user.setLogin(request.login());
@@ -84,7 +84,7 @@ public class UserServiceImpl implements UserService {
 
         User savedUser = userRepository.save(user);
 
-        //set users limits and rpw
+        // Set users limits and rpw
         List<Model> models = modelRepository.findAllByOrganization(savedUser.getOrganization());
         createAndSaveUserLimitsForOrgModels(savedUser);
         userRpwService.createAndSaveModelsRpwForUser(savedUser, models);
@@ -106,7 +106,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void updateUserPassword(Long id, UpdatePasswordRequest request) {
-        User user = userRepository.findById(id).orElseThrow();
+        User user = getUserById(id);
         if (passwordEncoder.matches(request.oldPassword(), user.getPassword())) {
             user.setPassword(passwordEncoder.encode(request.newPassword()));
             userRepository.save(user);
@@ -118,10 +118,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void setUserPassword(Long id, String password) {
-        User user = userRepository.findById(id).orElseThrow(() -> new ResponseStatusException(
-                HttpStatus.NOT_FOUND,
-                "User not found")
-        );
+        User user = getUserById(id);
         user.setPassword(passwordEncoder.encode(password));
         userRepository.save(user);
     }
@@ -136,10 +133,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void setUserEmailConfirm(Long id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new ResponseStatusException(
-                HttpStatus.NOT_FOUND,
-                "User not found")
-        );
+        User user = getUserById(id);
         user.setEmailConfirm(true);
         userRepository.save(user);
     }
