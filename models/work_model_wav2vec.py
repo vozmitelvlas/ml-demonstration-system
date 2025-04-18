@@ -1,28 +1,32 @@
 import os
 import librosa
 import numpy as np
-import onnxruntime as ort
 import matplotlib.pyplot as plt
 from pydub import AudioSegment
 from transformers import Wav2Vec2Processor
+import tritonclient.grpc as grpcclient
+from tritonclient.utils import np_to_triton_dtype
 
 
 class AudioProcessor:
-    def __init__(self, mp3_file, model_path, target_sr=16000):
+    def __init__(self, mp3_file, triton_url="localhost:8001", model_name="wav2vec2", target_sr=16000):
         """
         Инициализация процессора аудио.
-        
+
         :param mp3_file: Путь к входному MP3-файлу.
-        :param model_path: Путь к модели ONNX.
+        :param triton_url: URL Triton Inference Server (например, "localhost:8001").
+        :param model_name: Имя модели, развернутой на Triton.
         :param target_sr: Целевая частота дискретизации (по умолчанию 16000 Гц).
         """
         self.mp3_file = mp3_file
-        self.model_path = model_path
+        self.triton_url = triton_url
+        self.model_name = model_name
         self.target_sr = target_sr
         self.wav_file = self._generate_wav_filename()
         self.processor = Wav2Vec2Processor.from_pretrained("facebook/wav2vec2-base-960h")
         self.waveform = None
         self.sr = None
+        self.triton_client = grpcclient.InferenceServerClient(url=triton_url)
 
     def _generate_wav_filename(self):
         """Генерация имени временного WAV-файла."""
@@ -48,22 +52,26 @@ class AudioProcessor:
         self.waveform = waveform
         self.sr = sr
 
-    def transcribe_audio_with_onnx(self):
-        """Использование модели ONNX для распознавания текста."""
-        if not os.path.exists(self.model_path):
-            raise FileNotFoundError(f"Модель {self.model_path} не найдена.")
-        print(f"Загрузка модели ONNX: {self.model_path}")
-        
-        # Инициализация ONNX Runtime
-        session = ort.InferenceSession(self.model_path)
+    def transcribe_audio_with_triton(self):
+        """Использование модели на Triton для распознавания текста."""
+        if not self.triton_client.is_server_live():
+            raise ConnectionError(f"Triton Server на {self.triton_url} недоступен.")
+
+        print(f"Отправка запроса к модели {self.model_name} на Triton...")
 
         # Подготовка входных данных
-        input_name = session.get_inputs()[0].name
-        inputs = {input_name: self.waveform.reshape(1, -1).astype(np.float32)}
+        input_data = self.waveform.reshape(1, -1).astype(np.float32)
+        inputs = [
+            grpcclient.InferInput("input", input_data.shape, np_to_triton_dtype(input_data.dtype))
+        ]
+        inputs[0].set_data_from_numpy(input_data)
+
+        # Подготовка выходных данных
+        outputs = [grpcclient.InferRequestedOutput("output")]
 
         # Выполнение инференса
-        outputs = session.run(None, inputs)
-        logits = outputs[0]
+        response = self.triton_client.infer(model_name=self.model_name, inputs=inputs, outputs=outputs)
+        logits = response.as_numpy("output")
 
         # Декодирование выходных данных
         predicted_ids = np.argmax(logits, axis=-1)
@@ -74,7 +82,7 @@ class AudioProcessor:
         """Построение графиков и спектрограммы."""
         print("Построение графиков и спектрограммы...")
         plt.figure(figsize=(12, 6))
-        
+
         # График аудиосигнала
         plt.subplot(2, 1, 1)
         time = np.arange(len(self.waveform)) / self.sr
@@ -107,8 +115,8 @@ class AudioProcessor:
             # Шаг 2: Загрузка и предобработка аудио
             self.load_and_preprocess_audio()
 
-            # Шаг 3: Распознавание текста с помощью модели ONNX
-            transcription = self.transcribe_audio_with_onnx()
+            # Шаг 3: Распознавание текста с помощью модели на Triton
+            transcription = self.transcribe_audio_with_triton()
             print("Transcription:", transcription)
 
             # Шаг 4: Построение графиков и спектрограммы
@@ -124,7 +132,8 @@ class AudioProcessor:
 # Пример использования
 if __name__ == "__main__":
     mp3_file = "./audio/Sound_1.mp3"
-    model_path = "./model_repository/wav2vec2/1/model.onnx"  # Укажите путь к вашей модели ONNX
+    triton_url = "localhost:8001"  # URL Triton Inference Server
+    model_name = "wav2vec2"  # Имя модели, развернутой на Triton
 
-    processor = AudioProcessor(mp3_file=mp3_file, model_path=model_path)
+    processor = AudioProcessor(mp3_file=mp3_file, triton_url=triton_url, model_name=model_name)
     processor.process()

@@ -1,160 +1,173 @@
-# audio_processor_onnx.py
 import os
-import librosa
 import numpy as np
-import matplotlib.pyplot as plt
-import onnxruntime as ort
+import librosa
+import tritonclient.grpc as grpcclient
 from transformers import WhisperProcessor
+import matplotlib.pyplot as plt
+from pydub import AudioSegment
 
-class AudioProcessorONNX:
-    def __init__(self, encoder_path="./model_repository/whisper_encoder/1/model.onnx", 
-                 decoder_path="./model_repository/whisper_decoder/1/model.onnx", 
-                 model_name="openai/whisper-tiny"):
-        """
-        Инициализация класса для обработки аудио с использованием ONNX-моделей.
-        """
-        self.encoder_path = encoder_path
-        self.decoder_path = decoder_path
-        self.model_name = model_name
-        self.processor = None
-        self.encoder_session = None
-        self.decoder_session = None
+# Параметры
+TRITON_SERVER_URL = "localhost:8001"
+AUDIO_FILE_PATH = os.path.join("audio", "Sound_1.mp3")
+MODEL_NAME_ENCODER = "whisper_encoder"
+MODEL_NAME_DECODER = "whisper_decoder"
 
-    def load_model(self):
-        """
-        Загружает процессор Whisper и ONNX-модели.
-        """
-        print("Загрузка процессора Whisper...")
-        self.processor = WhisperProcessor.from_pretrained(self.model_name)
+# Генерация имени временного WAV-файла
+def generate_wav_filename(mp3_file):
+    base_name = os.path.splitext(mp3_file)[0]
+    return f"{base_name}.wav"
 
-        print(f"Загрузка ONNX-модели Encoder: {self.encoder_path}")
-        self.encoder_session = ort.InferenceSession(self.encoder_path)
+# Конвертация MP3 в WAV
+def convert_mp3_to_wav(mp3_file, wav_file, target_sr=16000):
+    print(f"Converting {mp3_file} to WAV...")
+    audio = AudioSegment.from_mp3(mp3_file)
+    audio = audio.set_frame_rate(target_sr)  # Установка частоты дискретизации
+    audio.export(wav_file, format="wav")
+    print(f"File successfully converted: {wav_file}")
 
-        print(f"Загрузка ONNX-модели Decoder: {self.decoder_path}")
-        self.decoder_session = ort.InferenceSession(self.decoder_path)
+# Загрузка процессора Whisper
+print("Loading Whisper processor...")
+processor = WhisperProcessor.from_pretrained("openai/whisper-tiny")
 
-    def load_audio(self, audio_path):
-        """
-        Загружает аудиофайл и преобразует его в формат, подходящий для модели.
-        """
-        print(f"Загрузка аудио: {audio_path}")
-        waveform, sample_rate = librosa.load(audio_path, sr=self.processor.feature_extractor.sampling_rate)
-        return waveform, sample_rate
+# Подключение к Triton Inference Server
+print("Connecting to Triton Inference Server...")
+triton_client = grpcclient.InferenceServerClient(url=TRITON_SERVER_URL)
 
-    def generate_spectrogram(self, waveform, sample_rate, output_path="spectrogram.png"):
-        """
-        Генерирует спектограмму аудиофайла и сохраняет её как изображение.
-        """
-        print(f"Генерация спектограммы: {output_path}")
-        spectrogram = librosa.stft(waveform)
-        spectrogram_db = librosa.amplitude_to_db(np.abs(spectrogram))
+# Загрузка и предварительная обработка аудио
+def preprocess_audio(file_path):
+    print(f"Loading audio file: {file_path}")
+    # Загрузка аудио с помощью librosa
+    audio_data, sample_rate = librosa.load(file_path, sr=16000)
+    
+    # Визуализация аудиосигнала
+    plot_waveform(audio_data, sample_rate)
+    
+    # Преобразование аудио в лог-мел спектрограмму
+    features = processor.feature_extractor(audio_data, sampling_rate=sample_rate, return_tensors="np").input_features
+    
+    # Визуализация спектрограммы
+    plot_spectrogram(features[0])
+    
+    return features
 
-        plt.figure(figsize=(10, 4))
-        librosa.display.specshow(spectrogram_db, sr=sample_rate, x_axis='time', y_axis='hz')
-        plt.colorbar(format='%+2.0f dB')
-        plt.title('Spectrogram')
-        plt.tight_layout()
-        plt.savefig(output_path)
-        plt.close()
-        print(f"Спектограмма сохранена: {output_path}")
+# Функция для построения графика аудиосигнала
+def plot_waveform(audio_data, sample_rate):
+    print("Plotting waveform...")
+    plt.figure(figsize=(14, 5))
+    plt.plot(np.linspace(0, len(audio_data) / sample_rate, num=len(audio_data)), audio_data)
+    plt.title("Waveform")
+    plt.xlabel("Time (s)")
+    plt.ylabel("Amplitude")
+    plt.grid(True)
+    plt.show()
 
-    def visualize_waveform(self, waveform, sample_rate, output_path="waveform.png"):
-        """
-        Визуализирует форму волны аудиофайла и сохраняет её как изображение.
-        """
-        print(f"Генерация формы волны: {output_path}")
-        plt.figure(figsize=(10, 4))
-        librosa.display.waveshow(waveform, sr=sample_rate)
-        plt.title('Waveform')
-        plt.tight_layout()
-        plt.savefig(output_path)
-        plt.close()
-        print(f"Форма волны сохранена: {output_path}")
+# Функция для построения спектрограммы
+def plot_spectrogram(spectrogram):
+    print("Plotting spectrogram...")
+    plt.figure(figsize=(14, 5))
+    librosa.display.specshow(librosa.power_to_db(spectrogram, ref=np.max), y_axis='mel', x_axis='time', sr=16000, fmax=8000)
+    plt.colorbar(format='%+2.0f dB')
+    plt.title("Mel Spectrogram")
+    plt.xlabel("Time (s)")
+    plt.ylabel("Frequency (Hz)")
+    plt.tight_layout()
+    plt.show()
 
-    def preprocess_audio(self, waveform):
-        """
-        Преобразует аудиосигнал в mel-спектрограмму для подачи в модель.
-        """
-        print("Предобработка аудио...")
-        input_features = self.processor(waveform, sampling_rate=self.processor.feature_extractor.sampling_rate, return_tensors="np").input_features
-        return input_features
+# Отправка данных в энкодер
+def run_encoder(features):
+    print("Running encoder inference...")
+    inputs = [
+        grpcclient.InferInput("audio_features", features.shape, "FP32")
+    ]
+    inputs[0].set_data_from_numpy(features.astype(np.float32))
 
-    def run_encoder(self, mel_input):
-        """
-        Выполняет инференс через ONNX-модель Encoder.
-        """
-        print("Выполнение инференса Encoder...")
-        encoder_inputs = {"mel": mel_input}
-        encoder_outputs = self.encoder_session.run(None, encoder_inputs)
-        encoder_hidden_states = encoder_outputs[0]  # Получаем скрытые состояния encoder
-        return encoder_hidden_states
+    outputs = [
+        grpcclient.InferRequestedOutput("encoder_output")
+    ]
 
-    def run_decoder(self, decoder_input_ids, encoder_hidden_states):
-        """
-        Выполняет инференс через ONNX-модель Decoder.
-        """
-        print("Выполнение инференса Decoder...")
-        
-        # Проверка размерности encoder_hidden_states
-        print(f"Форма encoder_hidden_states: {encoder_hidden_states.shape}")
-        
-        # Изменение формы encoder_hidden_states, если необходимо
-        if encoder_hidden_states.shape != (1, 1, 1, 384):  # Пример ожидаемой формы
-            encoder_hidden_states = encoder_hidden_states[:, :1, :]  # Обрезаем до 1 шага
-            encoder_hidden_states = encoder_hidden_states.reshape(1, 1, 384)
-            print(f"Изменена форма encoder_hidden_states на: {encoder_hidden_states.shape}")
-        
-        # Подготовка decoder_input_ids: преобразуем в массив NumPy
-        decoder_input_ids = np.array(decoder_input_ids).astype(np.int64)
-        
-        # Подготовка входных данных для Decoder
-        decoder_inputs = {
-            "decoder_input_ids": decoder_input_ids,
-            "encoder_hidden_states": encoder_hidden_states
-        }
-        
-        # Выполнение инференса Decoder
-        decoder_outputs = self.decoder_session.run(None, decoder_inputs)
-        return decoder_outputs[0]  # Возвращаем logits
+    response = triton_client.infer(MODEL_NAME_ENCODER, inputs, outputs=outputs)
+    encoder_output = response.as_numpy("encoder_output")
+    return encoder_output
 
-    def transcribe_audio(self, waveform):
-        """
-        Выполняет транскрипцию аудиофайла с использованием ONNX-моделей.
-        """
-        print("Выполнение транскрипции...")
-        # Предобработка аудио
-        mel_input = self.preprocess_audio(waveform)
+# Отправка данных в декодер
+def run_decoder(encoder_output):
+    print("Running decoder inference...")
+    # Инициализация входных токенов (начальный токен)
+    decoder_input_ids = np.array([[50258]], dtype=np.int64)  # Токен начала последовательности
+    eos_token_id = processor.tokenizer.eos_token_id  # Токен конца последовательности
 
-        # Инференс Encoder
-        encoder_hidden_states = self.run_encoder(mel_input)
+    # Список для хранения сгенерированных токенов
+    generated_tokens = []
 
-        # Подготовка входных данных для Decoder
-        sot_token_id = self.processor.tokenizer.convert_tokens_to_ids("<|startoftranscript|>")  # Start of transcription token
-        decoder_input_ids = [[sot_token_id]]  # Токен начала транскрипции
+    # Максимальная длина последовательности
+    max_length = 100
 
-        logits = self.run_decoder(decoder_input_ids, encoder_hidden_states)
+    # Цикл декодирования
+    for _ in range(max_length):
+        inputs = [
+            grpcclient.InferInput("decoder_input", decoder_input_ids.shape, "INT64"),
+            grpcclient.InferInput("encoder_output", encoder_output.shape, "FP32")
+        ]
+        inputs[0].set_data_from_numpy(decoder_input_ids)
+        inputs[1].set_data_from_numpy(encoder_output.astype(np.float32))
 
-        # Декодирование выходных данных
-        predicted_ids = np.argmax(logits, axis=-1)
-        transcription = self.processor.batch_decode(predicted_ids, skip_special_tokens=True)[0]
-        print(f"Транскрипция: {transcription}")
-        return transcription
+        outputs = [
+            grpcclient.InferRequestedOutput("decoder_output")
+        ]
 
+        response = triton_client.infer(MODEL_NAME_DECODER, inputs, outputs=outputs)
+        decoder_output = response.as_numpy("decoder_output")
 
+        # Выбор наиболее вероятного токена
+        predicted_token = np.argmax(decoder_output[:, -1, :], axis=-1)
+        generated_tokens.append(predicted_token[0])
 
+        print(f"Predicted token: {predicted_token[0]}, Decoded: {processor.tokenizer.decode([predicted_token[0]])}")
+
+        # Проверка на достижение токена конца последовательности
+        if predicted_token[0] == eos_token_id:
+            break
+
+        # Обновление входных данных для следующего шага
+        decoder_input_ids = np.hstack((decoder_input_ids, [[predicted_token[0]]]))
+
+    return np.array(generated_tokens, dtype=np.int64)
+
+# Декодирование выходных данных в текст
+def decode_output(generated_tokens):
+    print("Decoding output...")
+    transcription = processor.tokenizer.decode(generated_tokens, skip_special_tokens=True)
+    return transcription
+
+# Основная функция
+def main():
+    try:
+        # Конвертация MP3 в WAV
+        wav_file = generate_wav_filename(AUDIO_FILE_PATH)
+        convert_mp3_to_wav(AUDIO_FILE_PATH, wav_file)
+
+        # Предварительная обработка аудио
+        audio_features = preprocess_audio(wav_file)
+        print("Audio features shape:", audio_features.shape)
+
+        # Выполнение инференса через энкодер
+        encoder_output = run_encoder(audio_features)
+
+        # Выполнение инференса через декодер
+        generated_tokens = run_decoder(encoder_output)
+
+        # Декодирование результата
+        transcription = decode_output(generated_tokens)
+
+        # Вывод транскрипции
+        print("Transcription:")
+        print(transcription)
+
+    finally:
+        # Удаление временного WAV-файла
+        if os.path.exists(wav_file):
+            print(f"Removing temporary WAV file: {wav_file}")
+            os.remove(wav_file)
 
 if __name__ == "__main__":
-    # Создаем экземпляр класса
-    processor = AudioProcessorONNX()
-
-    # Загрузка модели
-    processor.load_model()
-
-    # Путь к аудиофайлу
-    audio_path = "./audio/Sound_2.mp3"
-
-    # Загрузка аудио
-    waveform, sample_rate = processor.load_audio(audio_path)
-
-    # Транскрипция аудио
-    processor.transcribe_audio(waveform)
+    main()

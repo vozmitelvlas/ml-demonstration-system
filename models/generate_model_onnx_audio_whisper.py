@@ -1,221 +1,210 @@
-# integrated_whisper_processor.py
 import os
-import numpy as np
 import torch
+from datasets import load_dataset
+from transformers import WhisperModel, WhisperFeatureExtractor, WhisperProcessor
 import onnxruntime as ort
-from transformers import WhisperProcessor, WhisperForConditionalGeneration
+import numpy as np
 
+# Параметры
+MODEL_NAME = "openai/whisper-tiny"
+MODEL_REPO_DIR = "./model_repository"
+ENCODER_DIR = os.path.join(MODEL_REPO_DIR, "whisper_encoder")
+DECODER_DIR = os.path.join(MODEL_REPO_DIR, "whisper_decoder")
+ONNX_ENCODER_PATH = os.path.join(ENCODER_DIR, "1", "model.onnx")
+ONNX_DECODER_PATH = os.path.join(DECODER_DIR, "1", "model.onnx")
 
-class WhisperExporter:
-    def __init__(self, model_name="openai/whisper-tiny", model_repository_path="./model_repository", triton_version="1"):
-        """
-        Инициализация класса для экспорта моделей Whisper.
-        """
-        self.model_name = model_name
-        self.model_repository_path = model_repository_path
-        self.triton_version = triton_version
-        self.model = None
-        self.processor = None
+# Создание структуры папок
+def create_model_repository():
+    os.makedirs(os.path.join(ENCODER_DIR, "1"), exist_ok=True)
+    os.makedirs(os.path.join(DECODER_DIR, "1"), exist_ok=True)
 
-    def load_model(self):
-        """
-        Загружает модель Whisper и процессор.
-        """
-        print(f"Загрузка модели Whisper: {self.model_name}")
-        self.model = WhisperForConditionalGeneration.from_pretrained(self.model_name)
-        self.processor = WhisperProcessor.from_pretrained(self.model_name)
+# Экспорт энкодера в ONNX
+def export_encoder_to_onnx(model):
+    # Загрузка реального аудио из датасета
+    dataset = load_dataset("librispeech_asr", split="test.clean", streaming=True)
+    sample = next(iter(dataset))
+    audio_data = sample["audio"]["array"]
+    sample_rate = sample["audio"]["sampling_rate"]
 
-    def export_encoder(self, encoder_dir):
-        """
-        Экспортирует encoder в формат ONNX.
-        """
-        print("Экспорт encoder...")
-        encoder_input = torch.randn(1, 80, 3000)  # Пример входных данных для encoder
-        encoder_path = os.path.join(encoder_dir, "model.onnx")
-        torch.onnx.export(
-            self.model.model.encoder,
-            encoder_input,
-            encoder_path,
-            input_names=["mel"],
-            output_names=["encoder_hidden_states"],
-            dynamic_axes={
-                "mel": {0: "batch_size", 2: "sequence_length"},
-                "encoder_hidden_states": {0: "batch_size", 1: "sequence_length"}
-            },
-            opset_version=14
-        )
-        print(f"Encoder экспортирован: {encoder_path}")
+    # Преобразование аудио в лог-мел спектрограмму
+    features = feature_extractor(audio_data, sampling_rate=sample_rate, return_tensors="pt").input_features
 
-    def export_decoder(self, decoder_dir):
-        """
-        Экспортирует decoder в формат ONNX.
-        """
-        print("Экспорт decoder...")
-        decoder_input_ids = torch.randint(0, self.model.config.vocab_size, (1, 10))  # Пример входных данных для decoder
-        encoder_hidden_states = torch.randn(1, 10, self.model.config.d_model)  # Выход encoder
-        decoder_path = os.path.join(decoder_dir, "model.onnx")
-        torch.onnx.export(
-            self.model.model.decoder,
-            (decoder_input_ids, encoder_hidden_states),
-            decoder_path,
-            input_names=["decoder_input_ids", "encoder_hidden_states"],
-            output_names=["logits"],
-            dynamic_axes={
-                "decoder_input_ids": {0: "batch_size", 1: "sequence_length"},
-                "encoder_hidden_states": {0: "batch_size", 1: "sequence_length"},
-                "logits": {0: "batch_size", 1: "sequence_length"}
-            },
-            opset_version=14
-        )
-        print(f"Decoder экспортирован: {decoder_path}")
+    # Экспорт энкодера
+    torch.onnx.export(
+        model.encoder,
+        features,
+        ONNX_ENCODER_PATH,
+        input_names=["audio_features"],
+        output_names=["encoder_output"],
+        dynamic_axes={
+            "audio_features": {0: "batch_size", 2: "sequence_length"},  # Динамическая длина аудио
+            "encoder_output": {0: "batch_size", 1: "sequence_length"}   # Динамическая длина выхода
+        },
+        opset_version=15,  # Обновленная версия ONNX
+        verbose=True
+    )
+    print(f"Encoder exported to {ONNX_ENCODER_PATH}")
 
-    def create_triton_config(self, model_dir, model_name, sampling_rate=None, d_model=None, vocab_size=None):
-        """
-        Создает конфигурационный файл для Triton.
-        """
-        if model_name == "whisper_encoder":
-            config_content = f"""
-name: "{model_name}"
+    # Проверка экспорта
+    ort_session = ort.InferenceSession(ONNX_ENCODER_PATH)
+    onnx_inputs = {"audio_features": features.numpy()}
+    onnx_outputs = ort_session.run(None, onnx_inputs)
+    print(f"ONNX encoder output shape: {onnx_outputs[0].shape}")
+
+# Экспорт декодера в ONNX
+def export_decoder_to_onnx(model):
+    # Загрузка реального аудио из датасета
+    dataset = load_dataset("librispeech_asr", split="test.clean", streaming=True)
+    sample = next(iter(dataset))
+    audio_data = sample["audio"]["array"]
+    sample_rate = sample["audio"]["sampling_rate"]
+
+    # Преобразование аудио в лог-мел спектрограмму
+    features = feature_extractor(audio_data, sampling_rate=sample_rate, return_tensors="pt").input_features
+
+    # Получение выхода энкодера
+    encoder_hidden_states = model.encoder(features)
+
+    # Генерация примера текстовых токенов
+    text = "This is a test transcription."
+    tokenized_text = processor.tokenizer(text, return_tensors="pt").input_ids
+
+    # Упрощенный декодер без кэширования
+    class SimplifiedDecoder(torch.nn.Module):
+        def __init__(self, decoder):
+            super().__init__()
+            self.decoder = decoder
+
+        def forward(self, decoder_input_ids, encoder_hidden_states):
+            return self.decoder(
+                input_ids=decoder_input_ids,
+                encoder_hidden_states=encoder_hidden_states,
+                past_key_values=None
+            ).last_hidden_state
+
+    simplified_decoder = SimplifiedDecoder(model.decoder)
+
+    # Экспорт упрощенного декодера
+    torch.onnx.export(
+        simplified_decoder,
+        (tokenized_text, encoder_hidden_states.last_hidden_state),
+        ONNX_DECODER_PATH,
+        input_names=["decoder_input", "encoder_output"],
+        output_names=["decoder_output"],
+        dynamic_axes={
+            "decoder_input": {0: "batch_size", 1: "sequence_length"},
+            "encoder_output": {0: "batch_size", 1: "sequence_length"},
+            "decoder_output": {0: "batch_size", 1: "sequence_length"}
+        },
+        opset_version=15,  # Обновленная версия ONNX
+        verbose=True
+    )
+    print(f"Decoder exported to {ONNX_DECODER_PATH}")
+
+    # Проверка экспорта
+    ort_session = ort.InferenceSession(ONNX_DECODER_PATH)
+    onnx_inputs = {
+        "decoder_input": tokenized_text.numpy(),
+        "encoder_output": encoder_hidden_states.last_hidden_state.detach().numpy()  # Используем detach()
+    }
+    onnx_outputs = ort_session.run(None, onnx_inputs)
+    print(f"ONNX decoder output shape: {onnx_outputs[0].shape}")
+
+# Генерация config.pbtxt для энкодера
+def generate_encoder_config():
+    config_content = """
+name: "whisper_encoder"
 platform: "onnxruntime_onnx"
 max_batch_size: 0
 input [
-    {{
-        name: "mel"  
-        data_type: TYPE_FP32
-        dims: [-1, 80]
-    }}
+  {
+    name: "audio_features"
+    data_type: TYPE_FP32
+    dims: [-1, 80, -1]
+  }
 ]
 output [
-    {{
-        name: "encoder_hidden_states"
-        data_type: TYPE_FP32
-        dims: [-1, {d_model}]
-    }}
+  {
+    name: "encoder_output"
+    data_type: TYPE_FP32
+    dims: [-1, 1500, 384]  # Динамическая длина последовательности
+  }
 ]
 instance_group [
-    {{
-        kind: KIND_CPU  # Используем CPU вместо GPU
-        count: 1
-    }}
+  {
+    kind: KIND_CPU
+    count: 1
+  }
 ]
 """
-        elif model_name == "whisper_decoder":
-            config_content = f"""
-name: "{model_name}"
+    with open(os.path.join(ENCODER_DIR, "config.pbtxt"), "w") as f:
+        f.write(config_content)
+    print(f"Encoder config.pbtxt created at {os.path.join(ENCODER_DIR, 'config.pbtxt')}")
+
+# Генерация config.pbtxt для декодера
+def generate_decoder_config():
+    config_content = """
+name: "whisper_decoder"
 platform: "onnxruntime_onnx"
 max_batch_size: 0
 input [
-    {{
-        name: "decoder_input_ids"
-        data_type: TYPE_INT64
-        dims: [-1]
-    }},
-    {{
-        name: "encoder_hidden_states"
-        data_type: TYPE_FP32
-        dims: [-1, {d_model}]
-    }}
+  {
+    name: "decoder_input"
+    data_type: TYPE_INT64
+    dims: [-1, -1]
+  },
+  {
+    name: "encoder_output"
+    data_type: TYPE_FP32
+    dims: [-1, -1, 384]
+  }
 ]
 output [
-    {{
-        name: "logits"
-        data_type: TYPE_FP32
-        dims: [-1, {vocab_size}]
-    }}
+  {
+    name: "decoder_output"
+    data_type: TYPE_FP32
+    dims: [-1, -1, 384]
+  }
 ]
 instance_group [
-    {{
-        kind: KIND_CPU  # Используем CPU вместо GPU
-        count: 1
-    }}
+  {
+    kind: KIND_CPU
+    count: 1
+  }
 ]
 """
+    with open(os.path.join(DECODER_DIR, "config.pbtxt"), "w") as f:
+        f.write(config_content)
+    print(f"Decoder config.pbtxt created at {os.path.join(DECODER_DIR, 'config.pbtxt')}")
 
-        config_path = os.path.join(model_dir, "config.pbtxt")
-        with open(config_path, "w") as f:
-            f.write(config_content.strip())
-        print(f"Конфигурационный файл создан: {config_path}")
+# Основная функция
+def main():
+    # Загрузка модели
+    print("Loading Whisper Tiny model...")
+    model = WhisperModel.from_pretrained(MODEL_NAME)
+    global feature_extractor, processor
+    feature_extractor = WhisperFeatureExtractor.from_pretrained(MODEL_NAME)
+    processor = WhisperProcessor.from_pretrained(MODEL_NAME)
 
-    def test_encoder(self, encoder_path):
-        """
-        Тестирует экспортированную модель encoder.
-        """
-        print("Тестирование encoder...")
-        encoder_session = ort.InferenceSession(encoder_path)
+    # Создание структуры папок
+    print("Creating model repository structure...")
+    create_model_repository()
 
-        # Пример входных данных
-        encoder_input = np.random.randn(1, 80, 3000).astype(np.float32)  # Форма: (batch_size, num_features, sequence_length)
+    # Экспорт моделей в ONNX
+    print("Exporting encoder to ONNX...")
+    export_encoder_to_onnx(model)
 
-        # Выполнение инференса
-        encoder_outputs = encoder_session.run(None, {"mel": encoder_input})
+    print("Exporting decoder to ONNX...")
+    export_decoder_to_onnx(model)
 
-        # Проверка выходных данных
-        print("Форма выходных данных encoder:", encoder_outputs[0].shape)
-        assert len(encoder_outputs[0].shape) == 3, "Некорректная форма выходных данных encoder"
+    # Генерация конфигурационных файлов
+    print("Generating encoder config.pbtxt...")
+    generate_encoder_config()
 
-    def test_decoder(self, decoder_path):
-        """
-        Тестирует экспортированную модель decoder.
-        """
-        print("Тестирование decoder...")
-        decoder_session = ort.InferenceSession(decoder_path)
+    print("Generating decoder config.pbtxt...")
+    generate_decoder_config()
 
-        # Пример входных данных
-        decoder_input_ids = np.random.randint(0, self.model.config.vocab_size, (1, 10)).astype(np.int64)  # Форма: (batch_size, sequence_length)
-        encoder_hidden_states = np.random.randn(1, 10, self.model.config.d_model).astype(np.float32)  # Форма: (batch_size, sequence_length, d_model)
-
-        # Выполнение инференса
-        decoder_outputs = decoder_session.run(None, {
-            "decoder_input_ids": decoder_input_ids,
-            "encoder_hidden_states": encoder_hidden_states
-        })
-
-        # Проверка выходных данных
-        print("Форма выходных данных decoder:", decoder_outputs[0].shape)
-        assert len(decoder_outputs[0].shape) == 3, "Некорректная форма выходных данных decoder"
-
-    def export_to_triton(self):
-        """
-        Экспортирует модели encoder и decoder Whisper в формат ONNX и создает структуру для Triton.
-        """
-        # Создаем папку model_repository, если она не существует
-        os.makedirs(self.model_repository_path, exist_ok=True)
-
-        # Загружаем модель Whisper
-        self.load_model()
-
-        # Определяем пути для encoder и decoder
-        encoder_dir = os.path.join(self.model_repository_path, "whisper_encoder", self.triton_version)
-        decoder_dir = os.path.join(self.model_repository_path, "whisper_decoder", self.triton_version)
-
-        # Создаем папки для моделей
-        os.makedirs(encoder_dir, exist_ok=True)
-        os.makedirs(decoder_dir, exist_ok=True)
-
-        # Экспорт encoder
-        self.export_encoder(encoder_dir)
-
-        # Тестирование encoder
-        print("Тестирование encoder...")
-        encoder_path = os.path.join(encoder_dir, "model.onnx")
-        self.test_encoder(encoder_path)
-
-        # Экспорт decoder
-        self.export_decoder(decoder_dir)
-
-        # Тестирование decoder
-        print("Тестирование decoder...")
-        decoder_path = os.path.join(decoder_dir, "model.onnx")
-        self.test_decoder(decoder_path)
-
-        # Создание конфигурационных файлов для Triton
-        self.create_triton_config(encoder_dir, "whisper_encoder", self.processor.feature_extractor.sampling_rate, self.model.config.d_model)
-        self.create_triton_config(decoder_dir, "whisper_decoder", d_model=self.model.config.d_model, vocab_size=self.model.config.vocab_size)
-
-        print("Интеграция завершена. Модели готовы для использования в Triton.")
-
+    print("All tasks completed successfully!")
 
 if __name__ == "__main__":
-    # Шаг 1: Генерация ONNX-моделей
-    exporter = WhisperExporter()
-    exporter.export_to_triton()
+    main()
