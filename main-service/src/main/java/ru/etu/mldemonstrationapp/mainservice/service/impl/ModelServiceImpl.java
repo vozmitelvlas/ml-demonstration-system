@@ -55,9 +55,9 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
-    public void runTheModel(Long modelVersionId, Long userId) {
-        ModelVersion modelVersion = getModelVersionById(modelVersionId, userId);
-        throttlingService.checkRequestLimitExceeded(userId, modelVersion.getModelId());
+    public void runTheModel(Long modelId, Long userId) {
+        Model model = getModelById(modelId, userId);
+        throttlingService.checkRequestLimitExceeded(model.getModelId(), userId);
     }
 
 }
