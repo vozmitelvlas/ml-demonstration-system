@@ -11,18 +11,17 @@ import org.springframework.web.server.ResponseStatusException;
 import ru.etu.mldemonstrationapp.mainservice.dto.UpdatePasswordRequest;
 import ru.etu.mldemonstrationapp.mainservice.dto.UpdateProfileRequest;
 import ru.etu.mldemonstrationapp.mainservice.dto.UserRegistrationRequest;
-import ru.etu.mldemonstrationapp.mainservice.entity.Organization;
-import ru.etu.mldemonstrationapp.mainservice.entity.Role;
-import ru.etu.mldemonstrationapp.mainservice.entity.User;
+import ru.etu.mldemonstrationapp.mainservice.entity.*;
+import ru.etu.mldemonstrationapp.mainservice.repository.LimitRepository;
+import ru.etu.mldemonstrationapp.mainservice.repository.ModelRepository;
 import ru.etu.mldemonstrationapp.mainservice.repository.OrganizationRepository;
 import ru.etu.mldemonstrationapp.mainservice.repository.UserRepository;
-import ru.etu.mldemonstrationapp.mainservice.service.JwtService;
+import ru.etu.mldemonstrationapp.mainservice.service.UserRpwService;
 import ru.etu.mldemonstrationapp.mainservice.service.UserService;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -32,6 +31,12 @@ public class UserServiceImpl implements UserService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private OrganizationRepository organizationRepository;
+    @Autowired
+    private LimitRepository limitRepository;
+    @Autowired
+    private ModelRepository modelRepository;
+    @Autowired
+    private UserRpwService userRpwService;
 
     @Override
     public User getUserById(Long id) {
@@ -77,7 +82,14 @@ public class UserServiceImpl implements UserService {
 
         user.setEmailConfirm(false);
 
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+
+        //set users limits and rpw
+        List<Model> models = modelRepository.findAllByOrganization(savedUser.getOrganization());
+        createAndSaveUserLimitsForOrgModels(savedUser);
+        userRpwService.createAndSaveModelsRpwForUser(savedUser, models);
+
+        return savedUser;
     }
 
     @Transactional
@@ -131,10 +143,43 @@ public class UserServiceImpl implements UserService {
         user.setEmailConfirm(true);
         userRepository.save(user);
     }
+
     @Transactional
     @Scheduled(fixedDelay = 1, timeUnit = TimeUnit.HOURS)
-    public void deleteUnconfirmedUsers(){
+    public void deleteUnconfirmedUsers() {
         userRepository.deleteAllByEmailConfirm(false);
     }
 
+    @Transactional
+    @Override
+    public void createAndSaveUserLimitsForOrgMembers(Organization organization, ModelOrganizationLimit limit) {
+        List<ModelUserLimit> newUserLimits = organization.getMembers().stream()
+                .map(user ->  {
+                    ModelUserLimit userLimit = new ModelUserLimit();
+                    userLimit.setUser(user);
+                    userLimit.setModel(limit.getModel());
+                    userLimit.setRps(limit.getRps());
+                    userLimit.setRequestsPerWeek(limit.getRequestsPerWeek());
+                    return userLimit;
+                })
+                .toList();
+        limitRepository.saveAll(newUserLimits);
+    }
+
+    @Transactional
+    @Override
+    public void createAndSaveUserLimitsForOrgModels(User user) {
+        List<ModelUserLimit> newUserLimits = user.getOrganization().getLimits().stream()
+                .map(orgLimit -> {
+                    ModelUserLimit userLimit = new ModelUserLimit();
+                    userLimit.setUser(user);
+                    userLimit.setModel(orgLimit.getModel());
+                    userLimit.setRps(orgLimit.getRps());
+                    userLimit.setRequestsPerWeek(orgLimit.getRequestsPerWeek());
+                    return userLimit;
+                })
+                .toList();
+
+        limitRepository.saveAll(newUserLimits);
+    }
 }

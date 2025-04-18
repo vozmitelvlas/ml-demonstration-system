@@ -1,3 +1,4 @@
+
 plugins {
 	java
 	id("org.springframework.boot") version "3.4.1"
@@ -43,9 +44,11 @@ allprojects {
 		implementation("io.jsonwebtoken:jjwt-api:0.12.6")
 		implementation("io.jsonwebtoken:jjwt-impl:0.12.6")
 		implementation("io.jsonwebtoken:jjwt-jackson:0.12.6")
-
 		// Swagger
 		implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0")
+
+		// Bucket4j core library
+		implementation("com.bucket4j:bucket4j_jdk17-core:8.14.0")
 
 
 		// Lombok

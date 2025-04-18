@@ -33,3 +33,5 @@ VALUES (1, 1, '121', 'http://localhost:4000/densenet/121', 'A DenseNet convoluti
 INSERT INTO models_users_limits (model_id, user_id, limit_id) VALUES (1, 2, 3), (1, 3, 4), (2, 3, 5);
 
 INSERT INTO models_organizations_limits (model_id, organization_id, limit_id) VALUES (1, 2, 6), (1, 4, 7), (2, 4, 8);
+
+INSERT INTO user_rpw (user_id, model_id, current_requests) VALUES (2, 1, 0), (3, 1, 0), (3, 2, 0);

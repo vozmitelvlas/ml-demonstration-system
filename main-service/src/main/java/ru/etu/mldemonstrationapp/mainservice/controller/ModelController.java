@@ -11,10 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.etu.mldemonstrationapp.mainservice.configuration.JwtToken;
-import ru.etu.mldemonstrationapp.mainservice.entity.Model;
-import ru.etu.mldemonstrationapp.mainservice.entity.ModelProblemType;
-import ru.etu.mldemonstrationapp.mainservice.entity.ModelRuntime;
-import ru.etu.mldemonstrationapp.mainservice.entity.ModelVersion;
+import ru.etu.mldemonstrationapp.mainservice.entity.*;
 import ru.etu.mldemonstrationapp.mainservice.service.ModelService;
 
 import java.util.Arrays;
@@ -26,7 +23,6 @@ import java.util.List;
 public class ModelController {
     @Autowired
     private ModelService modelService;
-
     /**
      * Get all models available to the current user.
      *
@@ -104,5 +100,13 @@ public class ModelController {
     @GetMapping("/problem-types")
     public List<ModelProblemType> getSupportedProblemTypes() {
         return Arrays.asList(ModelProblemType.values());
+    }
+
+    @Operation(description = "Get model result")
+    @ApiResponse(responseCode = "200")
+    @GetMapping("/{modelId}/user/{userId}")
+    public ResponseEntity<Void> runTheModel(@PathVariable Long modelId, @PathVariable Long userId) {
+        modelService.runTheModel(userId, modelId);
+        return ResponseEntity.noContent().build();
     }
 }
