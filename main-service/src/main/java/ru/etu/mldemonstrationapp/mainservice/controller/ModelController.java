@@ -106,7 +106,7 @@ public class ModelController {
     @ApiResponse(responseCode = "200")
     @GetMapping("/{modelId}/user/{userId}")
     public ResponseEntity<Void> runTheModel(@PathVariable Long modelId, @PathVariable Long userId) {
-        modelService.runTheModel(userId, modelId);
+        modelService.runTheModel(modelId, userId);
         return ResponseEntity.noContent().build();
     }
 }

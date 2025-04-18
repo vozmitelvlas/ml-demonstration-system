@@ -14,5 +14,5 @@ public interface ModelService {
 
     List<ModelVersion> getAvailableModelsVersions(Long userId);
 
-    void runTheModel(Long userId, Long modelId);
+    void runTheModel(Long modelId, Long userId);
 }
