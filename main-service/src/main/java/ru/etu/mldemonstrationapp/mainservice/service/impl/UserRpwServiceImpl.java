@@ -23,7 +23,9 @@ public class UserRpwServiceImpl implements UserRpwService {
     public void resetCurrentRequestsWeekly() {
         userRpwRepository.updateCurrentRequestsToZero();
     }
+
     @Transactional
+    @Override
     public void createAndSaveRpwForOrgMembers(Organization organization, Model model) {
         List<UserRpw> newUserRpws = organization.getMembers().stream()
                 .map(user -> {
@@ -37,7 +39,9 @@ public class UserRpwServiceImpl implements UserRpwService {
 
         userRpwRepository.saveAll(newUserRpws);
     }
+
     @Transactional
+    @Override
     public void createAndSaveModelsRpwForUser(User user, List<Model> models) {
         List<UserRpw> newUserRpws = models.stream()
                 .map(model -> {
@@ -51,4 +55,18 @@ public class UserRpwServiceImpl implements UserRpwService {
 
         userRpwRepository.saveAll(newUserRpws);
     }
+
+    @Transactional
+    @Override
+    public void deleteAllUserRpw(User user) {
+        userRpwRepository.deleteAllByUser(user);
+    }
+
+    @Transactional
+    @Override
+    public void deleteAllOrganizationMembersRpwForModel(Organization organization, Model model) {
+        List<UserRpw> userRpwToDelete = userRpwRepository.findAllByOrganizationAndModel(organization.getOrganizationId(), model.getModelId());
+        userRpwRepository.deleteAllInBatch(userRpwToDelete);
+    }
+
 }

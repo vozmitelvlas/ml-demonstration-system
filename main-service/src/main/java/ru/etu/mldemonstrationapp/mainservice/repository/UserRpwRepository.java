@@ -12,9 +12,8 @@ import java.util.Optional;
 
 public interface UserRpwRepository extends JpaRepository<UserRpw, Long> {
 
-
-
     void deleteAllByUser(@Param("user") User user);
+
     @Query("""
             SELECT ur FROM UserRpw ur
             JOIN ur.user u

@@ -10,12 +10,14 @@ import java.util.List;
 public interface UserRpwService {
 
     @Transactional
-    void resetCurrentRequestsWeekly();
-
-    @Transactional
     void createAndSaveRpwForOrgMembers(Organization organization, Model model);
 
     @Transactional
     void createAndSaveModelsRpwForUser(User user, List<Model> models);
 
+    @Transactional
+    void deleteAllUserRpw(User user);
+
+    @Transactional
+    void deleteAllOrganizationMembersRpwForModel(Organization organization, Model model);
 }
