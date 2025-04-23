@@ -11,7 +11,6 @@ import ru.etu.mldemonstrationapp.mainservice.entity.Organization;
 import ru.etu.mldemonstrationapp.mainservice.repository.ModelRepository;
 import ru.etu.mldemonstrationapp.mainservice.repository.ModelVersionRepository;
 import ru.etu.mldemonstrationapp.mainservice.service.ModelService;
-import ru.etu.mldemonstrationapp.mainservice.service.ThrottlingService;
 import ru.etu.mldemonstrationapp.mainservice.service.UserService;
 
 import java.util.List;
@@ -25,8 +24,6 @@ public class ModelServiceImpl implements ModelService {
     private ModelVersionRepository modelVersionRepository;
     @Autowired
     private UserService userService;
-    @Autowired
-    private ThrottlingService throttlingService;
 
     @Override
     public List<Model> getAvailableModels(Long userId) {
@@ -53,12 +50,5 @@ public class ModelServiceImpl implements ModelService {
         Organization organization = userService.getUserById(userId).getOrganization();
         return modelVersionRepository.findAllByOrganization(organization);
     }
-
-    @Override
-    public void runTheModel(Long modelId, Long userId) {
-        Model model = getModelById(modelId, userId);
-        throttlingService.checkRequestLimitExceeded(model.getModelId(), userId);
-    }
-
 }
 

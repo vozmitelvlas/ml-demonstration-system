@@ -20,7 +20,7 @@ public class GlobalExceptionHandler {
 
 
     @ExceptionHandler(RpsLimitException.class)
-    public ResponseEntity<ProblemDetail> handleRpsLimitException(RpsLimitException exception){
+    public ResponseEntity<ProblemDetail> handleRpsLimitException(RpsLimitException exception) {
         return ResponseEntity
                 .status(HttpStatus.TOO_MANY_REQUESTS)
                 .body(ProblemDetail.forStatusAndDetail(HttpStatus.TOO_MANY_REQUESTS, exception.getMessage()));

@@ -11,7 +11,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.etu.mldemonstrationapp.mainservice.configuration.JwtToken;
-import ru.etu.mldemonstrationapp.mainservice.entity.*;
+import ru.etu.mldemonstrationapp.mainservice.entity.Model;
+import ru.etu.mldemonstrationapp.mainservice.entity.ModelProblemType;
+import ru.etu.mldemonstrationapp.mainservice.entity.ModelRuntime;
+import ru.etu.mldemonstrationapp.mainservice.entity.ModelVersion;
 import ru.etu.mldemonstrationapp.mainservice.service.ModelService;
 
 import java.util.Arrays;
@@ -23,6 +26,7 @@ import java.util.List;
 public class ModelController {
     @Autowired
     private ModelService modelService;
+
     /**
      * Get all models available to the current user.
      *
@@ -78,8 +82,8 @@ public class ModelController {
     /**
      * Get all supported runtimes for models. Supported runtimes are specified in the {@link ModelRuntime} enum.
      *
-     * @see ModelRuntime
      * @return List of supported runtimes for models.
+     * @see ModelRuntime
      */
     @Operation(description = "Get all supported runtimes for models")
     @ApiResponse(responseCode = "200", useReturnTypeSchema = true)
@@ -92,8 +96,8 @@ public class ModelController {
      * Get all supported problem types for models. Supported problem types.
      * are specified in the {@link ModelProblemType} enum.
      *
-     * @see ModelProblemType
      * @return List of supported problem types for models.
+     * @see ModelProblemType
      */
     @Operation(description = "Get all supported problem types for models")
     @ApiResponse(responseCode = "200", useReturnTypeSchema = true)
@@ -102,11 +106,4 @@ public class ModelController {
         return Arrays.asList(ModelProblemType.values());
     }
 
-    @Operation(description = "Get model result")
-    @ApiResponse(responseCode = "200")
-    @GetMapping("/{modelId}/user/{userId}")
-    public ResponseEntity<Void> runTheModel(@PathVariable Long modelId, @PathVariable Long userId) {
-        modelService.runTheModel(modelId, userId);
-        return ResponseEntity.noContent().build();
-    }
 }

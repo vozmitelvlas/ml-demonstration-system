@@ -34,7 +34,7 @@
         "server_url": "unix:///var/run/docker.sock",
         "entrypoint": "/bin/bash,-c",
         "command": "python3 -u /opt/monai/app/app.py",
-        "task_timeout_minutes": "5",
+        "task_timeout_minutes": "10",
         "temp_storage_container_path": "/var/lib/mde/",
         "env_CUDA_VISIBLE_DEVICES": " ",
         "env_NVIDIA_VISIBLE_DEVICES": " ",

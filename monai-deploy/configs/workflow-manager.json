@@ -12,7 +12,7 @@
       "maxPageSize": 1000000
     },
     "TaskManager": {
-      "concurrency": 1,
+      "concurrency": 4,
       "taskTimeoutMinutes": 60,
       "perTaskTypeTimeoutMinutes": {
         "aide_clinical_review": 5760

@@ -25,7 +25,7 @@ public class AdminOrganizationController extends OrganizationController {
     /**
      * Create a new organization.
      *
-     * @param dto Request body with a new organization data.
+     * @param dto                  Request body with a new organization data.
      * @param uriComponentsBuilder URI builder used to specify a Location header.
      * @return New organization details.
      */
@@ -45,7 +45,7 @@ public class AdminOrganizationController extends OrganizationController {
     /**
      * Update organization.
      *
-     * @param id The ID of the organization.
+     * @param id  The ID of the organization.
      * @param dto Update request with a new organization details.
      * @return Updated organization.
      */
@@ -72,7 +72,7 @@ public class AdminOrganizationController extends OrganizationController {
     /**
      * Open access and create limit to the model for the organization.
      *
-     * @param id The ID of the organization.
+     * @param id      The ID of the organization.
      * @param request Request with an ID of the model and limit info.
      * @return {@link ModelOrganizationLimitResponse}
      */
@@ -94,8 +94,8 @@ public class AdminOrganizationController extends OrganizationController {
      * Update a model limit for the organization.
      *
      * @param organizationId The ID of the organization.
-     * @param modelId The ID of the model.
-     * @param limit New limit to the model for the organization.
+     * @param modelId        The ID of the model.
+     * @param limit          New limit to the model for the organization.
      * @return {@link ModelOrganizationLimitResponse}
      */
     @Operation(description = "Update organization limit for available model")
@@ -110,7 +110,7 @@ public class AdminOrganizationController extends OrganizationController {
      * Close access to the model and delete the model limit for the organization.
      *
      * @param organizationId The ID of the organization.
-     * @param modelId The ID of the model.
+     * @param modelId        The ID of the model.
      * @return No content if successful.
      */
     @Operation(description = "Close access to model for organization")
