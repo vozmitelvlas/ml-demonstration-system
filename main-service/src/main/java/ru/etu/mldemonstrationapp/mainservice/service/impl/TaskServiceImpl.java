@@ -67,4 +67,11 @@ public class TaskServiceImpl implements TaskService {
         taskRepository.save(task);
     }
 
+    @Override
+    public void deleteOutputPath(UUID taskId) {
+        Task task = getTask(taskId);
+        task.setOutputPath(null);
+        taskRepository.save(task);
+    }
+
 }

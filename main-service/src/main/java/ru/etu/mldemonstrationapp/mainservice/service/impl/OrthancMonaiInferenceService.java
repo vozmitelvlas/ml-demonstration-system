@@ -70,6 +70,7 @@ public class OrthancMonaiInferenceService implements ModelInferenceService {
 
             // Clearing
             orthancRestClient.deleteSeries(resultSeriesId);
+            taskService.deleteOutputPath(taskId);
             executorService.schedule(() -> clearArtifacts(inputFilePath, resultFilePath), monaiDeployProperties.getResultStoringTimeMinutes(), TimeUnit.MINUTES);
 
         } catch (Exception e) {

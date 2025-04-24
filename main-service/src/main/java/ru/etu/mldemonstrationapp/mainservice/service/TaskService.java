@@ -19,4 +19,7 @@ public interface TaskService {
 
     @Transactional
     void markFailed(UUID taskId, String errorMessage);
+
+    @Transactional
+    void deleteOutputPath(UUID taskId);
 }
