@@ -1,18 +1,24 @@
-package ru.etu.mldemonstrationapp.mainservice.clients;
+package ru.etu.mldemonstrationapp.mainservice.clients.orthanc;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClient;
 import ru.etu.mldemonstrationapp.mainservice.exception.ExternalServerClientError;
 import ru.etu.mldemonstrationapp.mainservice.exception.ExternalServerResponseError;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -25,6 +31,9 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class OrthancRestClientImpl implements OrthancRestClient {
     private final RestClient restClient;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     /**
      * Upload DICOM instance to the Orthanc server. This implementation returns uploaded Series ID
@@ -48,32 +57,33 @@ public class OrthancRestClientImpl implements OrthancRestClient {
 
             // Orthanc returns an array of objects when multiple DICOM instances are loaded, and a single object
             // when only one is loaded. Therefore, it is necessary to use ObjectMapper
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode root = mapper.readTree(jsonBody);
+            JsonNode root = objectMapper.readTree(jsonBody);
 
             if (root.isArray()) { // Multiple instances case
-                List<OrthancUploadInstanceResponse> instances = mapper
+                List<OrthancUploadInstanceResponse> instances = objectMapper
                         .readerForListOf(OrthancUploadInstanceResponse.class)
                         .readValue(root);
 
                 if (instances.isEmpty()) {
-                    log.warn("Orthanc returned an empty list of uploaded instances");
-                    throw new ExternalServerClientError("Некорректный формат файла");
+                    throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Orthanc returned an empty list of uploaded instances");
                 }
 
                 return instances.get(0).ParentSeries();
             }
 
             // One instance case
-            return mapper.treeToValue(root, OrthancUploadInstanceResponse.class).ParentSeries();
+            return objectMapper.treeToValue(root, OrthancUploadInstanceResponse.class).ParentSeries();
 
         } catch (HttpClientErrorException.BadRequest e) {
-            log.warn(e.getMessage());
+            log.error("Client error while uploading DICOM instances to Orthanc: {}", StringUtils.normalizeSpace(e.getResponseBodyAsString()));
             throw new ExternalServerClientError("Некорректный формат файла");
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            throw new ExternalServerResponseError("Ошибка при отправке данных удаленному серверу");
+        } catch (HttpServerErrorException e) {
+            log.error("Orthanc error while uploading DICOM instances to Orthanc: {}", StringUtils.normalizeSpace(e.getResponseBodyAsString()));
+            throw new ExternalServerResponseError("Ошибка при отправке данных Orthanc серверу");
+        } catch (IOException e) {
+            log.error("Error while parsing Orthanc response: {}", e.getMessage());
         }
+        return "";
     }
 
     /**
@@ -100,13 +110,12 @@ public class OrthancRestClientImpl implements OrthancRestClient {
                     .body(OrthancStoreResponse.class);
 
             if (Objects.isNull(response)) {
-                log.error("OrthancStoreResponse body is null");
-                throw new ExternalServerResponseError("Ошибка при отправке данных удаленному серверу");
+                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "OrthancStoreResponse body is null");
             }
             return response.ID();
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            throw new ExternalServerResponseError("Получен неожиданный ответ от удаленного сервера");
+        } catch (HttpStatusCodeException e) {
+            log.error("Error while sending instance to remote modality {}: {}", modalityName, StringUtils.normalizeSpace(e.getResponseBodyAsString()));
+            throw new ExternalServerResponseError("Ошибка при отправке данных в модальность %s".formatted(modalityName));
         }
 
     }
@@ -119,9 +128,9 @@ public class OrthancRestClientImpl implements OrthancRestClient {
                     .uri("/jobs/{jobId}", jobId)
                     .retrieve()
                     .body(OrthancJob.class);
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            throw new ExternalServerResponseError("Получен неожиданный ответ от удаленного сервера");
+        } catch (HttpStatusCodeException e) {
+            log.error("Error while getting Orthanc job: {}", StringUtils.normalizeSpace(e.getResponseBodyAsString()));
+            throw new ExternalServerResponseError("Ошибка при получении состояния задачи c ID %s".formatted(jobId));
         }
     }
 
@@ -133,9 +142,9 @@ public class OrthancRestClientImpl implements OrthancRestClient {
                     .uri("/series/{seriesId}?requested-tags={requested-tags}", seriesId, String.join(";", requestedTags))
                     .retrieve()
                     .body(OrthancSeries.class);
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            throw new ExternalServerResponseError("Получен неожиданный ответ от удаленного сервера");
+        } catch (HttpStatusCodeException e) {
+            log.error("Error while getting Orthanc series: {}", StringUtils.normalizeSpace(e.getResponseBodyAsString()));
+            throw new ExternalServerResponseError("Ошибка при запросе информации о серии с ID %s".formatted(seriesId));
         }
     }
 
@@ -147,8 +156,9 @@ public class OrthancRestClientImpl implements OrthancRestClient {
                     .uri("/series/{seriesId}", seriesId)
                     .retrieve()
                     .toBodilessEntity();
-        } catch (Exception e) {
-            log.error(e.getMessage());
+        } catch (HttpStatusCodeException e) {
+            log.error("Error while deleting Orthanc series: {}", StringUtils.normalizeSpace(e.getResponseBodyAsString()));
+            throw new ExternalServerResponseError("Ошибка при удалении серии с ID %s".formatted(seriesId));
         }
     }
 
@@ -162,14 +172,16 @@ public class OrthancRestClientImpl implements OrthancRestClient {
                     .body(Resource.class);
 
             if (Objects.isNull(body)) {
-                log.error("Series zip is null");
-                throw new ExternalServerResponseError("Не удалось получить данные от удаленного сервера");
+                throw new HttpServerErrorException(HttpStatus.BAD_GATEWAY, "Zip body is null");
             }
 
             return new InputStreamResource(body.getInputStream());
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            throw new ExternalServerResponseError("Не удалось получить данные от удаленного сервера");
+        } catch (HttpStatusCodeException e) {
+            log.error("Error while getting series archive: {}", StringUtils.normalizeSpace(e.getResponseBodyAsString()));
+            throw new ExternalServerResponseError("Ошибка при получении результата");
+        } catch (IOException e) {
+            log.error("Error while reading zip response body: {}", e.getMessage());
+            throw new ExternalServerResponseError("Ошибка при чтении результата");
         }
     }
 
@@ -189,9 +201,9 @@ public class OrthancRestClientImpl implements OrthancRestClient {
                     ))
                     .retrieve()
                     .body(parameterizedTypeReference);
-        } catch (HttpClientErrorException e) {
-            log.error(e.getMessage());
-            throw new ExternalServerResponseError("Получен неожиданный ответ от удаленного сервера");
+        } catch (HttpStatusCodeException e) {
+            log.error("Error while getting result resource ID: {}", StringUtils.normalizeSpace(e.getResponseBodyAsString()));
+            throw new ExternalServerResponseError("Ошибка при получении ID результата инференса");
         }
 
     }

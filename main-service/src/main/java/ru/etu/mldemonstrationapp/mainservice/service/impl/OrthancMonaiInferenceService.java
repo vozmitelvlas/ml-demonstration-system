@@ -11,7 +11,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
-import ru.etu.mldemonstrationapp.mainservice.clients.OrthancRestClient;
+import ru.etu.mldemonstrationapp.mainservice.clients.orthanc.OrthancRestClient;
 import ru.etu.mldemonstrationapp.mainservice.configuration.inference.monaideploy.MonaiDeployProperties;
 import ru.etu.mldemonstrationapp.mainservice.dto.InferRequest;
 import ru.etu.mldemonstrationapp.mainservice.entity.ModelRuntime;

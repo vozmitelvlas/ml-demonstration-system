@@ -1,6 +1,9 @@
-package ru.etu.mldemonstrationapp.mainservice.clients;
+package ru.etu.mldemonstrationapp.mainservice.clients.orthanc;
 
 import org.springframework.core.io.Resource;
+import ru.etu.mldemonstrationapp.mainservice.clients.PacsModalitySender;
+import ru.etu.mldemonstrationapp.mainservice.clients.PacsResourceFinder;
+import ru.etu.mldemonstrationapp.mainservice.clients.PacsResourceUploader;
 
 import java.util.List;
 import java.util.Map;
