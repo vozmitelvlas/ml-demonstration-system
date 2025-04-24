@@ -63,3 +63,5 @@ inference:
   monai-deploy:
     pacs:
       url: http://localhost:8042
+      store-timeout-seconds: 20
+      inference-task-timeout-seconds: 600 # 10 * 60

@@ -147,7 +147,7 @@ public class OrthancMonaiInferenceService implements ModelInferenceService {
     }
 
     private String waitForModelResult(String studyInstanceUID) {
-        return pollForModelResult(studyInstanceUID).orTimeout(7, TimeUnit.MINUTES).join();
+        return pollForModelResult(studyInstanceUID).orTimeout(monaiDeployProperties.getPacs().getInferenceTaskTimeoutSeconds(), TimeUnit.SECONDS).join();
     }
 
     private CompletableFuture<String> pollForModelResult(String studyInstanceUID) {
@@ -176,7 +176,7 @@ public class OrthancMonaiInferenceService implements ModelInferenceService {
 
     private void waitForJobCompletion(String jobId) {
         pollJobStatus(jobId)
-                .orTimeout(20, TimeUnit.SECONDS)
+                .orTimeout(monaiDeployProperties.getPacs().getStoreTimeoutSeconds(), TimeUnit.SECONDS)
                 .exceptionally(exception -> {
                     log.error(exception.getMessage());
 
