@@ -15,8 +15,8 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClient;
-import ru.etu.mldemonstrationapp.mainservice.exception.ExternalServerClientError;
-import ru.etu.mldemonstrationapp.mainservice.exception.ExternalServerResponseError;
+import ru.etu.mldemonstrationapp.mainservice.exception.ExternalServerClientException;
+import ru.etu.mldemonstrationapp.mainservice.exception.ExternalServerInternalException;
 
 import java.io.IOException;
 import java.util.List;
@@ -76,14 +76,14 @@ public class OrthancRestClientImpl implements OrthancRestClient {
 
         } catch (HttpClientErrorException.BadRequest e) {
             log.error("Client error while uploading DICOM instances to Orthanc: {}", StringUtils.normalizeSpace(e.getResponseBodyAsString()));
-            throw new ExternalServerClientError("Некорректный формат файла");
+            throw new ExternalServerClientException("Некорректный формат файла", e);
         } catch (HttpServerErrorException e) {
             log.error("Orthanc error while uploading DICOM instances to Orthanc: {}", StringUtils.normalizeSpace(e.getResponseBodyAsString()));
-            throw new ExternalServerResponseError("Ошибка при отправке данных Orthanc серверу");
+            throw new ExternalServerInternalException("Ошибка при отправке данных Orthanc серверу", e);
         } catch (IOException e) {
             log.error("Error while parsing Orthanc response: {}", e.getMessage());
+            throw new ExternalServerInternalException("HttpStatus.INTERNAL_SERVER_ERROR",  e);
         }
-        return "";
     }
 
     /**
@@ -115,7 +115,7 @@ public class OrthancRestClientImpl implements OrthancRestClient {
             return response.ID();
         } catch (HttpStatusCodeException e) {
             log.error("Error while sending instance to remote modality {}: {}", modalityName, StringUtils.normalizeSpace(e.getResponseBodyAsString()));
-            throw new ExternalServerResponseError("Ошибка при отправке данных в модальность %s".formatted(modalityName));
+            throw new ExternalServerInternalException("Ошибка при отправке данных в модальность %s".formatted(modalityName));
         }
 
     }
@@ -130,7 +130,7 @@ public class OrthancRestClientImpl implements OrthancRestClient {
                     .body(OrthancJob.class);
         } catch (HttpStatusCodeException e) {
             log.error("Error while getting Orthanc job: {}", StringUtils.normalizeSpace(e.getResponseBodyAsString()));
-            throw new ExternalServerResponseError("Ошибка при получении состояния задачи c ID %s".formatted(jobId));
+            throw new ExternalServerInternalException("Ошибка при получении состояния задачи c ID %s".formatted(jobId));
         }
     }
 
@@ -144,7 +144,7 @@ public class OrthancRestClientImpl implements OrthancRestClient {
                     .body(OrthancSeries.class);
         } catch (HttpStatusCodeException e) {
             log.error("Error while getting Orthanc series: {}", StringUtils.normalizeSpace(e.getResponseBodyAsString()));
-            throw new ExternalServerResponseError("Ошибка при запросе информации о серии с ID %s".formatted(seriesId));
+            throw new ExternalServerInternalException("Ошибка при запросе информации о серии с ID %s".formatted(seriesId));
         }
     }
 
@@ -158,7 +158,7 @@ public class OrthancRestClientImpl implements OrthancRestClient {
                     .toBodilessEntity();
         } catch (HttpStatusCodeException e) {
             log.error("Error while deleting Orthanc series: {}", StringUtils.normalizeSpace(e.getResponseBodyAsString()));
-            throw new ExternalServerResponseError("Ошибка при удалении серии с ID %s".formatted(seriesId));
+            throw new ExternalServerInternalException("Ошибка при удалении серии с ID %s".formatted(seriesId));
         }
     }
 
@@ -178,10 +178,10 @@ public class OrthancRestClientImpl implements OrthancRestClient {
             return new InputStreamResource(body.getInputStream());
         } catch (HttpStatusCodeException e) {
             log.error("Error while getting series archive: {}", StringUtils.normalizeSpace(e.getResponseBodyAsString()));
-            throw new ExternalServerResponseError("Ошибка при получении результата");
+            throw new ExternalServerInternalException("Ошибка при получении результата");
         } catch (IOException e) {
             log.error("Error while reading zip response body: {}", e.getMessage());
-            throw new ExternalServerResponseError("Ошибка при чтении результата");
+            throw new ExternalServerInternalException("Ошибка при чтении результата");
         }
     }
 
@@ -203,7 +203,7 @@ public class OrthancRestClientImpl implements OrthancRestClient {
                     .body(parameterizedTypeReference);
         } catch (HttpStatusCodeException e) {
             log.error("Error while getting result resource ID: {}", StringUtils.normalizeSpace(e.getResponseBodyAsString()));
-            throw new ExternalServerResponseError("Ошибка при получении ID результата инференса");
+            throw new ExternalServerInternalException("Ошибка при получении ID результата инференса");
         }
 
     }

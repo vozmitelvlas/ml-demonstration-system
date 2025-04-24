@@ -11,14 +11,13 @@ import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.NoSuchElementException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
-
     @ExceptionHandler(RpsLimitException.class)
     public ResponseEntity<ProblemDetail> handleRpsLimitException(RpsLimitException exception) {
         return ResponseEntity
@@ -78,5 +77,20 @@ public class GlobalExceptionHandler {
                 exception.getMessage()
         );
         return ResponseEntity.badRequest().body(problemDetail);
+    }
+
+    @ExceptionHandler(ModelNotSupportedException.class)
+    public ResponseEntity<ProblemDetail> handleModelNotSupportedException(ModelNotSupportedException exception) {
+        return ResponseEntity
+                .status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_ENTITY, exception.getMessage()));
+    }
+
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ProblemDetail> handleUploadSizeExceededException(MaxUploadSizeExceededException exception) {
+        return ResponseEntity
+                .status(HttpStatus.PAYLOAD_TOO_LARGE)
+                .body(ProblemDetail.forStatusAndDetail(HttpStatus.PAYLOAD_TOO_LARGE, exception.getMessage()));
     }
 }
