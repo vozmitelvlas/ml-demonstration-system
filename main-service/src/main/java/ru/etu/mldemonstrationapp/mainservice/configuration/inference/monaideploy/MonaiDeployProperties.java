@@ -20,7 +20,12 @@ public class MonaiDeployProperties {
     private PacsProperties pacs;
 
     /**
-     * MONAI Deploy Informatics Gateway Application Entity Title
+     * MONAI Deploy Informatics Gateway Application Entity Title (default: MONAI-DEPLOY)
      */
     private String aeTitle = "MONAI-DEPLOY";
+
+    /**
+     * Time (in minutes) for storing the inference result on the server
+     */
+    private Integer resultStoringTimeMinutes = 3;
 }

@@ -15,11 +15,10 @@ import ru.etu.mldemonstrationapp.mainservice.configuration.JwtToken;
 import ru.etu.mldemonstrationapp.mainservice.dto.InferRequest;
 import ru.etu.mldemonstrationapp.mainservice.entity.ModelVersion;
 import ru.etu.mldemonstrationapp.mainservice.entity.Task;
+import ru.etu.mldemonstrationapp.mainservice.service.ModelInferenceService;
 import ru.etu.mldemonstrationapp.mainservice.service.ModelService;
 import ru.etu.mldemonstrationapp.mainservice.service.TaskService;
 import ru.etu.mldemonstrationapp.mainservice.service.ThrottlingService;
-import ru.etu.mldemonstrationapp.mainservice.service.UserService;
-import ru.etu.mldemonstrationapp.mainservice.service.ModelInferenceService;
 
 import java.util.UUID;
 
@@ -38,10 +37,6 @@ public class InferenceController {
 
     @Autowired
     private TaskService taskService;
-
-    @Autowired
-    private UserService userService;
-
 
     /**
      * Perform inference using a specified model deployed on the inference server.
