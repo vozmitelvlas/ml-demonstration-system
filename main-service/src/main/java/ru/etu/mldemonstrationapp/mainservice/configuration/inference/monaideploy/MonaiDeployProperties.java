@@ -19,6 +19,7 @@ public class MonaiDeployProperties {
      */
     private PacsProperties pacs;
 
+    private MonaiWorkflowManagerProperties workflowManager;
     /**
      * MONAI Deploy Informatics Gateway Application Entity Title (default: MONAI-DEPLOY)
      */
