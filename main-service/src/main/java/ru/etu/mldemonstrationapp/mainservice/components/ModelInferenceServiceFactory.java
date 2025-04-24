@@ -7,12 +7,13 @@ import org.springframework.web.server.ResponseStatusException;
 import ru.etu.mldemonstrationapp.mainservice.entity.ModelVersion;
 import ru.etu.mldemonstrationapp.mainservice.service.ModelInferenceService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
 public class ModelInferenceServiceFactory {
-    @Autowired
-    private List<ModelInferenceService> services;
+    @Autowired(required = false)
+    private List<ModelInferenceService> services = new ArrayList<>();
 
     public ModelInferenceService getInferenceService(ModelVersion modelVersion) {
         return this.services.stream()

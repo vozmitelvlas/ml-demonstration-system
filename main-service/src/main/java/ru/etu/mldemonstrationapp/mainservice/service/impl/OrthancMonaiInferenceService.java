@@ -2,6 +2,7 @@ package ru.etu.mldemonstrationapp.mainservice.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -36,6 +37,7 @@ import java.util.concurrent.*;
  */
 @Service
 @Slf4j
+@ConditionalOnBean(MonaiDeployProperties.class)
 public class OrthancMonaiInferenceService implements ModelInferenceService {
     @Autowired
     private MonaiDeployProperties monaiDeployProperties;
