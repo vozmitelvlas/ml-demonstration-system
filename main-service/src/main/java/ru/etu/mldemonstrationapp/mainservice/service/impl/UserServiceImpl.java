@@ -21,6 +21,7 @@ import ru.etu.mldemonstrationapp.mainservice.service.UserService;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -41,7 +42,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserById(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+                .orElseThrow(() -> new NoSuchElementException(String.format("Пользователь с ID %d не найден", id)));
     }
 
     @Override
@@ -53,20 +54,20 @@ public class UserServiceImpl implements UserService {
     @Override
     public User registerUser(UserRegistrationRequest request) {
         if (userRepository.existsByLogin(request.login())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Login already exists");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Данный логин уже используется");
         }
         if (userRepository.existsByEmail(request.email())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Данный email уже используется");
         }
 
         List<Role> userRoles = userRepository.findRolesByName(Collections.singletonList("USER"));
         if (userRoles.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Default role USER not found");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Ошибка при назначении роли пользователя");
         }
 
         // Default organization
         Organization organization = organizationRepository.findById(1L)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Default organization with id 1 does not exist"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Ошибки при назначении организации"));
 
         User user = new User();
         user.setLogin(request.login());

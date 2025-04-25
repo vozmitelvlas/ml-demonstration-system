@@ -14,6 +14,8 @@ import ru.etu.mldemonstrationapp.mainservice.repository.LimitRepository;
 import ru.etu.mldemonstrationapp.mainservice.service.ThrottlingService;
 import ru.etu.mldemonstrationapp.mainservice.service.UserService;
 
+import java.util.NoSuchElementException;
+
 @Service
 public class ThrottlingServiceImpl implements ThrottlingService {
     @Autowired
@@ -48,7 +50,7 @@ public class ThrottlingServiceImpl implements ThrottlingService {
                         throw new IllegalArgumentException("Unknown limits type: " + limitsType);
                     }
                 })
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Limit for modelId " + modelId + " not found"));
+                .orElseThrow(() -> new NoSuchElementException("Limit for modelId " + modelId + " not found"));
     }
 
     @Override
