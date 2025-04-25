@@ -58,7 +58,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ProblemDetail> handleBindException(BindException exception) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.BAD_REQUEST,
-                "Request could not be processed due to incorrect format"
+                "Запрос не может быть обработан из-за некорректного формата"
         );
         problemDetail.setProperty("errors", exception.getAllErrors().stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)

@@ -83,6 +83,9 @@ public class AdminModelsServiceImpl implements AdminModelsService {
         modelRepository.save(model);
 
         if (dto.runtime() == ModelRuntime.MONAI_DEPLOY) {
+            if (dto.config() == null || dto.config().isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Конфигурация workflow не указана");
+            }
             String workflowId = workflowManagerClient.registerWorkflow(dto.config()).workflow_id();
             model.setOtherData(Map.of("workflowId", workflowId));
         }

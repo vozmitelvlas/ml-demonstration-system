@@ -42,6 +42,7 @@ export default function CatalogModels({isConfirmed, setIsConfirmed}) {
             description: "",
             problemType: "",
             runtime: "",
+            config: null
         }
     })
     const versionForm = useForm({
@@ -113,7 +114,8 @@ export default function CatalogModels({isConfirmed, setIsConfirmed}) {
         const payload = {
             ...newValue,
             problemType: newValue.problemType.value,
-            runtime: newValue.runtime.value
+            runtime: newValue.runtime.value,
+            config: newValue.config
         }
         dispatch(addModelAction(payload)).then(() => {
             setIsAddingModel(!isAddingModel)
