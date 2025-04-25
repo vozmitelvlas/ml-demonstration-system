@@ -93,4 +93,18 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.PAYLOAD_TOO_LARGE)
                 .body(ProblemDetail.forStatusAndDetail(HttpStatus.PAYLOAD_TOO_LARGE, exception.getMessage()));
     }
+
+    @ExceptionHandler(ExternalServerClientException.class)
+    public ResponseEntity<ProblemDetail> handleExternalServerClientException(ExternalServerClientException exception) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exception.getMessage()));
+    }
+
+    @ExceptionHandler(ExternalServerInternalException.class)
+    public ResponseEntity<ProblemDetail> handleExternalServerInternalException(ExternalServerInternalException exception) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_GATEWAY)
+                .body(ProblemDetail.forStatusAndDetail(HttpStatus.BAD_GATEWAY, exception.getMessage()));
+    }
 }

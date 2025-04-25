@@ -6,19 +6,18 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import ru.etu.mldemonstrationapp.mainservice.clients.monai.WorkflowManagerClient;
 import ru.etu.mldemonstrationapp.mainservice.dto.CreateModelRequest;
 import ru.etu.mldemonstrationapp.mainservice.dto.CreateModelVersionRequest;
 import ru.etu.mldemonstrationapp.mainservice.dto.UpdateModelVersionRequest;
-import ru.etu.mldemonstrationapp.mainservice.entity.Limit;
-import ru.etu.mldemonstrationapp.mainservice.entity.Model;
-import ru.etu.mldemonstrationapp.mainservice.entity.ModelInfo;
-import ru.etu.mldemonstrationapp.mainservice.entity.ModelVersion;
+import ru.etu.mldemonstrationapp.mainservice.entity.*;
 import ru.etu.mldemonstrationapp.mainservice.repository.ModelRepository;
 import ru.etu.mldemonstrationapp.mainservice.repository.ModelVersionRepository;
 import ru.etu.mldemonstrationapp.mainservice.service.AdminModelsService;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class AdminModelsServiceImpl implements AdminModelsService {
@@ -26,6 +25,9 @@ public class AdminModelsServiceImpl implements AdminModelsService {
     private ModelRepository modelRepository;
     @Autowired
     private ModelVersionRepository modelVersionRepository;
+    @Autowired
+    private WorkflowManagerClient workflowManagerClient;
+
 
     @Override
     public Model getModel(Long modelId) {
@@ -53,6 +55,7 @@ public class AdminModelsServiceImpl implements AdminModelsService {
         if (modelRepository.existsByName(dto.name())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Model name already in use");
         }
+
         Model model = new Model();
         model.setName(dto.name());
 
@@ -66,8 +69,8 @@ public class AdminModelsServiceImpl implements AdminModelsService {
         modelInfo.setModel(model);
 
         model.setModelInfo(modelInfo);
-
         modelRepository.save(model);
+
 
         // Add default version of the model
         ModelVersion modelVersion = new ModelVersion();
@@ -77,6 +80,13 @@ public class AdminModelsServiceImpl implements AdminModelsService {
         modelVersion.setModel(model);
 
         model.getModelVersions().add(modelVersion);
+        modelRepository.save(model);
+
+        if (dto.runtime() == ModelRuntime.MONAI_DEPLOY) {
+            String workflowId = workflowManagerClient.registerWorkflow(dto.config()).workflow_id();
+            model.setOtherData(Map. of("workflowId", workflowId));
+        }
+
         return modelRepository.save(model);
     }
 
