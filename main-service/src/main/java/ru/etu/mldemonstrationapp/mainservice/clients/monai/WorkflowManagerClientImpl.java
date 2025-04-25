@@ -38,7 +38,7 @@ public class WorkflowManagerClientImpl implements WorkflowManagerClient {
     public void deleteWorkflow(String workflowId) {
         try {
             restClient.delete()
-                    .uri("/workflows/{}", workflowId)
+                    .uri("/workflows/{workflowId}", workflowId)
                     .retrieve()
                     .toBodilessEntity();
 

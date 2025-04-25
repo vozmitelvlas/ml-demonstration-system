@@ -84,7 +84,7 @@ public class AdminModelsServiceImpl implements AdminModelsService {
 
         if (dto.runtime() == ModelRuntime.MONAI_DEPLOY) {
             String workflowId = workflowManagerClient.registerWorkflow(dto.config()).workflow_id();
-            model.setOtherData(Map. of("workflowId", workflowId));
+            model.setOtherData(Map.of("workflowId", workflowId));
         }
 
         return modelRepository.save(model);
@@ -150,10 +150,13 @@ public class AdminModelsServiceImpl implements AdminModelsService {
     @Override
     public void deleteModelVersion(Long id) {
         ModelVersion modelVersion = modelVersionRepository.findById(id).orElseThrow();
-        Long modelId = modelVersion.getModel().getModelId();
+        Model model = modelVersion.getModel();
+        if (modelVersion.getModel().getModelVersions().size() == 1 && model.getRuntime() == ModelRuntime.MONAI_DEPLOY) {
+            workflowManagerClient.deleteWorkflow(model.getOtherData().get("workflowId"));
+        }
         modelVersionRepository.delete(modelVersion);
 
         // Limit entity is removed because the model will be removed by cascade
-        modelRepository.deleteModelIfVersionsListEmpty(modelId);
+        modelRepository.deleteModelIfVersionsListEmpty(model.getModelId());
     }
 }
