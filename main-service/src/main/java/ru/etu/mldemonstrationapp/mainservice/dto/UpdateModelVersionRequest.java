@@ -18,9 +18,8 @@ public record UpdateModelVersionRequest(
         @Size(max = 500, message = "Description cannot exceed 500 characters")
         String description,
 
-        @NotNull(message = "URI cannot be null")
         @URL(message = "Invalid URI format")
-        @Size(min = 1, max = 255, message = "URI must be between 1 and 255 characters")
+        @Size(max = 255, message = "URI cannot exceed 255 characters")
         String uri,
 
         @NotNull(message = "Runtime cannot be null")

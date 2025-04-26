@@ -51,9 +51,7 @@
             <column name="version_name" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="uri" type="varchar(255)">
-                <constraints nullable="false"/>
-            </column>
+            <column name="uri" type="varchar(255)"/>
             <column name="description" type="text"/>
             <column name="updated_at" type="timestamptz" defaultValueComputed="current_timestamp">
                 <constraints nullable="false"/>

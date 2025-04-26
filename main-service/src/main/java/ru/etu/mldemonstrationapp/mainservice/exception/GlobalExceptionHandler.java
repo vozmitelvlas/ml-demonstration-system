@@ -58,7 +58,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ProblemDetail> handleBindException(BindException exception) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.BAD_REQUEST,
-                "Request could not be processed due to incorrect format"
+                "Запрос не может быть обработан из-за некорректного формата"
         );
         problemDetail.setProperty("errors", exception.getAllErrors().stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
@@ -91,6 +91,20 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ProblemDetail> handleUploadSizeExceededException(MaxUploadSizeExceededException exception) {
         return ResponseEntity
                 .status(HttpStatus.PAYLOAD_TOO_LARGE)
-                .body(ProblemDetail.forStatusAndDetail(HttpStatus.PAYLOAD_TOO_LARGE, exception.getMessage()));
+                .body(ProblemDetail.forStatusAndDetail(HttpStatus.PAYLOAD_TOO_LARGE, "Превышен максимальный размер загружаемого файла"));
+    }
+
+    @ExceptionHandler(ExternalServerClientException.class)
+    public ResponseEntity<ProblemDetail> handleExternalServerClientException(ExternalServerClientException exception) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exception.getMessage()));
+    }
+
+    @ExceptionHandler(ExternalServerInternalException.class)
+    public ResponseEntity<ProblemDetail> handleExternalServerInternalException(ExternalServerInternalException exception) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_GATEWAY)
+                .body(ProblemDetail.forStatusAndDetail(HttpStatus.BAD_GATEWAY, exception.getMessage()));
     }
 }

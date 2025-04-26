@@ -23,9 +23,10 @@ export function Models({onDeleteModelClick}){
                         <th className="text-center">Статус</th>
                         <th className="text-center">Название</th>
                         <th className="text-center">Версия</th>
-                        <th className="text-center">Тип модели</th>
+                        <th className="text-center">Тип задачи</th>
+                        <th className="text-center">Runtime</th>
                         <th className="text-center">Дата добавления</th>
-                        <th className="text-center">URI модели</th>
+
                         {isAdminMode && (
                             <th></th>
                         )}
@@ -52,13 +53,13 @@ export function Models({onDeleteModelClick}){
                             </td>
                             <td className="text-center">{model.versionName}</td>
                             <td className="text-center">{model.problemType.value}</td>
-                            <td className="text-center">{getDateFormat(new Date(model.createdAt))}</td>
                             <td className="text-center">
                                 <div className="URL">
-                                    {model.uri}
-                                    <a className="a-img" name="copyLogo"><img src={copyLogo}></img></a>
+                                    {model.runtime.value}
                                 </div>
                             </td>
+                            <td className="text-center">{getDateFormat(new Date(model.createdAt))}</td>
+
                             {isAdminMode && (
                                 <td className="text-center">
                                     <Link className="a-img"

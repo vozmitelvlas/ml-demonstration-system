@@ -72,7 +72,7 @@ export function AddNewModelVersionModal({isAddingVersion, setIsAddingVersion, on
                         <tr>
                             <td>URI<span> *</span></td>
                             <td className="text-center">
-                                <input type="text" {...form.register("uri")} required/>
+                                <input type="text" {...form.register("uri")}/>
                             </td>
                         </tr>
                         <tr>
