@@ -91,7 +91,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ProblemDetail> handleUploadSizeExceededException(MaxUploadSizeExceededException exception) {
         return ResponseEntity
                 .status(HttpStatus.PAYLOAD_TOO_LARGE)
-                .body(ProblemDetail.forStatusAndDetail(HttpStatus.PAYLOAD_TOO_LARGE, exception.getMessage()));
+                .body(ProblemDetail.forStatusAndDetail(HttpStatus.PAYLOAD_TOO_LARGE, "Превышен максимальный размер загружаемого файла"));
     }
 
     @ExceptionHandler(ExternalServerClientException.class)

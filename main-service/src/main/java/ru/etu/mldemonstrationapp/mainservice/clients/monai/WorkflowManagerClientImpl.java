@@ -26,6 +26,9 @@ public class WorkflowManagerClientImpl implements WorkflowManagerClient {
                     .body(WorkflowRegisterResponse.class);
 
         } catch (HttpClientErrorException.BadRequest e) {
+            if (e.getResponseBodyAsString().contains("already exists")) {
+                throw  new ExternalServerClientException(String.format("Workflow с названием %s уже существует", workflowConfig.get("name")), e);
+            }
             log.error("Incorrect workflow syntax: {}", StringUtils.normalizeSpace(e.getResponseBodyAsString()));
             throw new ExternalServerClientException("Некорректный workflow", e);
         } catch (HttpStatusCodeException e) {

@@ -45,20 +45,20 @@ public class InferenceController {
      * @param jwtToken     the JWT token containing the user ID, used to verify access permissions for model inference.
      * @return Inference task ID
      */
-    @Operation(description = "Run model inference and get inference task ID for tracking")
-    @ApiResponse(responseCode = "202", useReturnTypeSchema = true)
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<UUID> performInference(@Valid @RequestPart("parameters") InferRequest inferRequest,
-                                                 @RequestPart(required = false, name = "file") MultipartFile input,
-                                                 @AuthenticationPrincipal JwtToken jwtToken) {
-        ModelVersion modelVersion = modelService.getModelVersionById(inferRequest.modelVersionId(), jwtToken.userId());
-        throttlingService.checkRequestLimitExceeded(modelVersion.getModelId(), jwtToken.userId());
+        @Operation(description = "Run model inference and get inference task ID for tracking")
+        @ApiResponse(responseCode = "202", useReturnTypeSchema = true)
+        @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+        public ResponseEntity<UUID> performInference(@Valid @RequestPart("parameters") InferRequest inferRequest,
+                                                     @RequestPart(required = false, name = "file") MultipartFile input,
+                                                     @AuthenticationPrincipal JwtToken jwtToken) {
+            ModelVersion modelVersion = modelService.getModelVersionById(inferRequest.modelVersionId(), jwtToken.userId());
+            throttlingService.checkRequestLimitExceeded(modelVersion.getModelId(), jwtToken.userId());
 
-        ModelInferenceService inferenceService = modelInferenceServiceFactory.getInferenceService(modelVersion);
-        Task task = taskService.createTask(jwtToken.userId(), modelVersion);
-        inferenceService.infer(inferRequest, input, task.getTaskId());
-        return ResponseEntity.accepted().body(task.getTaskId());
-    }
+            ModelInferenceService inferenceService = modelInferenceServiceFactory.getInferenceService(modelVersion);
+            Task task = taskService.createTask(jwtToken.userId(), modelVersion);
+            inferenceService.infer(inferRequest, input, task.getTaskId());
+            return ResponseEntity.accepted().body(task.getTaskId());
+        }
 
     @Operation(description = "Get status of the inference task")
     @ApiResponse(responseCode = "200", useReturnTypeSchema = true)
