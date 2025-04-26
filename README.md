@@ -42,6 +42,7 @@ $ ./init.sh
 $ docker compose up
 ```
 Note: Ensure container ports are properly mapped to host ports for the Workflow Manager and Orthanc.
+
 3. Start Spring Boot application using
 ```bash
 $ ./gradlew :main-service:bootRun
@@ -85,10 +86,10 @@ The models-workflows-examples directory includes the examples of workflows confi
 Below are the instructions for setting up a MONAI model using the `liver-tumor.json` workflow 
 1. Pull the AI Liver Tumor MAP
 ```shell
-docker pull ghcr.io/mmelqin/monai_ai_livertumor_seg_app:1.0
+$ docker pull ghcr.io/mmelqin/monai_ai_livertumor_seg_app:1.0
 ```
 
-3. Log in as an administrator 
+2. Log in as an administrator 
 - Login: admin
 - Password: password
 
@@ -106,18 +107,7 @@ docker pull ghcr.io/mmelqin/monai_ai_livertumor_seg_app:1.0
 
 9. Upload a DICOM dataset as a ZIP archive and click to submit
 
-10. Wait for inference result 
-
-
-
-
-
-
-
-
-
-
-
+10. Wait for inference result
 
 ## Test users
 | ROLES                        | LOGIN    | PASSWORD |
