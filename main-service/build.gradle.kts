@@ -53,10 +53,10 @@ allprojects {
 		annotationProcessor("org.projectlombok:lombok")
 
 		// HTTP client for Triton REST API
-	    implementation ('com.squareup.okhttp3:okhttp:4.10.0')
+	    implementation ("com.squareup.okhttp3:okhttp:4.10.0")
 
 		// File handling
-	    implementation ('commons-io:commons-io:2.15.0')
+	    implementation ("commons-io:commons-io:2.15.0")
 
 		// Test dependencies
 		testImplementation("org.testcontainers:postgresql")
