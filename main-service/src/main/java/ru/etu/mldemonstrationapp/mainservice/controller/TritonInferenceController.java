@@ -11,11 +11,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/inference")
-public class InferenceController {
+public class TritonInferenceController {
 
     private final TritonService tritonService;
 
-    public InferenceController(TritonService tritonService) {
+    public TritonInferenceController(TritonService tritonService) {
         this.tritonService = tritonService;
     }
 
