@@ -16,14 +16,17 @@ class TinyConv(nn.Module):
             nn.ReLU(),
             nn.MaxPool1d(kernel_size=2, stride=2)
         )
+        # Заменяем AdaptiveAvgPool1d на глобальное усреднение
+        self.global_pool = nn.AdaptiveAvgPool1d(1)  # Глобальное усреднение до размера (batch_size, 32, 1)
         self.classifier = nn.Sequential(
-            nn.Linear(32 * 8, 64),  # Предполагается входной сигнал длиной 32
+            nn.Linear(32, 64),  # Размер входа равен количеству каналов после глобального усреднения
             nn.ReLU(),
             nn.Linear(64, num_classes)
         )
 
     def forward(self, x):
         x = self.features(x)
+        x = self.global_pool(x)  # Применяем глобальное усреднение
         x = torch.flatten(x, 1)  # Flatten для линейного слоя
         x = self.classifier(x)
         return x
@@ -33,8 +36,8 @@ input_channels = 1  # Например, одномерный сигнал (ECG, 
 num_classes = 5     # Количество классов для классификации
 model = TinyConv(input_channels=input_channels, num_classes=num_classes)
 
-# Пример входных данных (batch_size=1, channels=1, signal_length=32)
-dummy_input = torch.randn(1, 1, 32)
+# Пример входных данных (batch_size=1, channels=1, signal_length=произвольная длина)
+dummy_input = torch.randn(1, 1, 64)  # Сигнал длиной 64
 
 # 3. Экспорт модели в ONNX
 onnx_model_path = "tinycov_model.onnx"
@@ -47,8 +50,8 @@ torch.onnx.export(
     do_constant_folding=True,   # Оптимизация констант
     input_names=["input"],      # Имя входного тензора
     output_names=["output"],    # Имя выходного тензора
-    dynamic_axes={              # Динамические размеры для batch size
-        "input": {0: "batch_size"},
+    dynamic_axes={              # Динамические размеры для batch size и длины сигнала
+        "input": {0: "batch_size", 2: "signal_length"},
         "output": {0: "batch_size"}
     }
 )
@@ -71,6 +74,11 @@ os.makedirs(version_dir, exist_ok=True)
 # Копирование ONNX-файла в папку версии
 shutil.copy(onnx_model_path, os.path.join(version_dir, "model.onnx"))
 
+# Удаление временного файла tinycov_model.onnx
+if os.path.exists(onnx_model_path):
+    os.remove(onnx_model_path)
+    print(f"Временный файл {onnx_model_path} удален.")
+
 # Создание файла config.pbtxt
 config_pbtxt = f"""
 name: "{model_name}"
@@ -80,7 +88,7 @@ input [
   {{
     name: "input"
     data_type: TYPE_FP32
-    dims: [-1, 1, 32]  # Размерность входных данных без батча
+    dims: [-1, 1, -1]  # Размерность входных данных без батча
   }}
 ]
 output [
