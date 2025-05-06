@@ -6,6 +6,7 @@ from pydub import AudioSegment
 from transformers import Wav2Vec2Processor
 import tritonclient.grpc as grpcclient
 from tritonclient.utils import np_to_triton_dtype
+import time
 
 
 class AudioProcessor:
@@ -27,6 +28,7 @@ class AudioProcessor:
         self.waveform = None
         self.sr = None
         self.triton_client = grpcclient.InferenceServerClient(url=triton_url)
+        self.timing_data = {}  # Словарь для хранения времени этапов
 
     def _generate_wav_filename(self):
         """Генерация имени временного WAV-файла."""
@@ -35,6 +37,8 @@ class AudioProcessor:
 
     def convert_mp3_to_wav(self):
         """Конвертация MP3 в WAV."""
+        start_time = time.time()
+
         if not os.path.exists(self.mp3_file):
             raise FileNotFoundError(f"Файл {self.mp3_file} не найден.")
         print(f"Конвертация файла {self.mp3_file} в WAV...")
@@ -42,8 +46,13 @@ class AudioProcessor:
         audio.export(self.wav_file, format="wav")
         print(f"Файл успешно конвертирован: {self.wav_file}")
 
+        end_time = time.time()
+        self.timing_data['convert_mp3_to_wav'] = end_time - start_time
+
     def load_and_preprocess_audio(self):
         """Загрузка и предобработка аудио."""
+        start_time = time.time()
+
         if not os.path.exists(self.wav_file):
             raise FileNotFoundError(f"Файл {self.wav_file} не найден.")
         print(f"Загрузка и предобработка аудио: {self.wav_file}")
@@ -52,30 +61,35 @@ class AudioProcessor:
         self.waveform = waveform
         self.sr = sr
 
+        end_time = time.time()
+        self.timing_data['load_and_preprocess_audio'] = end_time - start_time
+
     def transcribe_audio_with_triton(self):
         """Использование модели на Triton для распознавания текста."""
+        start_time = time.time()
+
         if not self.triton_client.is_server_live():
             raise ConnectionError(f"Triton Server на {self.triton_url} недоступен.")
 
         print(f"Отправка запроса к модели {self.model_name} на Triton...")
 
-        # Подготовка входных данных
         input_data = self.waveform.reshape(1, -1).astype(np.float32)
         inputs = [
             grpcclient.InferInput("input", input_data.shape, np_to_triton_dtype(input_data.dtype))
         ]
         inputs[0].set_data_from_numpy(input_data)
 
-        # Подготовка выходных данных
         outputs = [grpcclient.InferRequestedOutput("output")]
 
-        # Выполнение инференса
         response = self.triton_client.infer(model_name=self.model_name, inputs=inputs, outputs=outputs)
         logits = response.as_numpy("output")
 
-        # Декодирование выходных данных
         predicted_ids = np.argmax(logits, axis=-1)
         transcription = self.processor.tokenizer.decode(predicted_ids[0])
+
+        end_time = time.time()
+        self.timing_data['transcribe_audio_with_triton'] = end_time - start_time
+
         return transcription
 
     def plot_waveform_and_spectrogram(self):
@@ -109,6 +123,8 @@ class AudioProcessor:
     def process(self):
         """Основной метод для выполнения всех шагов."""
         try:
+            total_start_time = time.time()
+
             # Шаг 1: Конвертация MP3 в WAV
             self.convert_mp3_to_wav()
 
@@ -122,16 +138,23 @@ class AudioProcessor:
             # Шаг 4: Построение графиков и спектрограммы
             self.plot_waveform_and_spectrogram()
 
+            total_end_time = time.time()
+            self.timing_data['total_processing_time'] = total_end_time - total_start_time
+
+            # Вывод результатов
+            print("\n⏱️ Время выполнения этапов:")
+            for step, duration in self.timing_data.items():
+                print(f"- {step}: {duration:.4f} сек.")
+
         except Exception as e:
             print(f"Ошибка: {e}")
         finally:
-            # Удаление временного WAV-файла
             self.cleanup()
 
 
 # Пример использования
 if __name__ == "__main__":
-    mp3_file = "./audio/Sound_1.mp3"
+    mp3_file = "./audio/Sound_5.mp3"
     triton_url = "localhost:8001"  # URL Triton Inference Server
     model_name = "wav2vec2"  # Имя модели, развернутой на Triton
 
