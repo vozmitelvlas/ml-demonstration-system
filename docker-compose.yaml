@@ -24,7 +24,8 @@ services:
       DB_PORT: 5432
       DB_USER: postgres
       DB_PASSWORD: postgres
-      SMTP_USERNAME: ml.demonstation.app@gmail.com
+      MONAI_PACS_URL: http://orthanc:8042
+      MONAI_WORKFLOW_MANAGER_URL: http://workflow-manager:5001
     restart: on-failure
     ports:
       - "8080:8080"
@@ -43,7 +44,7 @@ services:
     volumes:
       - app-data:/var/lib/postgresql/data
     networks:
-        - ml-demonstration-net
+      - ml-demonstration-net
 
   triton:
     image: nvcr.io/nvidia/tritonserver:24.12-py3

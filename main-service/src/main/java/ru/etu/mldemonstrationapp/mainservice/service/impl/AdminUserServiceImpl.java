@@ -11,18 +11,11 @@ import org.springframework.web.server.ResponseStatusException;
 import ru.etu.mldemonstrationapp.mainservice.dto.CreateUserRequest;
 import ru.etu.mldemonstrationapp.mainservice.dto.ModelUserLimitResponse;
 import ru.etu.mldemonstrationapp.mainservice.dto.UpdateUserRequest;
-import ru.etu.mldemonstrationapp.mainservice.entity.Limit;
-import ru.etu.mldemonstrationapp.mainservice.repository.LimitRepository;
-import ru.etu.mldemonstrationapp.mainservice.entity.Model;
-import ru.etu.mldemonstrationapp.mainservice.repository.ModelRepository;
-import ru.etu.mldemonstrationapp.mainservice.entity.ModelOrganizationLimit;
-import ru.etu.mldemonstrationapp.mainservice.entity.Organization;
-import ru.etu.mldemonstrationapp.mainservice.repository.OrganizationRepository;
-import ru.etu.mldemonstrationapp.mainservice.entity.ModelUserLimit;
-import ru.etu.mldemonstrationapp.mainservice.entity.Role;
-import ru.etu.mldemonstrationapp.mainservice.entity.User;
-import ru.etu.mldemonstrationapp.mainservice.repository.UserRepository;
+import ru.etu.mldemonstrationapp.mainservice.entity.*;
+import ru.etu.mldemonstrationapp.mainservice.repository.*;
 import ru.etu.mldemonstrationapp.mainservice.service.AdminUserService;
+import ru.etu.mldemonstrationapp.mainservice.service.UserRpwService;
+import ru.etu.mldemonstrationapp.mainservice.service.UserService;
 
 import java.time.Instant;
 import java.util.Collections;
@@ -41,6 +34,10 @@ public class AdminUserServiceImpl implements AdminUserService {
     private UserRepository userRepository;
     @Autowired
     private OrganizationRepository organizationRepository;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private UserRpwService userRpwService;
 
     @Override
     public List<User> getUsers() {
@@ -49,25 +46,16 @@ public class AdminUserServiceImpl implements AdminUserService {
 
     @Override
     public User getUser(Long userId) {
-        return userRepository.findById(userId).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "User with id %s not found".formatted(userId))
-        );
+        return userService.getUserById(userId);
     }
 
     @Override
     public List<ModelUserLimitResponse> getAllUserLimits(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with id %s not found".formatted(userId)));
+        User user = userService.getUserById(userId);
 
-        var limits = limitRepository.findLimitsForUser(user);
-        return limits.stream().map(result -> {
-            var organizationLimit = (ModelOrganizationLimit) result[0];
-            var userLimit = (ModelUserLimit) result[1];
-            return ModelUserLimitResponse.fromLimitAndModel(
-                    userLimit == null ? organizationLimit : userLimit,
-                    organizationLimit.getModel()
-            );
-
-        }).toList();
+        return user.getLimits().stream().map(limit -> ModelUserLimitResponse.fromLimitAndModel(
+                limit, limit.getModel()
+        )).toList();
     }
 
     @Transactional
@@ -109,9 +97,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     @Transactional
     @Override
     public User updateUser(Long userId, @Valid UpdateUserRequest dto) {
-        User user = userRepository.findById(userId).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "User with id %s not found".formatted(userId))
-        );
+        User user = userService.getUserById(userId);
 
         user.setFirstName(dto.firstName());
         user.setLastName(dto.lastName());
@@ -125,10 +111,18 @@ public class AdminUserServiceImpl implements AdminUserService {
                             HttpStatus.CONFLICT,
                             "Organization with id %s does not exist".formatted(dto.organizationId())
                     ));
-            user.setOrganization(organization);
+
+            userRpwService.deleteAllUserRpw(user);
 
             // Delete all user limits due to changing of available models list
             limitRepository.deleteAllByIdInBatch(user.getLimits().stream().map(Limit::getLimitId).toList());
+
+            List<Model> models = modelRepository.findAllByOrganization(organization);
+
+            user.setOrganization(organization);
+
+            userService.createAndSaveUserLimitsForOrgModels(user);
+            userRpwService.createAndSaveModelsRpwForUser(user, models);
         }
 
         // Обновление ролей
@@ -143,12 +137,10 @@ public class AdminUserServiceImpl implements AdminUserService {
         userRepository.deleteById(id);
     }
 
-
     @Transactional
     @Override
     public ModelUserLimit updateUserLimit(Long userId, Long modelId, ModelUserLimit limit) {
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        User user = userService.getUserById(userId);
         Model model = modelRepository.findById(modelId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Model not found"));
 
@@ -173,7 +165,7 @@ public class AdminUserServiceImpl implements AdminUserService {
 
     @Transactional
     @Override
-    public void setAccessRight(Long userId, Boolean isActive){
+    public void setAccessRight(Long userId, Boolean isActive) {
         User user = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND,
                 "User not found")

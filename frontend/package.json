@@ -11,9 +11,6 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^4.0.0",
-    "@reduxjs/toolkit": "^2.5.1",
-    "axios": "^1.7.9",
-    "jquery": "^3.7.1",
     "prop-types": "^15.8.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -21,6 +18,8 @@
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.1.1",
     "react-select": "^5.10.0",
+    "redux": "^5.0.1",
+    "redux-thunk": "^3.1.0",
     "yup": "^1.6.1"
   },
   "devDependencies": {

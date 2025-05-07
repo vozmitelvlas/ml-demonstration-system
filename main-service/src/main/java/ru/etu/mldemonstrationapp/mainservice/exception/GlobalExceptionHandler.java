@@ -11,13 +11,19 @@ import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.NoSuchElementException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
+    @ExceptionHandler(RpsLimitException.class)
+    public ResponseEntity<ProblemDetail> handleRpsLimitException(RpsLimitException exception) {
+        return ResponseEntity
+                .status(HttpStatus.TOO_MANY_REQUESTS)
+                .body(ProblemDetail.forStatusAndDetail(HttpStatus.TOO_MANY_REQUESTS, exception.getMessage()));
+    }
 
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<ProblemDetail> handleResponseStatusException(ResponseStatusException exception) {
@@ -52,7 +58,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ProblemDetail> handleBindException(BindException exception) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.BAD_REQUEST,
-                "Request could not be processed due to incorrect format"
+                "Запрос не может быть обработан из-за некорректного формата"
         );
         problemDetail.setProperty("errors", exception.getAllErrors().stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
@@ -76,5 +82,33 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(TritonException.class)
     public ResponseEntity<String> handleTritonError(TritonException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    @ExceptionHandler(ModelNotSupportedException.class)
+    public ResponseEntity<ProblemDetail> handleModelNotSupportedException(ModelNotSupportedException exception) {
+        return ResponseEntity
+                .status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_ENTITY, exception.getMessage()));
+    }
+
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ProblemDetail> handleUploadSizeExceededException(MaxUploadSizeExceededException exception) {
+        return ResponseEntity
+                .status(HttpStatus.PAYLOAD_TOO_LARGE)
+                .body(ProblemDetail.forStatusAndDetail(HttpStatus.PAYLOAD_TOO_LARGE, "Превышен максимальный размер загружаемого файла"));
+    }
+
+    @ExceptionHandler(ExternalServerClientException.class)
+    public ResponseEntity<ProblemDetail> handleExternalServerClientException(ExternalServerClientException exception) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exception.getMessage()));
+    }
+
+    @ExceptionHandler(ExternalServerInternalException.class)
+    public ResponseEntity<ProblemDetail> handleExternalServerInternalException(ExternalServerInternalException exception) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_GATEWAY)
+                .body(ProblemDetail.forStatusAndDetail(HttpStatus.BAD_GATEWAY, exception.getMessage()));
     }
 }

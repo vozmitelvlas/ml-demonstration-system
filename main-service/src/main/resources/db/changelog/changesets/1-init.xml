@@ -51,9 +51,7 @@
             <column name="version_name" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="uri" type="varchar(255)">
-                <constraints nullable="false"/>
-            </column>
+            <column name="uri" type="varchar(255)"/>
             <column name="description" type="text"/>
             <column name="updated_at" type="timestamptz" defaultValueComputed="current_timestamp">
                 <constraints nullable="false"/>
@@ -243,5 +241,74 @@
         />
         <addUniqueConstraint tableName="models_users_limits" columnNames="model_id, user_id"/>
 
+        <createTable tableName="tasks">
+            <column name="task_id" type="uuid">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="status" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="execution_time" type="double"/>
+            <column name="error_description" type="text"/>
+            <column name="output_path" type="varchar(255)"/>
+            <column name="user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="model_version_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamptz" defaultValueComputed="current_timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="completed_at" type="timestamptz"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="tasks"
+                                 baseColumnNames="user_id"
+                                 constraintName="tasks_user_id_fkey"
+                                 referencedTableName="users"
+                                 referencedColumnNames="user_id"
+                                 deleteCascade="true"
+        />
+        <addForeignKeyConstraint baseTableName="tasks"
+                                 baseColumnNames="model_version_id"
+                                 constraintName="tasks_model_version_id_fkey"
+                                 referencedTableName="model_versions"
+                                 referencedColumnNames="model_version_id"
+                                 deleteCascade="true"
+        />
+    </changeSet>
+
+
+    <changeSet id="2" author="Vlas Vozmitel">
+        <createTable tableName="user_rpw">
+            <column name="user_rpw_id" type="bigint" autoIncrement="true" generationType="by default" startWith="1">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="model_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="current_requests" type="integer">
+                <constraints nullable="false" unique="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="user_rpw"
+                                 baseColumnNames="model_id"
+                                 constraintName="user_rpw_model_id_fkey"
+                                 referencedTableName="models"
+                                 referencedColumnNames="model_id"
+                                 deleteCascade="true"
+        />
+
+        <addForeignKeyConstraint baseTableName="user_rpw"
+                                 baseColumnNames="user_id"
+                                 constraintName="user_rpw_user_id_fkey"
+                                 referencedTableName="users"
+                                 referencedColumnNames="user_id"
+                                 deleteCascade="true"
+        />
     </changeSet>
 </databaseChangeLog>

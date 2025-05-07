@@ -11,18 +11,18 @@ import org.springframework.web.server.ResponseStatusException;
 import ru.etu.mldemonstrationapp.mainservice.dto.UpdatePasswordRequest;
 import ru.etu.mldemonstrationapp.mainservice.dto.UpdateProfileRequest;
 import ru.etu.mldemonstrationapp.mainservice.dto.UserRegistrationRequest;
-import ru.etu.mldemonstrationapp.mainservice.entity.Organization;
-import ru.etu.mldemonstrationapp.mainservice.entity.Role;
-import ru.etu.mldemonstrationapp.mainservice.entity.User;
+import ru.etu.mldemonstrationapp.mainservice.entity.*;
+import ru.etu.mldemonstrationapp.mainservice.repository.LimitRepository;
+import ru.etu.mldemonstrationapp.mainservice.repository.ModelRepository;
 import ru.etu.mldemonstrationapp.mainservice.repository.OrganizationRepository;
 import ru.etu.mldemonstrationapp.mainservice.repository.UserRepository;
-import ru.etu.mldemonstrationapp.mainservice.service.JwtService;
+import ru.etu.mldemonstrationapp.mainservice.service.UserRpwService;
 import ru.etu.mldemonstrationapp.mainservice.service.UserService;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -32,11 +32,17 @@ public class UserServiceImpl implements UserService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private OrganizationRepository organizationRepository;
+    @Autowired
+    private LimitRepository limitRepository;
+    @Autowired
+    private ModelRepository modelRepository;
+    @Autowired
+    private UserRpwService userRpwService;
 
     @Override
     public User getUserById(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+                .orElseThrow(() -> new NoSuchElementException(String.format("Пользователь с ID %d не найден", id)));
     }
 
     @Override
@@ -48,20 +54,20 @@ public class UserServiceImpl implements UserService {
     @Override
     public User registerUser(UserRegistrationRequest request) {
         if (userRepository.existsByLogin(request.login())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Login already exists");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Данный логин уже используется");
         }
         if (userRepository.existsByEmail(request.email())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Данный email уже используется");
         }
 
         List<Role> userRoles = userRepository.findRolesByName(Collections.singletonList("USER"));
         if (userRoles.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Default role USER not found");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Ошибка при назначении роли пользователя");
         }
 
         // Default organization
         Organization organization = organizationRepository.findById(1L)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT, "Default organization with id 1 does not exist"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Ошибки при назначении организации"));
 
         User user = new User();
         user.setLogin(request.login());
@@ -77,7 +83,14 @@ public class UserServiceImpl implements UserService {
 
         user.setEmailConfirm(false);
 
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+
+        // Set users limits and rpw
+        List<Model> models = modelRepository.findAllByOrganization(savedUser.getOrganization());
+        createAndSaveUserLimitsForOrgModels(savedUser);
+        userRpwService.createAndSaveModelsRpwForUser(savedUser, models);
+
+        return savedUser;
     }
 
     @Transactional
@@ -94,7 +107,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void updateUserPassword(Long id, UpdatePasswordRequest request) {
-        User user = userRepository.findById(id).orElseThrow();
+        User user = getUserById(id);
         if (passwordEncoder.matches(request.oldPassword(), user.getPassword())) {
             user.setPassword(passwordEncoder.encode(request.newPassword()));
             userRepository.save(user);
@@ -106,10 +119,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void setUserPassword(Long id, String password) {
-        User user = userRepository.findById(id).orElseThrow(() -> new ResponseStatusException(
-                HttpStatus.NOT_FOUND,
-                "User not found")
-        );
+        User user = getUserById(id);
         user.setPassword(passwordEncoder.encode(password));
         userRepository.save(user);
     }
@@ -124,17 +134,47 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void setUserEmailConfirm(Long id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new ResponseStatusException(
-                HttpStatus.NOT_FOUND,
-                "User not found")
-        );
+        User user = getUserById(id);
         user.setEmailConfirm(true);
         userRepository.save(user);
     }
+
     @Transactional
     @Scheduled(fixedDelay = 1, timeUnit = TimeUnit.HOURS)
-    public void deleteUnconfirmedUsers(){
+    public void deleteUnconfirmedUsers() {
         userRepository.deleteAllByEmailConfirm(false);
     }
 
+    @Transactional
+    @Override
+    public void createAndSaveUserLimitsForOrgMembers(Organization organization, ModelOrganizationLimit limit) {
+        List<ModelUserLimit> newUserLimits = organization.getMembers().stream()
+                .map(user ->  {
+                    ModelUserLimit userLimit = new ModelUserLimit();
+                    userLimit.setUser(user);
+                    userLimit.setModel(limit.getModel());
+                    userLimit.setRps(limit.getRps());
+                    userLimit.setRequestsPerWeek(limit.getRequestsPerWeek());
+                    return userLimit;
+                })
+                .toList();
+        limitRepository.saveAll(newUserLimits);
+    }
+
+    @Transactional
+    @Override
+    public void createAndSaveUserLimitsForOrgModels(User user) {
+        List<ModelUserLimit> newUserLimits = user.getOrganization().getLimits().stream()
+                .map(orgLimit -> {
+                    ModelUserLimit userLimit = new ModelUserLimit();
+                    userLimit.setUser(user);
+                    userLimit.setModel(orgLimit.getModel());
+                    userLimit.setRps(orgLimit.getRps());
+                    userLimit.setRequestsPerWeek(orgLimit.getRequestsPerWeek());
+                    return userLimit;
+                })
+                .toList();
+
+        limitRepository.saveAll(newUserLimits);
+    }
 }

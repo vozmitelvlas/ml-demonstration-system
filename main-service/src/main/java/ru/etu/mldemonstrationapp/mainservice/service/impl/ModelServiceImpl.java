@@ -10,8 +10,8 @@ import ru.etu.mldemonstrationapp.mainservice.entity.ModelVersion;
 import ru.etu.mldemonstrationapp.mainservice.entity.Organization;
 import ru.etu.mldemonstrationapp.mainservice.repository.ModelRepository;
 import ru.etu.mldemonstrationapp.mainservice.repository.ModelVersionRepository;
-import ru.etu.mldemonstrationapp.mainservice.repository.UserRepository;
 import ru.etu.mldemonstrationapp.mainservice.service.ModelService;
+import ru.etu.mldemonstrationapp.mainservice.service.UserService;
 
 import java.util.List;
 
@@ -19,35 +19,35 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ModelServiceImpl implements ModelService {
     @Autowired
-    private UserRepository userRepository;
-    @Autowired
     private ModelRepository modelRepository;
     @Autowired
     private ModelVersionRepository modelVersionRepository;
+    @Autowired
+    private UserService userService;
 
     @Override
     public List<Model> getAvailableModels(Long userId) {
-        Organization organization = userRepository.findById(userId).orElseThrow().getOrganization();
+        Organization organization = userService.getUserById(userId).getOrganization();
         return modelRepository.findAllByOrganization(organization);
     }
 
     @Override
     public Model getModelById(Long id, Long userId) {
-        Organization organization = userRepository.findById(userId).orElseThrow().getOrganization();
+        Organization organization = userService.getUserById(userId).getOrganization();
         return modelRepository.findByIdAndOrganization(id, organization).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Model not found"));
     }
 
     @Override
     public ModelVersion getModelVersionById(Long id, Long userId) {
-        Organization organization = userRepository.findById(userId).orElseThrow().getOrganization();
+        Organization organization = userService.getUserById(userId).getOrganization();
         return modelVersionRepository.findByIdAndOrganization(id, organization).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Model version not found"));
     }
 
     @Override
     public List<ModelVersion> getAvailableModelsVersions(Long userId) {
-        Organization organization = userRepository.findById(userId).orElseThrow().getOrganization();
+        Organization organization = userService.getUserById(userId).getOrganization();
         return modelVersionRepository.findAllByOrganization(organization);
     }
 }

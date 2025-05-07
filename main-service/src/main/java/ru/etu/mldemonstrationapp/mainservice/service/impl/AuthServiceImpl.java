@@ -29,6 +29,7 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private EmailService emailService;
 
+
     @Override
     public ResponseEntity<LoginResponse> login(LoginRequest loginRequest){
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
@@ -49,9 +50,11 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public RegisterResponse register(UserRegistrationRequest createUserRequest, String origin) {
         User user = userService.registerUser(createUserRequest);
-        String token = jwtService.generateEmailConfirmToken(new CustomUserDetails(user));
 
+        // send confirm message
+        String token = jwtService.generateEmailConfirmToken(new CustomUserDetails(user));
         emailService.sendMessage(user.getEmail(), "Подтверждение адреса электронной почты", "%s/models?token=%s".formatted(origin, token));
+
         return new RegisterResponse(user);
     }
 

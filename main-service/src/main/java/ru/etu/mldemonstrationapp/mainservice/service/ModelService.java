@@ -13,4 +13,5 @@ public interface ModelService {
     ModelVersion getModelVersionById(Long id, Long userId);
 
     List<ModelVersion> getAvailableModelsVersions(Long userId);
+
 }

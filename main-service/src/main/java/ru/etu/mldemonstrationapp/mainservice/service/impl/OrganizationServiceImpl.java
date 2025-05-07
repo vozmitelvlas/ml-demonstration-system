@@ -8,11 +8,10 @@ import org.springframework.web.server.ResponseStatusException;
 import ru.etu.mldemonstrationapp.mainservice.dto.CreateOrganizationRequest;
 import ru.etu.mldemonstrationapp.mainservice.dto.UpdateOrganizationRequest;
 import ru.etu.mldemonstrationapp.mainservice.entity.*;
-import ru.etu.mldemonstrationapp.mainservice.repository.LimitRepository;
-import ru.etu.mldemonstrationapp.mainservice.repository.ModelRepository;
-import ru.etu.mldemonstrationapp.mainservice.repository.OrganizationRepository;
-import ru.etu.mldemonstrationapp.mainservice.repository.UserRepository;
+import ru.etu.mldemonstrationapp.mainservice.repository.*;
 import ru.etu.mldemonstrationapp.mainservice.service.OrganizationService;
+import ru.etu.mldemonstrationapp.mainservice.service.UserRpwService;
+import ru.etu.mldemonstrationapp.mainservice.service.UserService;
 
 import java.time.Instant;
 import java.util.Collections;
@@ -26,9 +25,11 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Autowired
     private LimitRepository limitRepository;
     @Autowired
-    private UserRepository userRepository;
-    @Autowired
     private ModelRepository modelRepository;
+    @Autowired
+    private UserRpwService userRpwService;
+    @Autowired
+    private UserService userService;
 
     @Override
     public Organization getOrganization(Long id) {
@@ -62,7 +63,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Transactional
     @Override
     public Organization updateOrganization(Long organizationId, UpdateOrganizationRequest dto) {
-        Organization organization = organizationRepository.findById(organizationId).orElseThrow();
+        Organization organization = getOrganization(organizationId);
         if (!organization.getName().equals(dto.name()) && organizationRepository.existsByName(dto.name())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Organization name already in use");
         }
@@ -74,11 +75,11 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Transactional
     @Override
     public void updateOrganizationLimitsType(Long userId, Long organizationId, OrganizationLimitsType limitsType) {
-        User user = userRepository.findById(userId).orElseThrow();
+        User user = userService.getUserById(userId);
         Organization organization = organizationRepository.findById(organizationId).orElseThrow();
 
         if (!user.getOrganization().equals(organization) &&
-                user.getRoles().stream().noneMatch(role -> role.getName().equals("ADMIN"))) {
+            user.getRoles().stream().noneMatch(role -> role.getName().equals("ADMIN"))) {
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN,
                     "You do not have permission to change limits type for this organization"
@@ -109,8 +110,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         if (limitRepository.findByOrganizationIdAndModelId(organizationId, modelId).isPresent()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Organization already has access to this model");
         }
-        Organization organization = organizationRepository.findById(organizationId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Organization not found"));
+        Organization organization = getOrganization(organizationId);
 
         Model model = modelRepository.findById(modelId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Model not found"));
@@ -129,7 +129,12 @@ public class OrganizationServiceImpl implements OrganizationService {
         limit.setOrganization(organization);
         limit.setModel(model);
 
-        return limitRepository.save(limit);
+        ModelOrganizationLimit modelOrganizationLimit = limitRepository.save(limit);
+
+        userService.createAndSaveUserLimitsForOrgMembers(organization, modelOrganizationLimit);
+        userRpwService.createAndSaveRpwForOrgMembers(organization, model);
+
+        return modelOrganizationLimit;
     }
 
     @Transactional
@@ -147,17 +152,20 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Transactional
     @Override
     public void removeAccessToModel(Long organizationId, Long modelId) {
-        Organization organization = organizationRepository.findById(organizationId).orElseThrow();
+        Organization organization = getOrganization(organizationId);
+        Model model = modelRepository.findById(modelId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Model not found"));
+
         var organizationModelLimits = organization.getLimits().stream()
                 .filter(limit -> limit.getModel().getModelId().equals(modelId))
                 .map(Limit::getLimitId);
 
         var userModelLimits = organization.getMembers().stream()
                 .flatMap(user -> user.getLimits().stream()
-                        .filter(limit -> limit.getModel().getModelId().equals(modelId))
+                         .filter(limit -> limit.getModel().getModelId().equals(modelId))
                         .map(Limit::getLimitId));
 
         limitRepository.deleteAllByIdInBatch((Stream.concat(organizationModelLimits, userModelLimits).toList()));
+        userRpwService.deleteAllOrganizationMembersRpwForModel(organization, model);
         organizationRepository.save(organization);
     }
 }

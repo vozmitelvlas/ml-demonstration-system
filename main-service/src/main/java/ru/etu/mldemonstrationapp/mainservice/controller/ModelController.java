@@ -82,8 +82,8 @@ public class ModelController {
     /**
      * Get all supported runtimes for models. Supported runtimes are specified in the {@link ModelRuntime} enum.
      *
-     * @see ModelRuntime
      * @return List of supported runtimes for models.
+     * @see ModelRuntime
      */
     @Operation(description = "Get all supported runtimes for models")
     @ApiResponse(responseCode = "200", useReturnTypeSchema = true)
@@ -96,8 +96,8 @@ public class ModelController {
      * Get all supported problem types for models. Supported problem types.
      * are specified in the {@link ModelProblemType} enum.
      *
-     * @see ModelProblemType
      * @return List of supported problem types for models.
+     * @see ModelProblemType
      */
     @Operation(description = "Get all supported problem types for models")
     @ApiResponse(responseCode = "200", useReturnTypeSchema = true)
@@ -105,4 +105,5 @@ public class ModelController {
     public List<ModelProblemType> getSupportedProblemTypes() {
         return Arrays.asList(ModelProblemType.values());
     }
+
 }
