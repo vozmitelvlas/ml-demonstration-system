@@ -39,6 +39,7 @@ public class SecurityBeans {
     protected SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         List<RequestMatcher> authenticationIgnoredRequestMatchers = List.of(
                 new AntPathRequestMatcher("/api/auth/**"),
+                new AntPathRequestMatcher("/api/triton-models/**"),
                 new AntPathRequestMatcher("/swagger-ui/*"),
                 new AntPathRequestMatcher("/swagger-ui.html"),
                 new AntPathRequestMatcher("/v3/api-docs/**")
@@ -52,6 +53,7 @@ public class SecurityBeans {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(config -> config
                         .requestMatchers("/swagger-ui/*", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/api/triton-models/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/organizations/*/models").hasRole("ORGANIZATION_HEAD")
                         .requestMatchers("/api/organizations/*/members").hasRole("ORGANIZATION_HEAD")
@@ -72,6 +74,7 @@ public class SecurityBeans {
     protected CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+        configuration.setAllowedOrigins(List.of("http://localhost:8080/api/triton-models/**"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"));
         configuration.setAllowedHeaders(Collections.singletonList("*"));
         configuration.setExposedHeaders(Collections.singletonList(HttpHeaders.CONTENT_DISPOSITION));

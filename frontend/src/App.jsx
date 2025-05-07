@@ -19,6 +19,7 @@ import PasswordReset from "./pages/PasswordRecover/PasswordReset.jsx";
 import {useDispatch, useSelector} from "react-redux";
 import {getUserProfileAction} from "./actions/user-actions.js";
 import {selectUserData, selectUserRoles} from "./selectors/user-selector.js";
+import TritonModels from "./pages/TritonModels/TritonModels.jsx";
 
 
 function App() {
@@ -63,6 +64,7 @@ function App() {
 
                     <Route path="/organisations" element={<CatalogOrganisations/>}/>
                     <Route path="/organisations/:orgId/edit" element={<ChangeOrganisation/>}/>
+                    <Route path="/triton" element={<TritonModels />} />
                 </Routes>
             </div>
         </div>
