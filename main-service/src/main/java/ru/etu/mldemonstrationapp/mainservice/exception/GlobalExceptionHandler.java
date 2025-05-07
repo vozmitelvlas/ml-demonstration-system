@@ -79,6 +79,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(problemDetail);
     }
 
+    @ExceptionHandler(TritonException.class)
+    public ResponseEntity<String> handleTritonError(TritonException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
     @ExceptionHandler(ModelNotSupportedException.class)
     public ResponseEntity<ProblemDetail> handleModelNotSupportedException(ModelNotSupportedException exception) {
         return ResponseEntity
