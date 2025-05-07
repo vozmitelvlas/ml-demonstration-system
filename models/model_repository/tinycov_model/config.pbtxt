@@ -1,0 +1,24 @@
+
+name: "tinycov_model"
+platform: "onnxruntime_onnx"
+max_batch_size: 4
+input [
+  {
+    name: "input"
+    data_type: TYPE_FP32
+    dims: [1, -1]  # Размерность входных данных без батча
+  }
+]
+output [
+  {
+    name: "output"
+    data_type: TYPE_FP32
+    dims: [5]  # Размерность выходных данных
+  }
+]
+instance_group [
+  {
+    kind: KIND_CPU
+    count: 1
+  }
+]
