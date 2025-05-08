@@ -14,6 +14,7 @@ import ru.etu.mldemonstrationapp.mainservice.repository.ModelVersionRepository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -189,7 +190,7 @@ class AdminModelsServiceImplTest {
 
 
     @Test
-    void deleteModelVersion_shouldNotDeleteWorkflow_ifModelHasMultipleVersions() {
+    void deleteModelVersionWhenModelHasMultipleVersions() {
         Long firstVersionId = 100L;
         Long secondVersionId = 102L;
         Long modelId = 10L;
@@ -198,7 +199,6 @@ class AdminModelsServiceImplTest {
         model.setModelId(modelId);
         var modelInfo = new ModelInfo(modelId, model, ModelRuntime.TRITON_INFERENCE_SERVER, ModelProblemType.NLP);
         model.setModelInfo(modelInfo);
-        model.setOtherData(Map.of("workflowId", "workflow-id-example"));
 
         ModelVersion versionToDelete = new ModelVersion();
         versionToDelete.setModelVersionId(firstVersionId);
@@ -223,7 +223,7 @@ class AdminModelsServiceImplTest {
     void deleteModelVersionWhenModelVersionDoesNotExist() {
         when(modelVersionRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        assertThrows(Exception.class, () -> service.deleteModelVersion(123L));
+        assertThrows(NoSuchElementException.class, () -> service.deleteModelVersion(123L));
 
         verify(workflowManagerClient, never()).deleteWorkflow(any());
         verify(modelVersionRepository, never()).delete(any());
