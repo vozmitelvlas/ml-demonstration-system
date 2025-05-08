@@ -55,4 +55,5 @@ public class TritonModelService {
             throw new Exception("Ошибка при выполнении инференса: " + e.getMessage());
         }
     }
+
 }
