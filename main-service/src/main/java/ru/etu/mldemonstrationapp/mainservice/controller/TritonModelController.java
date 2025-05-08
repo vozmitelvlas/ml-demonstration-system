@@ -19,14 +19,21 @@ public class TritonModelController {
         this.tritonModelService = tritonModelService;
     }
 
-    // Получить список известных моделей, доступных в данный момент
+    // Проверка доступности Triton
+    @GetMapping("/health")
+    public ResponseEntity<String> checkTritonHealth() {
+        boolean loaded = tritonModelService.isModelLoaded("wav2vec2");
+        return loaded ? ResponseEntity.ok("OK") : ResponseEntity.status(503).body("Triton недоступен");
+    }
+
+    // Получить список доступных моделей
     @GetMapping("/available")
     public ResponseEntity<List<String>> getAvailableModels() {
         List<String> availableModels = tritonModelService.getAvailableModels();
         return ResponseEntity.ok(availableModels);
     }
 
-    // Выполнить инференс для указанной модели
+    // Выполнить инференс
     @PostMapping("/infer")
     public ResponseEntity<?> infer(@RequestBody TritonInferenceRequest request) {
         try {
@@ -48,22 +55,14 @@ public class TritonModelController {
         }
     }
 
-    // Дополнительно: получить метаданные конкретной модели из Triton
+    // Получить метаданные модели
     @GetMapping("/{modelName}")
     public ResponseEntity<?> getModelMetadata(@PathVariable String modelName) {
+        String url = tritonModelService.tritonProperties.getUrl() + "/" + modelName;
+
         try {
-            String url = "http://localhost:8000/v2/models/" + modelName;
-
-            var client = java.net.http.HttpClient.newHttpClient();
-            var request = java.net.http.HttpRequest.newBuilder()
-                    .uri(java.net.URI.create(url))
-                    .GET()
-                    .build();
-
-            var response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
-
-            return ResponseEntity.status(response.statusCode()).body(response.body());
-
+            String response = tritonModelService.restTemplate.getForObject(url, String.class);
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.status(500).body(Collections.singletonMap(
                     "error", "Ошибка получения метаданных: " + e.getMessage()

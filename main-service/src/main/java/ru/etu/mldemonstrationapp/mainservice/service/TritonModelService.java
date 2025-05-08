@@ -1,85 +1,58 @@
 package ru.etu.mldemonstrationapp.mainservice.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import ru.etu.mldemonstrationapp.mainservice.configuration.TritonProperties;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.time.Duration;
 import java.util.*;
 
 @Service
 public class TritonModelService {
 
-    private final HttpClient availabilityClient = HttpClient.newBuilder()
-            .connectTimeout(Duration.ofSeconds(3))
-            .version(HttpClient.Version.HTTP_1_1)
-            .build();
+    public final RestTemplate restTemplate = new RestTemplate();
+    public final TritonProperties tritonProperties;
 
-    private final HttpClient inferenceClient = HttpClient.newBuilder()
-            .connectTimeout(Duration.ofSeconds(5))
-            .version(HttpClient.Version.HTTP_1_1)
-            .build();
+    public TritonModelService(TritonProperties tritonProperties) {
+        this.tritonProperties = tritonProperties;
+    }
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
-    private final List<String> knownModels = Arrays.asList(
-        "tinycov_model",
-        "unet_signal_processing",
-        "wav2vec2"
-    );
-
-    private static final String TRITON_BASE_URL = "http://localhost:8000/v2/models";
-
-    // Проверяет, загружена ли модель в Triton
+    // Проверяет, загружена ли модель
     public boolean isModelLoaded(String modelName) {
+        String url = tritonProperties.getUrl() + "/" + modelName;
+        System.out.println("Проверяем модель: " + modelName);
+        System.out.println("URL запроса: " + url);
+
         try {
-            String url = TRITON_BASE_URL + "/" + modelName;
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .timeout(Duration.ofSeconds(5))
-                    .GET()
-                    .build();
-
-            HttpResponse<Void> response = availabilityClient.send(request, HttpResponse.BodyHandlers.discarding());
-            return response.statusCode() == 200;
-
+            String response = restTemplate.getForObject(url, String.class);
+            return response != null && !response.isEmpty();
         } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }
 
-    // Возвращает список только доступных моделей
+    // Возвращает список доступных моделей
     public List<String> getAvailableModels() {
-        return knownModels.stream()
+        return tritonProperties.getKnownModels().stream()
                 .filter(this::isModelLoaded)
                 .toList();
     }
 
-    // Выполняет инференс для указанной модели
+    // Выполняет инференс
     public Map<String, Object> infer(Map<String, Object> inputs, String modelName) throws Exception {
-        String modelUrl = TRITON_BASE_URL + "/" + modelName + "/infer";
+        String modelUrl = tritonProperties.getUrl() + "/" + modelName + "/infer";
 
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("inputs", inputs);
+        Map<String, Object> payload = Map.of("inputs", inputs);
 
-        String jsonBody = objectMapper.writeValueAsString(payload);
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(modelUrl))
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
-                .timeout(Duration.ofSeconds(15))
-                .build();
-
-        HttpResponse<String> response = inferenceClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-        if (response.statusCode() != 200) {
-            throw new Exception("Ошибка при выполнении инференса. Код: " + response.statusCode());
+        try {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> response = restTemplate.postForObject(modelUrl, payload, Map.class);
+            if (response == null) {
+                throw new Exception("Пустой ответ от сервера");
+            }
+            return response;
+        } catch (Exception e) {
+            throw new Exception("Ошибка при выполнении инференса: " + e.getMessage());
         }
-
-        return objectMapper.readValue(response.body(), Map.class);
     }
 }

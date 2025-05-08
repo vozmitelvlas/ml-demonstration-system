@@ -10,8 +10,22 @@ const TritonModels = () => {
     const [error, setError] = useState("");
 
     const handleFileChange = (e) => {
-        setFile(e.target.files[0]);
-        setError("");
+        const selectedFile = e.target.files[0];
+        if (selectedFile) {
+            const allowedTypes = ["application/csv", ".csv", "audio/wav", "audio/x-wav"];
+            const fileName = selectedFile.name.toLowerCase();
+            if (
+                allowedTypes.includes(selectedFile.type) ||
+                fileName.endsWith(".csv") ||
+                fileName.endsWith(".wav")
+            ) {
+                setFile(selectedFile);
+                setError("");
+            } else {
+                setError("Неверный формат файла. Поддерживаются только .csv и .wav.");
+                setFile(null);
+            }
+        }
     };
 
     const handleSubmit = async () => {
@@ -28,16 +42,21 @@ const TritonModels = () => {
         formData.append("model", model);
 
         try {
-            const response = await axios.post("http://localhost:2001/infer", formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-            });
+            // Прямой адрес бэкенда
+            const response = await axios.post(
+                "http://main-service:8080/api/triton-models/infer",
+                formData,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                }
+            );
 
             setResult(response.data);
         } catch (err) {
             setError("Ошибка при выполнении инференса. Попробуйте снова.");
-            console.error(err);
+            console.error("Ошибка запроса:", err);
         } finally {
             setLoading(false);
         }
@@ -61,11 +80,11 @@ const TritonModels = () => {
             </div>
 
             <div className={styles.formGroup}>
-                <label htmlFor="file-upload">Загрузите файл (.npy или .wav):</label>
+                <label htmlFor="file-upload">Загрузите файл (.csv или .wav):</label>
                 <input
                     id="file-upload"
                     type="file"
-                    accept=".npy,.wav"
+                    accept=".csv,.wav"
                     onChange={handleFileChange}
                 />
             </div>
