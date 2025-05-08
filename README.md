@@ -83,10 +83,14 @@ http://localhost:5173
 ### Set up MONAI model
 The models-workflows-examples directory includes the examples of workflows configuration.
 
-Below are the instructions for setting up a MONAI model using the `liver-tumor.json` workflow 
-1. Pull the AI Liver Tumor MAP
+Below are the instructions for setting up a MONAI model using the `breast-classification.json` workflow.
+
+
+Sample DICOM files for testing can be found at the following link: https://drive.google.com/drive/folders/1Dryozl2MwNunpsGaFPVoaKBLkNbVM3Hu
+
+1. Pull the MONAI AI Breast Density Classification MAP
 ```shell
-$ docker pull ghcr.io/mmelqin/monai_ai_livertumor_seg_app:1.0
+$ docker pull ghcr.io/mmelqin/monai_ai_breast_density_cls_app:1.0
 ```
 
 2. Log in as an administrator 
@@ -97,7 +101,7 @@ $ docker pull ghcr.io/mmelqin/monai_ai_livertumor_seg_app:1.0
 
 4. In the "Runtime" field, select the "MONAI Deploy" option. You should see a new field with the option to attach a file
 
-5. Select the file `models-workflows-examples/liver-tumor.json`
+5. Select the file `models-workflows-examples/breast-classification.json`
  
 6. Fill in the remaining fields and click the button to create a new model
 
@@ -105,7 +109,7 @@ $ docker pull ghcr.io/mmelqin/monai_ai_livertumor_seg_app:1.0
 
 8. (Optional) Test the model. Go to the model visualization page
 
-9. Upload a DICOM dataset as a ZIP archive and click to submit
+9. Upload a DICOM and click to submit. 
 
 10. Wait for inference result
 
