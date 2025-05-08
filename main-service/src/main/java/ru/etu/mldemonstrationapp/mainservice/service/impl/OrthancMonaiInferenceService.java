@@ -70,8 +70,9 @@ public class OrthancMonaiInferenceService implements ModelInferenceService {
             pollUntilJobCompleted(jobId).get(monaiDeployProperties.getPacs().getStoreTimeoutSeconds(), TimeUnit.SECONDS);
 
             // Find DICOM series produced by MONAI model
-            String studyInstanceUIDTag = requestStudyInstanceUID(orthancSeriesId);
-            String resultSeriesId = pollUntilInferenceResult(studyInstanceUIDTag)
+            OrthancRestClient.OrthancSeries series = requestStudyInstanceUID(orthancSeriesId);
+
+            String resultSeriesId = pollUntilInferenceResult(series)
                     .get(monaiDeployProperties.getPacs().getInferenceTaskTimeoutSeconds(), TimeUnit.SECONDS);
 
             Path resultFilePath = getResultFile(resultSeriesId, taskId);
@@ -189,10 +190,10 @@ public class OrthancMonaiInferenceService implements ModelInferenceService {
         return resultFuture;
     }
 
-    private String requestStudyInstanceUID(String orthancSeriesId) {
+    private OrthancRestClient.OrthancSeries requestStudyInstanceUID(String orthancSeriesId) {
         List<String> requestedTags = List.of("0020,000d");
         OrthancRestClient.OrthancSeries series = orthancRestClient.getSeries(orthancSeriesId, requestedTags);
-        return Optional.ofNullable(series.RequestedTags().get("StudyInstanceUID")).orElseThrow(() -> {
+        return Optional.ofNullable(series).orElseThrow(() -> {
             log.error("Not found StudyInstanceUID tag in Orthanc Series {} details", orthancSeriesId);
             return new ExternalServerInternalException(String.format("Не удалось получить значение тега StudyInstanceUID для серии %s", orthancSeriesId));
         });
@@ -200,12 +201,18 @@ public class OrthancMonaiInferenceService implements ModelInferenceService {
     }
 
 
-    private CompletableFuture<String> pollUntilInferenceResult(String studyInstanceUID) {
+    private CompletableFuture<String> pollUntilInferenceResult(OrthancRestClient.OrthancSeries series) {
         CompletableFuture<String> resultFuture = new CompletableFuture<>();
+        String studyInstanceUID = series.RequestedTags().get("StudyInstanceUID");
+        String[] lastUpdate = series.LastUpdate().split("T");
 
         ScheduledFuture<?> pollingTask = taskScheduler.scheduleWithFixedDelay(() -> {
             try {
-                List<String> resources = orthancRestClient.findResources("Series", Map.of("StudyInstanceUID", studyInstanceUID, "ManufacturerModelName", "MONAI Deploy App SDK"));
+                List<String> resources = orthancRestClient.findResources("Series", Map.of(
+                                "StudyInstanceUID", studyInstanceUID,
+                                "SeriesDate", lastUpdate[0] + "-"
+                        )
+                );
                 if (!resources.isEmpty()) {
                     resultFuture.complete(resources.get(0));
                 }
