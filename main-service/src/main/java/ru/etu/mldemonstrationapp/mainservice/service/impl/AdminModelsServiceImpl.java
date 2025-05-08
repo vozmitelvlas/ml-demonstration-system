@@ -25,7 +25,7 @@ public class AdminModelsServiceImpl implements AdminModelsService {
     private ModelRepository modelRepository;
     @Autowired
     private ModelVersionRepository modelVersionRepository;
-    @Autowired
+    @Autowired(required = false)
     private WorkflowManagerClient workflowManagerClient;
 
 
