@@ -31,6 +31,7 @@ allprojects {
 		implementation("org.springframework.boot:spring-boot-starter-security")
 		implementation("org.springframework.boot:spring-boot-starter-validation")
 		implementation("org.springframework.boot:spring-boot-starter-mail")
+		implementation("org.springframework.boot:spring-boot-starter-actuator")
 		developmentOnly("org.springframework.boot:spring-boot-devtools")
 		annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
