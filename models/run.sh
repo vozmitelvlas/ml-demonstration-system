@@ -10,6 +10,6 @@ python3 generate_model_unet.py
 
 # Запуск третьего скрипта: генерация модели Wav2Vec2
 echo "Запуск generate_model_wav2vec.py..."
-python3 generate_model_wav2vec.py
+python3 generate_model_wav2vec_noquant.py
 
 echo "Все три модели успешно обработаны."

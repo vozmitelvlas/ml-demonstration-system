@@ -2,123 +2,116 @@ import numpy as np
 import pandas as pd
 import tritonclient.http as httpclient
 from tritonclient.utils import np_to_triton_dtype
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
+from sklearn.preprocessing import LabelEncoder
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 # 1. Загрузка данных из CSV
 def load_data_from_csv(csv_file, signal_length=187):
     """
-    Загружает данные из CSV-файла и преобразует их в массив NumPy.
-    :param csv_file: Путь к CSV-файлу.
-    :param signal_length: Длина сигнала (количество точек).
-    :return: Массив NumPy с данными.
+    Загружает данные из CSV-файла.
+    :param csv_file: Путь к файлу с данными (последний столбец — метка)
+    :param signal_length: Количество признаков (точек сигнала)
+    :return: signals, labels
     """
-    # Загрузка CSV
     df = pd.read_csv(csv_file, header=None)
-    
-    # Удаление первой строки (пустой) и преобразование в массив NumPy
-    data = df.iloc[:, :signal_length].values.astype(np.float32)
-    
-    return data
 
-# 2. Подготовка данных для отправки
-def prepare_input(data):
-    """
-    Подготавливает входные данные для отправки в Triton.
-    :param data: Массив NumPy с данными.
-    :return: Список объектов InferInput.
-    """
-    # Изменение размерности данных на [batch_size, channels, signal_length]
-    data = np.expand_dims(data, axis=0)  # Добавляем batch_size
-    data = np.expand_dims(data, axis=1)  # Добавляем каналы
+    # Последний столбец — это метки
+    signals = df.iloc[:, :signal_length].values.astype(np.float32)
+    labels = df.iloc[:, -1].values
 
-    # Создание объекта InferInput
+    # Кодируем текстовые метки в числовые (например, "normal" -> 0, "afib" -> 1)
+    le = LabelEncoder()
+    encoded_labels = le.fit_transform(labels)
+
+    return signals, encoded_labels
+
+
+# 2. Подготовка входного тензора
+def prepare_input(signal):
+    """Подготавливает сигнал для отправки в Triton"""
+    signal = np.expand_dims(signal, axis=0)  # Добавляем batch_size
+    signal = np.expand_dims(signal, axis=1)  # Добавляем канал
     inputs = [
-        httpclient.InferInput(
-            "input",  # Имя входного тензора (должно совпадать с конфигурацией модели)
-            data.shape,  # Размерность данных
-            np_to_triton_dtype(data.dtype)  # Тип данных
-        )
+        httpclient.InferInput("input", signal.shape, np_to_triton_dtype(signal.dtype))
     ]
-    inputs[0].set_data_from_numpy(data)
-
+    inputs[0].set_data_from_numpy(signal)
     return inputs
 
+
 # 3. Отправка запроса к Triton
-def send_request_to_triton(triton_url, model_name, inputs):
-    """
-    Отправляет запрос к Triton Inference Server.
-    :param triton_url: URL Triton сервера (например, "localhost:8000").
-    :param model_name: Имя модели.
-    :param inputs: Список объектов InferInput.
-    :return: Результат вывода модели.
-    """
-    # Создание клиента
+def send_request(triton_url, model_name, inputs):
     client = httpclient.InferenceServerClient(url=triton_url)
-    
-    # Отправка запроса
-    result = client.infer(
-        model_name=model_name,
-        inputs=inputs
-    )
-    
-    # Получение выходных данных
-    output = result.as_numpy("output")  # Имя выходного тензора (должно совпадать с конфигурацией модели)
-    return output
+    result = client.infer(model_name=model_name, inputs=inputs)
+    return result.as_numpy("output")
 
-# 4. Применение softmax для вычисления вероятностей
+
+# 4. Применение softmax
 def softmax(logits):
-    """
-    Вычисляет softmax для преобразования логитов в вероятности.
-    :param logits: Логиты от модели.
-    :return: Вероятности для каждого класса.
-    """
-    exp_logits = np.exp(logits - np.max(logits))  # Для численной стабильности
-    probabilities = exp_logits / np.sum(exp_logits)
-    return probabilities
+    exp_logits = np.exp(logits - np.max(logits))  # Численная стабильность
+    return exp_logits / np.sum(exp_logits)
 
-# 5. Обработка результата
-def process_output(output):
-    """
-    Обрабатывает выходные данные модели и определяет предсказанный класс.
-    :param output: Выходные данные модели (логиты).
-    :return: Вероятности классов и предсказанный класс.
-    """
-    # Преобразуем логиты в вероятности
-    probabilities = softmax(output[0])  # output[0]: первый элемент batch size
-    
-    # Определяем класс с наибольшей вероятностью
+
+# 5. Обработка выхода модели
+def process_output(output, index=0):
+    logits = output[index]
+    probabilities = softmax(logits)
     predicted_class = np.argmax(probabilities)
-    
     return probabilities, predicted_class
 
-# 6. Основная функция
-def main():
-    # Параметры
-    csv_file = "./signals/synthetic_ecg_data.csv"  # Путь к CSV-файлу
-    triton_url = "localhost:8000"  # URL Triton сервера
-    model_name = "tinycov_model"  # Имя модели
-    signal_length = 187  # Длина сигнала
-    
-    # Загрузка данных
-    print("Загрузка данных из CSV...")
-    data = load_data_from_csv(csv_file, signal_length)
-    
-    # Выбор одного сигнала для тестирования
-    test_signal = data[0]  # Первый сигнал
-    
-    # Подготовка данных
-    print("Подготовка данных для отправки...")
-    inputs = prepare_input(test_signal)
-    
-    # Отправка запроса
-    print("Отправка запроса к Triton...")
-    output = send_request_to_triton(triton_url, model_name, inputs)
-    
-    # Обработка результата
-    probabilities, predicted_class = process_output(output)
-    
-    print("Результат модели:")
-    print(f"Вероятности классов: {probabilities}")
-    print(f"Предсказанный класс: {predicted_class}")
 
+# 6. Функция оценки модели на всем наборе данных
+def evaluate_model(triton_url, model_name, signals, true_labels):
+    predicted_labels = []
+
+    for idx in range(len(signals)):
+        signal = signals[idx]
+        inputs = prepare_input(signal)
+        output = send_request(triton_url, model_name, inputs)
+        _, predicted_class = process_output(output, index=0)
+        predicted_labels.append(predicted_class)
+
+    acc = accuracy_score(true_labels, predicted_labels)
+    prec = precision_score(true_labels, predicted_labels, average='macro', zero_division=0)
+    rec = recall_score(true_labels, predicted_labels, average='macro', zero_division=0)
+    f1 = f1_score(true_labels, predicted_labels, average='macro', zero_division=0)
+
+    print(f"Accuracy: {acc:.4f}")
+    print(f"Precision (macro): {prec:.4f}")
+    print(f"Recall (macro): {rec:.4f}")
+    print(f"F1 Score (macro): {f1:.4f}")
+
+    cm = confusion_matrix(true_labels, predicted_labels)
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues")
+    plt.title("Матрица ошибок")
+    plt.xlabel("Предсказанный класс")
+    plt.ylabel("Истинный класс")
+    plt.show()
+
+    return {
+        "accuracy": acc,
+        "precision": prec,
+        "recall": rec,
+        "f1": f1
+    }
+
+
+# 7. Основной запуск 
 if __name__ == "__main__":
-    main()
+    triton_url = "localhost:8000"
+    model_name = "tinycov_model"
+    csv_path = "./signals/synthetic_ecg_data_1.csv"
+
+    print("Загрузка данных...")
+    signals, labels = load_data_from_csv(csv_path)
+
+    print("Оценка модели...")
+    metrics = evaluate_model(triton_url, model_name, signals, labels)
+
+    print("\nРезультаты оценки:")
+    print(f"Accuracy: {metrics['accuracy']:.4f}")
+    print(f"Precision: {metrics['precision']:.4f}")
+    print(f"Recall: {metrics['recall']:.4f}")
+    print(f"F1-score: {metrics['f1']:.4f}")

@@ -56,8 +56,8 @@ services:
       - "8002:8002"  # Prometheus Metrics
     environment:
       - CUDA_VISIBLE_DEVICES=""  # Отключение GPU
-      - OMP_NUM_THREADS=8
-      - ONNXRUNTIME_THREADPOOL_SIZE=8
+      - OMP_NUM_THREADS=4
+      - ONNXRUNTIME_THREADPOOL_SIZE=4
     volumes:
       - ./models:/models
     command: ["tritonserver", "--model-repository=/models/model_repository"]
