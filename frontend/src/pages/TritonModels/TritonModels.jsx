@@ -47,17 +47,20 @@ const TritonModels = () => {
   const handleSubmit = async () => {
     if (!file) {
       setError("Пожалуйста, загрузите файл.");
+      console.warn("Файл не выбран");
       return;
     }
-
     setLoading(true);
     setError("");
     setResult(null);
-
+  
+    console.log("Отправляем файл:", file.name);
+    console.log("Модель:", model);
+  
     const formData = new FormData();
     formData.append("file", file);
     formData.append("model", model);
-
+  
     try {
       const response = await axios.post(
         "http://localhost:8080/api/triton-models/infer",
@@ -68,10 +71,11 @@ const TritonModels = () => {
           },
         }
       );
+      console.log("Успешный ответ от сервера:", response.data);
       setResult(response.data);
     } catch (err) {
+      console.error("Ошибка при выполнении инференса:", err.response?.data || err.message);
       setError("Ошибка при выполнении инференса. Попробуйте снова.");
-      console.error("Ошибка запроса:", err);
     } finally {
       setLoading(false);
     }

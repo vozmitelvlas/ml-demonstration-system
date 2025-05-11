@@ -1,0 +1,7 @@
+fastapi>=0.68,<0.69
+uvicorn>=0.15,<0.16
+librosa>=0.8
+numpy>=1.21,<2.0
+transformers>=4.12,<5.0
+tritonclient[http]>=2.24
+python-multipart >= 0.0.20

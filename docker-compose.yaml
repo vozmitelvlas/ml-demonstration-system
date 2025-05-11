@@ -63,6 +63,22 @@ services:
     command: ["tritonserver", "--model-repository=/models/model_repository"]
     networks:
       - ml-demonstration-net
+  
+  python-wav2vec2:
+    container_name: python-wav2vec2
+    build: ./triton_microservices/python-wav2vec2
+    ports:
+      - "5000:5000"
+    networks:
+      - ml-demonstration-net
+  
+  python-unet:
+    build: ./triton_microservices/python-unet
+    container_name: python-unet
+    ports:
+      - "5100:5100"
+    networks:
+      - ml-demonstration-net
 
 
 volumes:
