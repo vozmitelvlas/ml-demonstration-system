@@ -150,7 +150,7 @@ class AudioProcessor:
             print("Transcription:", self.transcription)
 
             # Шаг 4: Оценка качества
-            #self.evaluate_transcription()
+            self.evaluate_transcription()
 
             # Шаг 5: Визуализация
             self.plot_waveform_and_spectrogram()

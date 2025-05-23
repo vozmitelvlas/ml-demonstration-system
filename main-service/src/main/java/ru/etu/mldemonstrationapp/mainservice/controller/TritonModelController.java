@@ -64,6 +64,10 @@ public class TritonModelController {
             } else if ("unet_signal_processing".equals(modelName)) {
                 log.info("Проверяем модель: {}", modelName);
                 result = inferFromPythonUnet(file);
+                // Если есть изображение — отправляем его
+                if (result.containsKey("image")) {
+                    return ResponseEntity.ok(Map.of("image", result.get("image")));
+                }
             }else {
                 Map<String, Object> inputs = preprocessInput(file, modelName);
                 result = tritonModelService.infer(inputs, modelName);
@@ -154,11 +158,9 @@ public class TritonModelController {
 
     private Map<String, Object> inferFromPythonUnet(MultipartFile file) {
         String pythonServiceUrl = "http://python-unet:5100/unet/infer";
-    
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-    
             MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
             body.add("csv_file", new ByteArrayResource(file.getBytes()) {
                 @Override
@@ -166,11 +168,19 @@ public class TritonModelController {
                     return file.getOriginalFilename();
                 }
             });
-    
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
             ResponseEntity<Map> response = restTemplate.postForEntity(pythonServiceUrl, requestEntity, Map.class);
     
-            return response.getBody();
+            // Получаем ответ
+            Map<String, Object> responseBody = response.getBody();
+    
+            // Проверяем, есть ли изображение
+            if (responseBody != null && responseBody.containsKey("original_signal") && responseBody.containsKey("predicted_signal")) {
+                // Можно сохранить в бд или вернуть клиенту
+                return responseBody;
+            } else {
+                throw new RuntimeException("Ответ не содержит изображений");
+            }
     
         } catch (Exception e) {
             throw new RuntimeException("Ошибка при вызове Python-микросервиса U-Net: " + e.getMessage());

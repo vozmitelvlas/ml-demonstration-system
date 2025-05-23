@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 # Параметры генерации
-num_samples_per_class = 1000  # Количество образцов на каждый класс
+num_samples_per_class = 200  # Количество образцов на каждый класс
 signal_length = 187          # Длина сигнала (временной ряд)
 noise_level = 0.05           # Уровень шума
 classes = ["normal", "atrial_fibrillation", "ventricular_tachycardia"]
@@ -37,6 +37,6 @@ df = pd.DataFrame(data)
 df["label"] = labels
 
 # Сохранение в CSV
-df.to_csv("synthetic_ecg_data.csv", index=False)
+df.to_csv("synthetic_ecg_data_2.csv", index=False)
 
-print("Синтетический датасет успешно создан и сохранён в 'synthetic_ecg_data.csv'")
+print("Синтетический датасет успешно создан и сохранён в 'synthetic_ecg_data_2.csv'")

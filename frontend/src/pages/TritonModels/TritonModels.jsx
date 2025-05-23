@@ -53,14 +53,14 @@ const TritonModels = () => {
     setLoading(true);
     setError("");
     setResult(null);
-  
+
     console.log("Отправляем файл:", file.name);
     console.log("Модель:", model);
-  
+
     const formData = new FormData();
     formData.append("file", file);
     formData.append("model", model);
-  
+
     try {
       const response = await axios.post(
         "http://localhost:8080/api/triton-models/infer",
@@ -84,6 +84,7 @@ const TritonModels = () => {
   return (
     <div className={styles.container}>
       <h2>🧬 Инференс моделей через Triton</h2>
+
       <div className={styles.formGroup}>
         <label htmlFor="model-select">Выберите модель:</label>
         <select
@@ -112,13 +113,38 @@ const TritonModels = () => {
       {error && <p className={styles.error}>{error}</p>}
 
       <button onClick={handleSubmit} disabled={loading}>
-        {loading ? "Выполняется..." : "Выполнить инференс"}
+        {loading ? (
+          <>
+            <span className={styles.spinner}></span>
+            Выполняется...
+          </>
+        ) : (
+          "Выполнить инференс"
+        )}
       </button>
 
+      {/* Результаты инференса */}
       {result && (
         <div className={styles.result}>
           <h3>📊 Результат:</h3>
-          <pre>{JSON.stringify(result, null, 2)}</pre>
+
+          {/* U-Net — график */}
+          {model === "unet_signal_processing" && result.original_signal && result.predicted_signal ? (
+            <div className={styles.graphsContainer}>
+              <div className={styles.graphBox}>
+                <h4>Оригинальный сигнал</h4>
+                <img src={result.original_signal} alt="Оригинальный сигнал" />
+              </div>
+              <div className={styles.graphBox}>
+                <h4>Предсказание U-Net</h4>
+                <img src={result.predicted_signal} alt="Предсказание модели" />
+              </div>
+            </div>
+          ) : model === "wav2vec2" ? (
+            <p><strong>Транскрипция:</strong> {result}</p>
+          ) : (
+            <pre>{JSON.stringify(result, null, 2)}</pre>
+          )}
         </div>
       )}
     </div>
