@@ -1,13 +1,19 @@
 package ru.etu.mldemonstrationapp.mainservice.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-import ru.etu.mldemonstrationapp.mainservice.configuration.TritonProperties;
 
-import java.io.ByteArrayOutputStream;
-import javax.sound.sampled.*;
-import java.io.ByteArrayInputStream;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
+
+import ru.etu.mldemonstrationapp.mainservice.configuration.TritonProperties;
 import java.util.*;
 
 @Slf4j
@@ -42,61 +48,84 @@ public class TritonModelService {
                 .toList();
     }
 
-    // Выполняет инференс
-    public Map<String, Object> infer(Map<String, Object> inputs, String modelName) throws Exception {
-        String modelUrl = tritonProperties.getUrl() + "/" + modelName + "/infer";
-        Map<String, Object> payload = Map.of("inputs", inputs);
+    // Отправляем WAV-файл на Python-микросервис
+    public Map<String, Object> inferFromPythonWav2Vec(MultipartFile file) {
+        String pythonServiceUrl = "http://python-wav2vec2:5000/wav2vec2/infer";
+
         try {
-            @SuppressWarnings("unchecked")
-            Map<String, Object> response = restTemplate.postForObject(modelUrl, payload, Map.class);
-            if (response == null) {
-                throw new Exception("Пустой ответ от сервера");
-            }
-            return response;
+            // Создаем multipart/form-data запрос
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("audio_file", new ByteArrayResource(file.getBytes()) {
+                @Override
+                public String getFilename() {
+                    return file.getOriginalFilename();
+                }
+            });
+
+            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+            ResponseEntity<Map> response = restTemplate.postForEntity(pythonServiceUrl, requestEntity, Map.class);
+
+            return response.getBody();
         } catch (Exception e) {
-            throw new Exception("Ошибка при выполнении инференса: " + e.getMessage());
+            throw new RuntimeException("Ошибка при вызове Python-микросервиса: " + e.getMessage());
         }
     }
 
-    // WAV → float[]
-    public Map<String, Object> processWAV(byte[] wavBytes) throws Exception {
-        ByteArrayInputStream bis = new ByteArrayInputStream(wavBytes);
-        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(bis);
-        AudioFormat sourceFormat = audioInputStream.getFormat();
-
-        AudioFormat targetFormat = new AudioFormat(
-                AudioFormat.Encoding.PCM_SIGNED,
-                16000,
-                16,
-                1,
-                2,
-                16000,
-                false
-        );
-
-        AudioInputStream convertedStream = AudioSystem.getAudioInputStream(targetFormat, audioInputStream);
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        byte[] buffer = new byte[4096];
-        int bytesRead;
-        while ((bytesRead = convertedStream.read(buffer)) != -1) {
-            byteArrayOutputStream.write(buffer, 0, bytesRead);
+    public Map<String, Object> inferFromPythonUnet(MultipartFile file) {
+        String pythonServiceUrl = "http://python-unet:5100/unet/infer";
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("csv_file", new ByteArrayResource(file.getBytes()) {
+                @Override
+                public String getFilename() {
+                    return file.getOriginalFilename();
+                }
+            });
+            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+            ResponseEntity<Map> response = restTemplate.postForEntity(pythonServiceUrl, requestEntity, Map.class);
+    
+            // Получаем ответ
+            Map<String, Object> responseBody = response.getBody();
+    
+            // Проверяем, есть ли изображение
+            if (responseBody != null && responseBody.containsKey("original_signal") && responseBody.containsKey("predicted_signal")) {
+                // Можно сохранить в бд или вернуть клиенту
+                return responseBody;
+            } else {
+                throw new RuntimeException("Ответ не содержит изображений");
+            }
+    
+        } catch (Exception e) {
+            throw new RuntimeException("Ошибка при вызове Python-микросервиса U-Net: " + e.getMessage());
         }
+    }
 
-        byte[] pcmData = byteArrayOutputStream.toByteArray();
-        float[] signal = new float[pcmData.length / 2];
+    public Map<String, Object> inferFromPythonTinyConv(MultipartFile file) {
+        String pythonServiceUrl = "http://python-tinyconv:5200/tinyconv/infer";
 
-        for (int i = 0; i < signal.length; i++) {
-            int low = pcmData[2 * i] & 0xFF;
-            int high = pcmData[2 * i + 1] & 0xFF;
-            short sample = (short) (low | (high << 8));
-            signal[i] = sample / 32768.0f; // [-1.0, 1.0]
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("csv_file", new ByteArrayResource(file.getBytes()) {
+                @Override
+                public String getFilename() {
+                    return file.getOriginalFilename();
+                }
+            });
+
+            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+            ResponseEntity<Map> response = restTemplate.postForEntity(pythonServiceUrl, requestEntity, Map.class);
+
+            return response.getBody();
+        } catch (Exception e) {
+            throw new RuntimeException("Ошибка при вызове Python-микросервиса TinyConv: " + e.getMessage());
         }
-
-        return Map.of(
-                "name", "input",
-                "shape", new int[]{1, signal.length},
-                "datatype", "FP32",
-                "data", signal
-        );
     }
 }

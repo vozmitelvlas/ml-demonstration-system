@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import styles from "./TritonModels.module.css";
 
-const TritonModels = () => {
-  const [model, setModel] = useState("tinycov_model");
+const TritonModelBase = ({ modelType }) => {
   const [file, setFile] = useState(null);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -17,10 +16,12 @@ const TritonModels = () => {
     let isValid = false;
     const fileName = selectedFile.name.toLowerCase();
 
-    if (model === "wav2vec2" && (fileName.endsWith(".wav") || selectedFile.type === "audio/wav")) {
+    if (modelType === "wav2vec2" && (fileName.endsWith(".wav") || selectedFile.type === "audio/wav")) {
       isValid = true;
-    } else if ((model === "unet_signal_processing" || model === "tinycov_model") &&
-        (fileName.endsWith(".csv") || selectedFile.type === "application/csv")) {
+    } else if (
+      (modelType === "unet_signal_processing" || modelType === "tinycov_model") &&
+      (fileName.endsWith(".csv") || selectedFile.type === "application/csv")
+    ) {
       isValid = true;
     }
 
@@ -28,12 +29,11 @@ const TritonModels = () => {
       setFile(selectedFile);
       setError("");
     } else {
-      setError(`Неверный формат файла для модели "${model}". Поддерживаются: ${getFileFormat(model)}.`);
+      setError(`Неверный формат файла для модели "${modelType}". Поддерживаются: ${getFileFormat(modelType)}.`);
       setFile(null);
     }
   };
 
-  // Вспомогательная функция для подсказки форматов
   const getFileFormat = (modelName) => {
     switch (modelName) {
       case "wav2vec2": return ".wav";
@@ -43,7 +43,6 @@ const TritonModels = () => {
     }
   };
 
-  // Отправка на инференс
   const handleSubmit = async () => {
     if (!file) {
       setError("Пожалуйста, загрузите файл.");
@@ -54,12 +53,9 @@ const TritonModels = () => {
     setError("");
     setResult(null);
 
-    console.log("Отправляем файл:", file.name);
-    console.log("Модель:", model);
-
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("model", model);
+    formData.append("model", modelType);
 
     try {
       const response = await axios.post(
@@ -81,31 +77,37 @@ const TritonModels = () => {
     }
   };
 
+  const countClasses = (classNames) => {
+    return classNames.reduce((acc, name) => {
+      acc[name] = (acc[name] || 0) + 1;
+      return acc;
+    }, {});
+  };
+
+  const CLASS_COLORS = {
+    "Нормальный": "#2196f3",
+    "Фибрилляция": "#f44336",
+    "Другая аритмия": "#ff9800",
+    "Шум": "#9e9e9e",
+    "Неопределённый": "#9c27b0"
+  };
+
+  const getClassColor = (className) => {
+    return CLASS_COLORS[className] || "#000";
+  };
+
   return (
     <div className={styles.container}>
-      <h2>🧬 Инференс моделей через Triton</h2>
-
-      <div className={styles.formGroup}>
-        <label htmlFor="model-select">Выберите модель:</label>
-        <select
-          id="model-select"
-          value={model}
-          onChange={(e) => setModel(e.target.value)}
-        >
-          <option value="tinycov_model">TinyConv (классификация)</option>
-          <option value="unet_signal_processing">U-Net (сегментация)</option>
-          <option value="wav2vec2">Wav2Vec2 (ASR - .wav → текст)</option>
-        </select>
-      </div>
+      <h2>🧬 Инференс: {modelType}</h2>
 
       <div className={styles.formGroup}>
         <label htmlFor="file-upload">
-          Загрузите файл ({getFileFormat(model)}):
+          Загрузите файл ({getFileFormat(modelType)}):
         </label>
         <input
           id="file-upload"
           type="file"
-          accept={model === "wav2vec2" ? ".wav" : ".csv"}
+          accept={modelType === "wav2vec2" ? ".wav" : ".csv"}
           onChange={handleFileChange}
         />
       </div>
@@ -123,25 +125,59 @@ const TritonModels = () => {
         )}
       </button>
 
-      {/* Результаты инференса */}
+      {/* Результаты */}
       {result && (
         <div className={styles.result}>
           <h3>📊 Результат:</h3>
 
-          {/* U-Net — график */}
-          {model === "unet_signal_processing" && result.original_signal && result.predicted_signal ? (
+          {modelType === "unet_signal_processing" && result.original_signal && result.predicted_signal ? (
             <div className={styles.graphsContainer}>
               <div className={styles.graphBox}>
-                <h4>Оригинальный сигнал</h4>
-                <img src={result.original_signal} alt="Оригинальный сигнал" />
+                <h4>🔹 Оригинальный сигнал</h4>
+                <img src={result.original_signal} alt="Оригинал" />
               </div>
               <div className={styles.graphBox}>
-                <h4>Предсказание U-Net</h4>
-                <img src={result.predicted_signal} alt="Предсказание модели" />
+                <h4>🔸 Предсказание U-Net</h4>
+                <img src={result.predicted_signal} alt="Предсказание" />
               </div>
             </div>
-          ) : model === "wav2vec2" ? (
+          ) : modelType === "wav2vec2" ? (
             <p><strong>Транскрипция:</strong> {result}</p>
+          ) : modelType === "tinycov_model" && result.predicted_class_names ? (
+            <>
+              <p><strong>Всего сигналов:</strong> {result.total_samples}</p>
+
+              <div className={styles.distribution}>
+                <h3>📊 Распределение классов</h3>
+                <div className={styles.barChart}>
+                  {Object.entries(countClasses(result.predicted_class_names)).map(([name, count], index) => (
+                    <div
+                      key={index}
+                      className={styles.bar}
+                      style={{
+                        flex: count,
+                        backgroundColor: getClassColor(name),
+                      }}
+                      title={`${name}: ${count} сигналов`}
+                    >
+                      {count}
+                    </div>
+                  ))}
+                </div>
+
+                <div className={styles.legend}>
+                  {Array.from(new Set(result.predicted_class_names)).map((className, idx) => (
+                    <div key={idx} className={styles.legendItem}>
+                      <span
+                        className={styles.legendColor}
+                        style={{ backgroundColor: getClassColor(className) }}
+                      ></span>
+                      {className}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
           ) : (
             <pre>{JSON.stringify(result, null, 2)}</pre>
           )}
@@ -151,4 +187,4 @@ const TritonModels = () => {
   );
 };
 
-export default TritonModels;
+export default TritonModelBase;

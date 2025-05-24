@@ -19,7 +19,9 @@ import PasswordReset from "./pages/PasswordRecover/PasswordReset.jsx";
 import {useDispatch, useSelector} from "react-redux";
 import {getUserProfileAction} from "./actions/user-actions.js";
 import {selectUserData, selectUserRoles} from "./selectors/user-selector.js";
-import TritonModels from "./pages/TritonModels/TritonModels.jsx";
+import TinyconvPage from "./pages/TritonModels/TinyconvPage";
+import UnetPage from "./pages/TritonModels/UnetPage";
+import Wav2Vec2Page from "./pages/TritonModels/Wav2Vec2Page";
 
 
 function App() {
@@ -64,7 +66,9 @@ function App() {
 
                     <Route path="/organisations" element={<CatalogOrganisations/>}/>
                     <Route path="/organisations/:orgId/edit" element={<ChangeOrganisation/>}/>
-                    <Route path="/triton" element={<TritonModels />} />
+                    <Route path="/triton/tinyconv" element={<TinyconvPage />} />
+                    <Route path="/triton/unet" element={<UnetPage />} />
+                    <Route path="/triton/wav2vec2" element={<Wav2Vec2Page />} />
                 </Routes>
             </div>
         </div>

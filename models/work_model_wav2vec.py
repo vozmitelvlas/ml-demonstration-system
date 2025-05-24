@@ -101,7 +101,7 @@ class AudioProcessor:
         """Вычисление WER и CER."""
         wer = jiwer.wer(self.reference_text, self.transcription)
         cer = jiwer.cer(self.reference_text, self.transcription)
-        print("\n📊 Оценка качества транскрипции:")
+        print("\nОценка качества транскрипции:")
         print(f"Word Error Rate (WER): {wer:.4f}")
         print(f"Character Error Rate (CER): {cer:.4f}")
         return wer, cer
@@ -159,7 +159,7 @@ class AudioProcessor:
             self.timing_data['total_processing_time'] = total_end_time - total_start_time
 
             # Вывод времени работы
-            print("\n⏱️ Время выполнения этапов:")
+            print("\nВремя выполнения этапов:")
             for step, duration in self.timing_data.items():
                 print(f"- {step}: {duration:.4f} сек.")
 

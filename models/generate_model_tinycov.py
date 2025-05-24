@@ -169,6 +169,10 @@ instance_group [
     print(f"[INFO] Конфиг создан: {config_path}")
     print(f"[INFO] Структура модели готова в папке {model_dir}")
 
+    if os.path.exists(onnx_path):
+        os.remove(onnx_path)
+        print(f"[INFO] Удалён временный файл: {onnx_path}")
+
 
 # ----------------------------
 # 6. Основная часть

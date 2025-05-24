@@ -12,7 +12,7 @@ SIGNAL_LENGTH = 187     # Длина каждого сигнала
 NUM_CLASSES = 5         # Число классов
 AMPLITUDE = 1.0         # Амплитуда пика
 NOISE_LEVEL = 0.2       # Уровень шума
-OUTPUT_DIR = "./signals"  # Папка вывода
+OUTPUT_DIR = "../signals"  # Папка вывода
 CSV_FILENAME = "synthetic_ecg_data_1.csv"
 
 CLASSES = {

@@ -74,7 +74,7 @@ def train_model(model, dataloader, epochs=10, lr=0.001):
             total_loss += loss.item()
 
         print(f"Epoch {epoch+1}/{epochs}, Loss: {total_loss/len(dataloader):.4f}")
-    print("✅ Обучение завершено.")
+    print("Обучение завершено.")
     return model
 
 
@@ -117,7 +117,7 @@ def export_to_onnx(model, dummy_input, onnx_path):
                 "output": {0: "batch_size"}
             }
         )
-    print(f"✅ Модель экспортирована в {onnx_path}")
+    print(f"Модель экспортирована в {onnx_path}")
 
 
 # ----------------------------
@@ -127,13 +127,14 @@ def export_to_onnx(model, dummy_input, onnx_path):
 def create_triton_config(model_name="unet_signal_processing"):
     MODEL_DIR = Path("model_repository") / model_name
     VERSION_DIR = MODEL_DIR / "1"
+    onnx_path = f"{model_name}.onnx"
 
     if MODEL_DIR.exists():
         shutil.rmtree(MODEL_DIR)
     VERSION_DIR.mkdir(parents=True, exist_ok=True)
 
     # Копируем .onnx в нужную папку под названием 'model.onnx'
-    shutil.copy(f"{model_name}.onnx", VERSION_DIR / "model.onnx")
+    shutil.copy(onnx_path, VERSION_DIR / "model.onnx")
 
     config_content = f"""
 name: "{model_name}"
@@ -167,7 +168,9 @@ dynamic_batching {{
     with open(MODEL_DIR / "config.pbtxt", "w") as f:
         f.write(config_content.strip())
 
-    print(f"✅ Конфиг создан по пути: {MODEL_DIR / 'config.pbtxt'}")
+    print(f"Конфиг создан по пути: {MODEL_DIR / 'config.pbtxt'}")
+    os.remove(onnx_path)
+    print(f"Временный файл удален: {onnx_path}")
 
 
 # ----------------------------
@@ -180,20 +183,20 @@ if __name__ == "__main__":
     SIGNAL_LENGTH = 1024
     BATCH_SIZE = 8
 
-    print("🔄 Генерация синтетического датасета...")
+    print("Генерация синтетического датасета...")
     dataloader = generate_dataset(num_samples=1000, signal_length=SIGNAL_LENGTH)
 
-    print("🧠 Инициализация модели...")
+    print("Инициализация модели...")
     model = UNetImproved()
 
-    print("🎓 Обучение модели...")
+    print("Обучение модели...")
     trained_model = train_model(model, dataloader, epochs=EPOCHS)
 
-    print("📤 Экспорт модели в ONNX...")
+    print("Экспорт модели в ONNX...")
     dummy_input = torch.randn(1, 1, SIGNAL_LENGTH)
     export_to_onnx(trained_model, dummy_input, f"{MODEL_NAME}.onnx")
 
-    print("📂 Создание структуры модели для Triton...")
+    print("Создание структуры модели для Triton...")
     create_triton_config(MODEL_NAME)
 
-    print("🎉 Модель обучена, экспортирована и готова к запуску через Triton.")
+    print("Модель обучена, экспортирована и готова к запуску через Triton.")
