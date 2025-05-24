@@ -39,6 +39,7 @@ public class SecurityBeans {
     protected SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         List<RequestMatcher> authenticationIgnoredRequestMatchers = List.of(
                 new AntPathRequestMatcher("/api/auth/**"),
+                new AntPathRequestMatcher("/api/triton-models/**"),
                 new AntPathRequestMatcher("/swagger-ui/*"),
                 new AntPathRequestMatcher("/swagger-ui.html"),
                 new AntPathRequestMatcher("/v3/api-docs/**")
@@ -52,6 +53,7 @@ public class SecurityBeans {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(config -> config
                         .requestMatchers("/swagger-ui/*", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/api/triton-models/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/organizations/*/models").hasRole("ORGANIZATION_HEAD")
                         .requestMatchers("/api/organizations/*/members").hasRole("ORGANIZATION_HEAD")

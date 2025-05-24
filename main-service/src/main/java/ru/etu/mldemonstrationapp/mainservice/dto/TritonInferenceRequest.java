@@ -6,6 +6,8 @@ public class TritonInferenceRequest {
     private String modelName;
     private Map<String, Object> inputs;
 
+    // Геттеры и сеттеры
+
     public String getModelName() {
         return modelName;
     }

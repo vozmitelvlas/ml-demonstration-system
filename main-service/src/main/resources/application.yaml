@@ -69,3 +69,10 @@ inference:
       url: ${MONAI_WORKFLOW_MANAGER_URL}
 
     result-storing-time-minutes: 5
+
+triton:
+  url: http://triton:8000/v2/models
+  known-models:
+    - tinycov_model
+    - unet_signal_processing
+    - wav2vec2
