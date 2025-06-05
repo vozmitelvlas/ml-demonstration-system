@@ -113,6 +113,71 @@ $ docker pull ghcr.io/mmelqin/monai_ai_breast_density_cls_app:1.0
 
 10. Wait for inference result
 
+### Working with Triton Inference Models
+
+Для запуска и работы с моделями машинного обучения через **Triton Inference Server**, выполните следующие шаги:
+
+#### 1. Running the model loading script
+
+Before launching the main application, you need to prepare the models to work with **Triton Inference Server**.
+
+1. Go to the `models` directory and run the script `run.sh `, which exports models in ONNX format and creates the corresponding model repository structure:
+
+```bash
+$ cd models
+$ chmod +x run.sh  # если скрипт не исполняемый
+$ ./run.sh
+```
+
+This script:
+- Exports TinyConv, U-Net and Wav2Vec2 models in ONNX format.
+- Creates the necessary folder structure and configuration files (`config.pbtxt`) for each model.
+- Prepares Triton for their inference.
+
+#### 2. Launching the main container with Triton Inference Server
+
+Go back to the root directory of the project and run the main `docker-compose` to launch the Triton Inference Server:
+
+```bash
+$ cd ..
+$ docker compose up -d --build
+```
+
+This will launch:
+- **Triton Inference Server**
+- The PostgreSQL database
+- Main application (Spring Boot + React)
+
+#### 3. Launching microservices for interaction with Triton
+
+After launching Triton, go to the `triton_microservices` directory and launch microservices that provide preprocessing and postprocessing of data for each model:
+
+```bash
+$ cd triton_microservices
+$ docker compose up -d
+```
+
+#### 4. Logging in and registering models
+
+After successful launch of all components:
+
+1. Open a browser and navigate to.
+
+2. Log in as an administrator:
+ - **Login**: `admin`
+ - **Password**: `password`
+
+3. Go to the administrative panel.
+
+4. When creating a new model, specify one of the following URLs corresponding to the available models:
+ - `http://localhost:5173/triton/wav2vec2`
+ - `http://localhost:5173/triton/unet`
+ - `http://localhost:5173/triton/tinyconv`
+
+5. Select the model type — **Triton Inference Server**.
+
+6. Save the model and grant access to your organization.
+
 ## Test users
 | ROLES                        | LOGIN    | PASSWORD |
 |------------------------------|----------|----------|
