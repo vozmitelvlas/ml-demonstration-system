@@ -1,4 +1,11 @@
 # ML-Demonstration-System
+### [Original repository on GitLab](https://gitlab.com/USERNAME/PROJECT)
+
+# Presentation
+
+Project overview and implementation details:
+
+- [View presentation (PDF)](https://drive.google.com/file/d/1j6Adamp5D8jgwf06fPWKAkzr4uSdLA9v/view?usp=sharing)
 
 ## Requirements
 - Java Development Kit (JDK) version 17+
